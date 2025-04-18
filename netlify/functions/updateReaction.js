@@ -1,29 +1,25 @@
 const fetch = require("node-fetch");
 
-exports.handler = async function (event, context) {
-  const { recordId, field } = JSON.parse(event.body);
-  const airtableToken = process.env.AIRTABLE_TOKEN;
-  const baseId = "appaA8MFWiiWjXwSQ";
-  const tableName = "Letters";
+const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
+const BASE_ID = "appaA8MFWiiWjXwSQ";
+const TABLE_NAME = "Letters";
 
-  const url = `https://api.airtable.com/v0/${baseId}/${tableName}/${recordId}`;
+exports.handler = async function (event) {
+  const method = event.httpMethod;
 
-  const response = await fetch(url, {
-    method: "PATCH",
-    headers: {
-      Authorization: `Bearer ${airtableToken}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      fields: { [field]: 1 }
-    }),
-  });
+  if (method === "GET") {
+    const { list, recordId } = event.queryStringParameters;
 
-  const data = await response.json();
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify(data),
-  };
-};
-
+    // Fetch all letters
+    if (list === "true") {
+      const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`;
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${AIRTABLE_TOKEN}`
+        }
+      });
+      const data = await response.json();
+      return {
+        statusCode: 200,
+        body: JSON.stringify(data)
+      };
