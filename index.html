@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Letters to God Wall</title>
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background-color: #f4f1ed;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+    .letter-preview {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
+      padding: 20px;
+    }
+    .letter-header {
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+    .letter-snippet {
+      margin-bottom: 10px;
+    }
+    .read-more {
+      background-color: #c66b3d;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .reaction-buttons {
+      margin-top: 20px;
+    }
+    .reaction-buttons button {
+      font-size: 1.2rem;
+      margin-right: 10px;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Letters to God Wall</h1>
+  <div id="letters-container">
+    <!-- Letters will be dynamically inserted here -->
+  </div>
+
+  <script>
+    const airtableBaseId = "appaA8MFWiiWjXwSQ";
+    const airtableTableName = "Letters";
+    const airtableToken = "pat5Kze2HeVkqnJAF.fcbaddd01a408d2dd07b8ebede4834b6b28e7629cc3ee1f92e2d630420779d99";
+    const view = "Grid view";
+
+    async function fetchLetters() {
+      const url = `https://api.airtable.com/v0/${airtableBaseId}/${airtableTableName}?view=${view}`;
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${airtableToken}`,
+        },
+      });
+      const data = await response.json();
+      return data.records;
+    }
+
+    function createLetterHTML(record) {
+      const name = record.fields["Display Name"] || "Anonymous";
+      const content = record.fields["Letter Content"] || "";
+      const preview = content.substring(0, 100) + "...";
+      const id = record.id;
+
+      return `
+        <div class="letter-preview" data-id="${id}">
+          <div class="letter-header">${name}</div>
+          <div class="letter-snippet">${preview}</div>
+          <button class="read-more" onclick="incrementViewAndShow('${id}')">Read More</button>
+        </div>
+      `;
+    }
+
+    function incrementViewAndShow(id) {
+      // Add logic here to show full letter, increment View Count, and allow reactions
+      alert("This will show full letter and increment view count for: " + id);
+    }
+
+    async function renderLetters() {
+      const container = document.getElementById("letters-container");
+      const records = await fetchLetters();
+      container.innerHTML = records.map(createLetterHTML).join("");
+    }
+
+    renderLetters();
+  </script>
+</body>
+</html>
