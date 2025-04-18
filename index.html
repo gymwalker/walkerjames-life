@@ -45,26 +45,32 @@
       background: none;
       border: none;
     }
+    .full-letter {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+      display: none;
+    }
   </style>
 </head>
 <body>
   <h1>Letters to God Wall</h1>
-  <div id="letters-container">
-    <!-- Letters will be dynamically inserted here -->
-  </div>
+  <div id="letters-container"></div>
+  <div id="full-letter-view" class="full-letter"></div>
 
   <script>
     const airtableBaseId = "appaA8MFWiiWjXwSQ";
     const airtableTableName = "Letters";
-    const airtableToken = "YOUR_TOKEN_HERE";
+    const netlifyFunctionUrl = "/.netlify/functions/updateReaction";
     const view = "Grid view";
 
     async function fetchLetters() {
       const url = `https://api.airtable.com/v0/${airtableBaseId}/${airtableTableName}?view=${view}`;
       const response = await fetch(url, {
         headers: {
-          Authorization: `Bearer ${airtableToken}`,
-        },
+          Authorization: `Bearer ${"REPLACE_WITH_TEMP_TOKEN_IF_TESTING_LOCALLY"}`
+        }
       });
       const data = await response.json();
       return data.records;
@@ -80,14 +86,62 @@
         <div class="letter-preview" data-id="${id}">
           <div class="letter-header">${name}</div>
           <div class="letter-snippet">${preview}</div>
-          <button class="read-more" onclick="incrementViewAndShow('${id}')">Read More</button>
+          <button class="read-more" onclick="showFullLetter('${id}')">Read More</button>
         </div>
       `;
     }
 
-    function incrementViewAndShow(id) {
-      // Add logic here to show full letter, increment View Count, and allow reactions
-      alert("This will show full letter and increment view count for: " + id);
+    async function incrementViewCount(recordId) {
+      return fetch(netlifyFunctionUrl, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recordId: recordId, field: "View Count" })
+      });
+    }
+
+    function sendReaction(recordId, field) {
+      const key = `reaction_${recordId}_${field}`;
+      if (localStorage.getItem(key)) {
+        alert("You already clicked this reaction.");
+        return;
+      }
+
+      fetch(netlifyFunctionUrl, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recordId, field })
+      }).then(() => {
+        localStorage.setItem(key, true);
+        alert("Thank you for your response.");
+      });
+    }
+
+    async function showFullLetter(recordId) {
+      const url = `https://api.airtable.com/v0/${airtableBaseId}/${airtableTableName}/${recordId}`;
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${"REPLACE_WITH_TEMP_TOKEN_IF_TESTING_LOCALLY"}`
+        }
+      });
+      const record = await response.json();
+      const fullView = document.getElementById("full-letter-view");
+
+      fullView.innerHTML = `
+        <h2>${record.fields["Display Name"] || "Anonymous"}</h2>
+        <p>${record.fields["Letter Content"]}</p>
+        <div class="reaction-buttons">
+          <button onclick="sendReaction('${recordId}', 'Prayer Count')">🙏</button>
+          <button onclick="sendReaction('${recordId}', 'Hearts Count')">❤️</button>
+          <button onclick="sendReaction('${recordId}', 'Broken Hearts Count')">💔</button>
+        </div>
+      `;
+      fullView.style.display = "block";
+
+      // Increment view count only on first load
+      if (!localStorage.getItem(`viewed_${recordId}`)) {
+        await incrementViewCount(recordId);
+        localStorage.setItem(`viewed_${recordId}`, true);
+      }
     }
 
     async function renderLetters() {
