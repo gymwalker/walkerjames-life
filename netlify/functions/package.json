@@ -1,9 +1,0 @@
-{
-  "name": "letters-to-god-wall",
-  "version": "1.0.0",
-  "description": "Secure reactions wall for Letters to God",
-  "main": "index.html",
-  "dependencies": {
-    "node-fetch": "^2.6.7"
-  }
-}
