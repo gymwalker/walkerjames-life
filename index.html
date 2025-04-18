@@ -60,20 +60,14 @@
   <div id="full-letter-view" class="full-letter"></div>
 
   <script>
-    const airtableBaseId = "appaA8MFWiiWjXwSQ";
-    const airtableTableName = "Letters";
+    const fetchLettersUrl = "/.netlify/functions/updateReaction?list=true";
+    const fetchSingleLetterUrl = "/.netlify/functions/updateReaction?recordId=";
     const netlifyFunctionUrl = "/.netlify/functions/updateReaction";
-    const view = "Grid view";
 
     async function fetchLetters() {
-      const url = `https://api.airtable.com/v0/${airtableBaseId}/${airtableTableName}?view=${view}`;
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${"REPLACE_WITH_TEMP_TOKEN_IF_TESTING_LOCALLY"}`
-        }
-      });
+      const response = await fetch(fetchLettersUrl);
       const data = await response.json();
-      return data.records;
+      return data.records || [];
     }
 
     function createLetterHTML(record) {
@@ -117,12 +111,7 @@
     }
 
     async function showFullLetter(recordId) {
-      const url = `https://api.airtable.com/v0/${airtableBaseId}/${airtableTableName}/${recordId}`;
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${"REPLACE_WITH_TEMP_TOKEN_IF_TESTING_LOCALLY"}`
-        }
-      });
+      const response = await fetch(fetchSingleLetterUrl + recordId);
       const record = await response.json();
       const fullView = document.getElementById("full-letter-view");
 
@@ -137,7 +126,6 @@
       `;
       fullView.style.display = "block";
 
-      // Increment view count only on first load
       if (!localStorage.getItem(`viewed_${recordId}`)) {
         await incrementViewCount(recordId);
         localStorage.setItem(`viewed_${recordId}`, true);
