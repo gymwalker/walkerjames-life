@@ -20,8 +20,10 @@
       padding: 20px;
     }
     .letter-header {
+      display: flex;
+      justify-content: space-between;
       font-weight: bold;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       margin-bottom: 10px;
     }
     .letter-snippet {
@@ -79,9 +81,12 @@
       height: 150px;
       margin-top: 10px;
     }
-    #modal-date {
-      font-size: 0.9rem;
-      color: #555;
+    #modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.2rem;
+      font-weight: bold;
       margin-bottom: 10px;
     }
     .custom-alert {
@@ -107,8 +112,10 @@
   <div id="letter-modal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
-      <h2 id="modal-author">Anonymous</h2>
-      <div id="modal-date"></div>
+      <div id="modal-header">
+        <span id="modal-author">Anonymous</span>
+        <span id="modal-date"></span>
+      </div>
       <label for="modal-letter">Letter Content:</label>
       <textarea id="modal-letter" readonly></textarea>
       <label for="modal-response">Moderator Comment:</label>
@@ -140,10 +147,14 @@
       const content = record.fields["Letter Content"] || "";
       const preview = content.substring(0, 100) + "...";
       const id = record.id;
+      const dateText = record.fields["Date Submitted"] ? `Submission Date: ${new Date(record.fields["Date Submitted"]).toLocaleDateString()}` : "";
 
       return `
         <div class="letter-preview" data-id="${id}">
-          <div class="letter-header">${name}</div>
+          <div class="letter-header">
+            <span>${name}</span>
+            <span>${dateText}</span>
+          </div>
           <div class="letter-snippet">${preview}</div>
           <button class="read-more" onclick="showFullLetter('${id}')">Read More</button>
         </div>
@@ -192,7 +203,7 @@
       document.getElementById("modal-author").innerText = record.fields["Display Name"] || "Anonymous";
       document.getElementById("modal-letter").value = record.fields["Letter Content"] || "";
       document.getElementById("modal-response").value = record.fields["Moderator Comment"] || "";
-      document.getElementById("modal-date").innerText = record.fields["Date Submitted"] ? `Submitted on: ${new Date(record.fields["Date Submitted"]).toLocaleDateString()}` : "";
+      document.getElementById("modal-date").innerText = record.fields["Date Submitted"] ? `Submission Date: ${new Date(record.fields["Date Submitted"]).toLocaleDateString()}` : "";
 
       document.getElementById("letter-modal").style.display = "block";
 
