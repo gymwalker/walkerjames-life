@@ -118,19 +118,15 @@
   <div id="letter-modal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
-      <div id="modal-header">
-        <span id="modal-author">Anonymous</span>
-        <span id="modal-date"></span>
+      <div id="modal-header" style="font-weight: normal;">
+        <span id="modal-author">$1</span>
+        <span id="modal-date">$2</span>
       </div>
       <label for="modal-letter">Letter Content:</label>
       <textarea id="modal-letter" readonly></textarea>
       <label for="modal-response">Moderator Comment:</label>
       <textarea id="modal-response" readonly></textarea>
-      <div class="reaction-buttons">
-        <button onclick="sendReactionFromModal('Prayer Count')">🙏</button>
-        <button onclick="sendReactionFromModal('Hearts Count')">❤️</button>
-        <button onclick="sendReactionFromModal('Broken Hearts Count')">💔</button>
-      </div>
+      
       <div class="view-count" id="modal-views"></div>
     </div>
   </div>
@@ -158,9 +154,9 @@
 
       return `
         <div class="letter-preview" data-id="${id}">
-          <div class="letter-header">
-            <span>${name}</span>
-            <span>${dateText}</span>
+          <div class="letter-header" style="font-weight: normal;">
+            <span>$1</span>
+            <span>$2</span>
           </div>
           <div class="letter-snippet">${preview}</div>
           <button class="read-more" onclick="showFullLetter('${id}')">Read More</button>
