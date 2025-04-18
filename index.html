@@ -118,7 +118,7 @@
   <div id="letter-modal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
-      <div id="modal-header" style="font-weight: normal;">
+      <div id="modal-header" style="font-family: 'Open Sans', sans-serif; font-weight: normal;">
         <span id="modal-author">$1</span>
         <span id="modal-date">$2</span>
       </div>
@@ -154,9 +154,9 @@
 
       return `
         <div class="letter-preview" data-id="${id}">
-          <div class="letter-header" style="font-weight: normal;">
-            <span>$1</span>
-            <span>$2</span>
+          <div class="letter-header">
+            <span style="font-weight: bold;">${name}</span>
+            <span style="font-weight: normal;">${dateText}</span>
           </div>
           <div class="letter-snippet">${preview}</div>
           <button class="read-more" onclick="showFullLetter('${id}')">Read More</button>
