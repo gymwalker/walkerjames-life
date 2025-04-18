@@ -135,7 +135,8 @@
 
   <script>
     function formatDate(dateStr) {
-  return dateStr;
+  const [year, month, day] = dateStr.split('-');
+  return `${month}/${day}/${year}`;
 }
     const fetchLettersUrl = "/.netlify/functions/updateReaction?list=true";
     const fetchSingleLetterUrl = "/.netlify/functions/updateReaction?recordId=";
