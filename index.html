@@ -37,6 +37,7 @@
     }
     .reaction-buttons {
       margin-top: 20px;
+      text-align: center;
     }
     .reaction-buttons button {
       font-size: 1.2rem;
@@ -58,7 +59,10 @@
     }
     .modal-content {
       background-color: #fff;
-      margin: 10% auto;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       padding: 20px;
       border-radius: 12px;
       width: 80%;
@@ -76,6 +80,11 @@
       height: 150px;
       margin-top: 10px;
     }
+    #modal-date {
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
@@ -86,6 +95,7 @@
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
       <h2 id="modal-author">Anonymous</h2>
+      <div id="modal-date"></div>
       <label for="modal-letter">Letter Content:</label>
       <textarea id="modal-letter" readonly></textarea>
       <label for="modal-response">Moderator Response:</label>
@@ -148,7 +158,7 @@
         body: JSON.stringify({ recordId: currentRecordId, field })
       }).then(() => {
         localStorage.setItem(key, true);
-        alert("Thank you for your response.");
+        alert("Thank you for your response. Your encouragement has been shared on WalkerJames.Life/LettersToGod.");
       });
     }
 
@@ -160,6 +170,7 @@
       document.getElementById("modal-author").innerText = record.fields["Display Name"] || "Anonymous";
       document.getElementById("modal-letter").value = record.fields["Letter Content"] || "";
       document.getElementById("modal-response").value = record.fields["Moderator Response"] || "";
+      document.getElementById("modal-date").innerText = record.fields["Date Submitted"] ? `Submitted on: ${new Date(record.fields["Date Submitted"]).toLocaleDateString()}` : "";
 
       document.getElementById("letter-modal").style.display = "block";
 
