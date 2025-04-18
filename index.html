@@ -134,6 +134,10 @@
   <div id="custom-alert" class="custom-alert"></div>
 
   <script>
+    function formatDate(dateStr) {
+      const date = new Date(dateStr + 'T00:00:00Z');
+      return date.toLocaleDateString();
+    }
     const fetchLettersUrl = "/.netlify/functions/updateReaction?list=true";
     const fetchSingleLetterUrl = "/.netlify/functions/updateReaction?recordId=";
     const netlifyFunctionUrl = "/.netlify/functions/updateReaction";
@@ -150,7 +154,7 @@
       const content = record.fields["Letter Content"] || "";
       const preview = content.substring(0, 100) + "...";
       const id = record.id;
-      const dateText = record.fields["Submission Date"] ? `Submission Date: ${new Date(record.fields["Submission Date"]).toLocaleDateString()}` : "";
+      const dateText = record.fields["Submission Date"] ? `Submission Date: ${formatDate(record.fields["Submission Date"])} ` : "";
 
       return `
         <div class="letter-preview" data-id="${id}">
@@ -206,7 +210,7 @@
       document.getElementById("modal-author").innerText = record.fields["Display Name"] || "Anonymous";
       document.getElementById("modal-letter").value = record.fields["Letter Content"] || "";
       document.getElementById("modal-response").value = record.fields["Moderator Comments"] || "";
-      document.getElementById("modal-date").innerText = record.fields["Submission Date"] ? `Submission Date: ${new Date(record.fields["Submission Date"]).toLocaleDateString()}` : "";
+      document.getElementById("modal-date").innerText = record.fields["Submission Date"] ? `Submission Date: ${formatDate(record.fields["Submission Date"])} ` : "";
       document.getElementById("modal-views").innerText = record.fields["View Count"] ? `Views: ${record.fields["View Count"]}` : "Views: 0";
       document.getElementById("modal-views").innerHTML += `<br>🙏 ${record.fields['Prayer Count'] || 0} ❤️ ${record.fields['Hearts Count'] || 0} 💔 ${record.fields['Broken Hearts Count'] || 0}`;
 
