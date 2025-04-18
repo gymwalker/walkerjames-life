@@ -135,9 +135,8 @@
 
   <script>
     function formatDate(dateStr) {
-      const date = new Date(dateStr + 'T00:00:00Z');
-      return date.toLocaleDateString();
-    }
+  return dateStr;
+}
     const fetchLettersUrl = "/.netlify/functions/updateReaction?list=true";
     const fetchSingleLetterUrl = "/.netlify/functions/updateReaction?recordId=";
     const netlifyFunctionUrl = "/.netlify/functions/updateReaction";
