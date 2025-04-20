@@ -22,11 +22,9 @@
     .letter-header {
       display: flex;
       justify-content: space-between;
+      font-weight: bold;
       font-size: 1.1rem;
       margin-bottom: 10px;
-    }
-    .letter-header span:first-child {
-      font-weight: bold;
     }
     .letter-snippet {
       margin-bottom: 10px;
@@ -72,6 +70,18 @@
       margin-top: 10px;
       font-weight: bold;
     }
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .input-row label {
+      flex: 1;
+    }
+    .input-row input,
+    .input-row select {
+      flex: 1;
+    }
     textarea, select, input[type="text"] {
       width: 95%;
       margin-top: 5px;
@@ -98,134 +108,64 @@
       <span class="close" onclick="closeModal()">&times;</span>
       <h3 id="modal-author"></h3>
       <p id="modal-date"></p>
+
       <label for="modal-letter">Letter Content:</label>
       <textarea id="modal-letter" readonly></textarea>
 
-      <label for="first-name">First Name:</label>
-      <input type="text" id="first-name" readonly />
-      <label for="last-name">Last Name:</label>
-      <input type="text" id="last-name" readonly />
+      <div class="input-row">
+        <div>
+          <label for="first-name">First Name:</label>
+          <input type="text" id="first-name" readonly />
+        </div>
+        <div>
+          <label for="last-name">Last Name:</label>
+          <input type="text" id="last-name" readonly />
+        </div>
+        <div>
+          <label for="display-name">Display Name:</label>
+          <input type="text" id="display-name" readonly />
+        </div>
+      </div>
+
       <label for="email">Email:</label>
       <input type="text" id="email" readonly />
-      <label for="display-name">Display Name:</label>
-      <input type="text" id="display-name" readonly />
-      <label for="share-publicly">Share Publicly:</label>
-      <input type="text" id="share-publicly" readonly />
-      <label for="can-respond">Can Respond:</label>
-      <input type="text" id="can-respond" readonly />
 
-      <label for="approval-status">Approval Status:</label>
-      <select id="approval-status">
-        <option value="Pending">Pending</option>
-        <option value="Approved">Approved</option>
-        <option value="Rejected">Rejected</option>
-        <option value="Private">Private</option>
-      </select>
+      <div class="input-row">
+        <div>
+          <label for="share-publicly">Share Publicly:</label>
+          <input type="text" id="share-publicly" readonly />
+        </div>
+        <div>
+          <label for="can-respond">Can Respond:</label>
+          <input type="text" id="can-respond" readonly />
+        </div>
+      </div>
 
       <label for="moderator-comments">Moderator Comments:</label>
       <textarea id="moderator-comments"></textarea>
 
-      <label for="visibility">Visibility:</label>
-      <select id="visibility">
-        <option value="Public">Public</option>
-        <option value="Private">Private</option>
-        <option value="Under Review">Under Review</option>
-      </select>
+      <div class="input-row">
+        <div>
+          <label for="approval-status">Approval Status:</label>
+          <select id="approval-status">
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+            <option value="Private">Private</option>
+          </select>
+        </div>
+        <div>
+          <label for="visibility">Visibility:</label>
+          <select id="visibility">
+            <option value="Public">Public</option>
+            <option value="Private">Private</option>
+            <option value="Under Review">Under Review</option>
+          </select>
+        </div>
+      </div>
 
       <button id="save-button" onclick="saveChanges()">Save Changes</button>
     </div>
   </div>
-
-  <script>
-    const fetchUrl = "/.netlify/functions/updateReaction?list=true";
-    const detailUrl = "/.netlify/functions/updateReaction?recordId=";
-    const updateUrl = "/.netlify/functions/updateReaction";
-    let currentRecord = null;
-
-    function formatDate(dateStr) {
-      const [year, month, day] = dateStr.split('-');
-      return `${month}/${day}/${year}`;
-    }
-
-    async function fetchPendingLetters() {
-      const response = await fetch(fetchUrl);
-      const data = await response.json();
-      return (data.records || []).filter(rec => rec.fields["Approval Status"] === "Pending");
-    }
-
-    function createLetterHTML(record) {
-      const name = record.fields["Display Name"] || "Anonymous";
-      const content = record.fields["Letter Content"] || "";
-      const preview = content.substring(0, 100) + "...";
-      const id = record.id;
-
-      return `
-        <div class="letter-preview" data-id="${id}">
-          <div class="letter-header">
-            <span>${name} (${id})</span>
-            <span>${record.fields["Submission Date"] ? formatDate(record.fields["Submission Date"]) : ""}</span>
-          </div>
-          <div class="letter-snippet">${preview}</div>
-          <button class="review-button" onclick="reviewLetter('${id}')">Review</button>
-        </div>
-      `;
-    }
-
-    async function reviewLetter(id) {
-      const response = await fetch(detailUrl + id);
-      const record = await response.json();
-      currentRecord = record;
-
-      const fields = record.fields;
-      document.getElementById("modal-author").innerText = `${fields["Display Name"] || "Anonymous"} (${id})`;
-      document.getElementById("modal-date").innerText = `Submitted: ${fields["Submission Date"] ? formatDate(fields["Submission Date"]) : ""}`;
-      document.getElementById("modal-letter").value = fields["Letter Content"] || "";
-      document.getElementById("approval-status").value = fields["Approval Status"] || "Pending";
-      document.getElementById("moderator-comments").value = fields["Moderator Comments"] || "";
-      document.getElementById("visibility").value = fields["Visibility"] || "Public";
-      document.getElementById("first-name").value = fields["First Name"] || "";
-      document.getElementById("last-name").value = fields["Last Name"] || "";
-      document.getElementById("email").value = fields["Email"] || "";
-      document.getElementById("display-name").value = fields["Display Name"] || "";
-      document.getElementById("share-publicly").value = fields["Share Publicly"] || "";
-      document.getElementById("can-respond").value = fields["Can Respond"] || "";
-
-      document.getElementById("letter-modal").style.display = "block";
-    }
-
-    async function saveChanges() {
-      const updatedFields = {
-        "Approval Status": document.getElementById("approval-status").value,
-        "Moderator Comments": document.getElementById("moderator-comments").value,
-        "Visibility": document.getElementById("visibility").value
-      };
-
-      await fetch(updateUrl, {
-        method: "PATCH",
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          recordId: currentRecord.id,
-          fields: updatedFields
-        })
-      });
-
-      closeModal();
-      renderLetters();
-    }
-
-    function closeModal() {
-      document.getElementById("letter-modal").style.display = "none";
-    }
-
-    async function renderLetters() {
-      const container = document.getElementById("letters-container");
-      const records = await fetchPendingLetters();
-      container.innerHTML = records.map(createLetterHTML).join("");
-    }
-
-    renderLetters();
-  </script>
 </body>
 </html>
