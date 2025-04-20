@@ -212,7 +212,7 @@
       document.getElementById("modal-response").value = record.fields["Moderator Comments"] || "";
       document.getElementById("modal-date").innerText = record.fields["Submission Date"] ? `Submission Date: ${formatDate(record.fields["Submission Date"])} ` : "";
       document.getElementById("modal-views").innerText = record.fields["View Count"] ? `Views: ${record.fields["View Count"]}` : "Views: 0";
-      document.getElementById("modal-views").innerHTML += `<br>🙏 ${record.fields['Prayer Count'] || 0} ❤️ ${record.fields['Hearts Count'] || 0} 💔 ${record.fields['Broken Hearts Count'] || 0}`;
+      document.getElementById("modal-views").innerHTML += `<br>Praying: 🙏 ${record.fields['Prayer Count'] || 0} <br>Love: ❤️ ${record.fields['Hearts Count'] || 0} <br>Feel your pain: 💔 ${record.fields['Broken Hearts Count'] || 0}`;
 
       document.getElementById("letter-modal").style.display = "block";
 
