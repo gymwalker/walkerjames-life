@@ -22,9 +22,11 @@
     .letter-header {
       display: flex;
       justify-content: space-between;
-      font-weight: bold;
       font-size: 1.1rem;
       margin-bottom: 10px;
+    }
+    .letter-header span:first-child {
+      font-weight: bold;
     }
     .letter-snippet {
       margin-bottom: 10px;
@@ -51,7 +53,7 @@
     .modal-content {
       background-color: #fff;
       position: relative;
-      top: 150px;
+      top: 100px;
       margin: 0 auto;
       padding: 20px;
       border-radius: 12px;
@@ -70,8 +72,8 @@
       margin-top: 10px;
       font-weight: bold;
     }
-    textarea, select {
-      width: 100%;
+    textarea, select, input[type="text"] {
+      width: 95%;
       margin-top: 5px;
       padding: 10px;
       font-family: 'Open Sans', sans-serif;
@@ -98,19 +100,38 @@
       <p id="modal-date"></p>
       <label for="modal-letter">Letter Content:</label>
       <textarea id="modal-letter" readonly></textarea>
+
+      <label for="first-name">First Name:</label>
+      <input type="text" id="first-name" readonly />
+      <label for="last-name">Last Name:</label>
+      <input type="text" id="last-name" readonly />
+      <label for="email">Email:</label>
+      <input type="text" id="email" readonly />
+      <label for="display-name">Display Name:</label>
+      <input type="text" id="display-name" readonly />
+      <label for="share-publicly">Share Publicly:</label>
+      <input type="text" id="share-publicly" readonly />
+      <label for="can-respond">Can Respond:</label>
+      <input type="text" id="can-respond" readonly />
+
       <label for="approval-status">Approval Status:</label>
       <select id="approval-status">
         <option value="Pending">Pending</option>
         <option value="Approved">Approved</option>
         <option value="Rejected">Rejected</option>
+        <option value="Private">Private</option>
       </select>
+
       <label for="moderator-comments">Moderator Comments:</label>
       <textarea id="moderator-comments"></textarea>
+
       <label for="visibility">Visibility:</label>
       <select id="visibility">
         <option value="Public">Public</option>
         <option value="Private">Private</option>
+        <option value="Under Review">Under Review</option>
       </select>
+
       <button id="save-button" onclick="saveChanges()">Save Changes</button>
     </div>
   </div>
@@ -120,6 +141,11 @@
     const detailUrl = "/.netlify/functions/updateReaction?recordId=";
     const updateUrl = "/.netlify/functions/updateReaction";
     let currentRecord = null;
+
+    function formatDate(dateStr) {
+      const [year, month, day] = dateStr.split('-');
+      return `${month}/${day}/${year}`;
+    }
 
     async function fetchPendingLetters() {
       const response = await fetch(fetchUrl);
@@ -136,8 +162,8 @@
       return `
         <div class="letter-preview" data-id="${id}">
           <div class="letter-header">
-            <span>${name}</span>
-            <span>${record.fields["Submission Date"] || ""}</span>
+            <span>${name} (${id})</span>
+            <span>${record.fields["Submission Date"] ? formatDate(record.fields["Submission Date"]) : ""}</span>
           </div>
           <div class="letter-snippet">${preview}</div>
           <button class="review-button" onclick="reviewLetter('${id}')">Review</button>
@@ -150,12 +176,19 @@
       const record = await response.json();
       currentRecord = record;
 
-      document.getElementById("modal-author").innerText = record.fields["Display Name"] || "Anonymous";
-      document.getElementById("modal-date").innerText = `Submitted: ${record.fields["Submission Date"] || ""}`;
-      document.getElementById("modal-letter").value = record.fields["Letter Content"] || "";
-      document.getElementById("approval-status").value = record.fields["Approval Status"] || "Pending";
-      document.getElementById("moderator-comments").value = record.fields["Moderator Comments"] || "";
-      document.getElementById("visibility").value = record.fields["Visibility"] || "Public";
+      const fields = record.fields;
+      document.getElementById("modal-author").innerText = `${fields["Display Name"] || "Anonymous"} (${id})`;
+      document.getElementById("modal-date").innerText = `Submitted: ${fields["Submission Date"] ? formatDate(fields["Submission Date"]) : ""}`;
+      document.getElementById("modal-letter").value = fields["Letter Content"] || "";
+      document.getElementById("approval-status").value = fields["Approval Status"] || "Pending";
+      document.getElementById("moderator-comments").value = fields["Moderator Comments"] || "";
+      document.getElementById("visibility").value = fields["Visibility"] || "Public";
+      document.getElementById("first-name").value = fields["First Name"] || "";
+      document.getElementById("last-name").value = fields["Last Name"] || "";
+      document.getElementById("email").value = fields["Email"] || "";
+      document.getElementById("display-name").value = fields["Display Name"] || "";
+      document.getElementById("share-publicly").value = fields["Share Publicly"] || "";
+      document.getElementById("can-respond").value = fields["Can Respond"] || "";
 
       document.getElementById("letter-modal").style.display = "block";
     }
