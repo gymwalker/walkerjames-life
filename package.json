@@ -1,10 +1,13 @@
 {
-  "name": "letters-to-god-wall",
+  "name": "ltg-netlify-functions",
   "version": "1.0.0",
-  "type": "commonjs",
-  "dependencies": {
-    "node-fetch": "^2.6.7"
+  "description": "Netlify functions for Letters to God",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "echo 'No build step required'"
+  },
   "dependencies": {
     "airtable": "^0.11.6"
-}
+  }
 }
