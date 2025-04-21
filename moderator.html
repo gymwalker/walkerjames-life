@@ -189,6 +189,7 @@
       const content = record.fields["Letter Content"] || "";
       const preview = content.substring(0, 100) + "...";
       const id = record.id;
+      const letterId = record.fields["Letter ID"] || id;
 
       return `
         <div class="letter-preview" data-id="${id}">
@@ -208,7 +209,7 @@
       currentRecord = record;
 
       const fields = record.fields;
-      document.getElementById("modal-author").innerText = `${fields["Display Name"] || "Anonymous"} (${id})`;
+      document.getElementById("modal-author").innerText = `${fields["Display Name"] || "Anonymous"} (${fields["Letter ID"] || id})`;
       document.getElementById("modal-date").innerText = `Submitted: ${fields["Submission Date"] ? formatDate(fields["Submission Date"]) : ""}`;
       document.getElementById("modal-letter").value = fields["Letter Content"] || "";
       document.getElementById("approval-status").value = fields["Approval Status"] || "Pending";
