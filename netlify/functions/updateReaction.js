@@ -1,91 +1,61 @@
-const fetch = require("node-fetch");
+// Netlify Function: updateReaction.js
+const Airtable = require("airtable");
 
-const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
-const BASE_ID = "appaA8MFWiiWjXwSQ";
-const TABLE_NAME = "Letters";
+const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base("appaA8MFWiiWjXwSQ");
+const tableName = "Letters";
 
-exports.handler = async function (event) {
-  const method = event.httpMethod;
+exports.handler = async (event) => {
+  const headers = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "GET,POST,PATCH,OPTIONS"
+  };
+
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 200, headers, body: "" };
+  }
 
   try {
-    if (method === "GET") {
-      const { list, recordId } = event.queryStringParameters;
-
-      if (list === "true") {
-        const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`;
-        const response = await fetch(url, {
-          headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
-        });
-        const data = await response.json();
-        return {
-          statusCode: 200,
-          body: JSON.stringify(data)
-        };
-      }
-
-      if (recordId) {
-        const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}/${recordId}`;
-        const response = await fetch(url, {
-          headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
-        });
-        const data = await response.json();
-        return {
-          statusCode: 200,
-          body: JSON.stringify(data)
-        };
-      }
-
+    // List all records
+    if (event.httpMethod === "GET" && event.queryStringParameters.list === "true") {
+      const records = await base(tableName).select({}).all();
       return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Missing 'list' or 'recordId' parameter." })
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ records: records.map((r) => ({ id: r.id, fields: r.fields })) })
       };
     }
 
-    if (method === "POST") {
-      const { recordId, field } = JSON.parse(event.body);
-
-      if (!recordId || !field) {
-        return {
-          statusCode: 400,
-          body: JSON.stringify({ error: "Missing recordId or field." })
-        };
-      }
-
-      // Get current field value
-      const getUrl = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}/${recordId}`;
-      const getResponse = await fetch(getUrl, {
-        headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
-      });
-      const record = await getResponse.json();
-      const currentValue = record.fields[field] || 0;
-
-      // Patch +1 to the field
-      const patchUrl = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}/${recordId}`;
-      const patchResponse = await fetch(patchUrl, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${AIRTABLE_TOKEN}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          fields: { [field]: currentValue + 1 }
-        })
-      });
-
-      const result = await patchResponse.json();
+    // Get a specific record
+    if (event.httpMethod === "GET" && event.queryStringParameters.recordId) {
+      const record = await base(tableName).find(event.queryStringParameters.recordId);
       return {
         statusCode: 200,
-        body: JSON.stringify(result)
+        headers,
+        body: JSON.stringify({ id: record.id, fields: record.fields })
+      };
+    }
+
+    // Update a record
+    if (event.httpMethod === "PATCH") {
+      const { recordId, fields } = JSON.parse(event.body);
+      const updated = await base(tableName).update(recordId, fields);
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ id: updated.id, fields: updated.fields })
       };
     }
 
     return {
       statusCode: 405,
+      headers,
       body: JSON.stringify({ error: "Method Not Allowed" })
     };
   } catch (err) {
     return {
       statusCode: 500,
+      headers,
       body: JSON.stringify({ error: err.message })
     };
   }
