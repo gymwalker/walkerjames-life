@@ -194,7 +194,7 @@
       return `
         <div class="letter-preview" data-id="${id}">
           <div class="letter-header">
-            <span>${name} (${id})</span>
+            <span>${name} (${letterId})</span>
             <span>${record.fields["Submission Date"] ? formatDate(record.fields["Submission Date"]) : ""}</span>
           </div>
           <div class="letter-snippet">${preview}</div>
@@ -232,7 +232,7 @@
         "Visibility": document.getElementById("visibility").value
       };
 
-      await fetch(updateUrl, {
+      const response = await fetch(updateUrl, {
         method: "PATCH",
         headers: {
           'Content-Type': 'application/json'
@@ -244,6 +244,8 @@
       });
 
       closeModal();
+      const result = await response.json();
+      console.log("Update response:", result);
       renderLetters();
     }
 
