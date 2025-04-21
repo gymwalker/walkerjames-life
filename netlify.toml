@@ -1,19 +1,14 @@
 [build]
-  publish = "/"
   functions = "netlify/functions"
-  command = ""
 
 [functions]
   node_bundler = "esbuild"
 
-[build]
-  functions = "netlify/functions"
-
 [[plugins]]
   package = "@netlify/plugin-functions-install-core"
 
-[build.environment]
-  AIRTABLE_TOKEN = "pattF9yPGTxfq5DLR.f763d6dc73591e6349ea219103986063700a58a4c1ac705bd7d086cc1bd19e95"
-
 [functions."updateReaction"]
   external_node_modules = ["airtable"]
+
+[build.environment]
+  AIRTABLE_TOKEN = ""
