@@ -3,7 +3,7 @@ exports.handler = async (event) => {
   const templateUrl = "https://lovely-malabi-0895dc.netlify.app/templates/email/letter_approved.html";
 
   // Sample data for testing – you can replace this later with dynamic input
-  const name = "Walker James";
+  const name = event.queryStringParameters.name || "Friend";
   const letter = "Thank you for reading my letter. I’m so grateful for the opportunity to share.";
   const moderatorComment = "This letter was beautiful. It deeply touched our review team.";
   const publicUrl = "https://walkerjames.life/letters/view/123";
