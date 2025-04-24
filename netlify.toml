@@ -10,5 +10,8 @@
 [functions."updateReaction"]
   external_node_modules = ["airtable"]
 
+[functions."LetterApproved"]
+node_bundler = "esbuild"
+
 [build.environment]
   AIRTABLE_TOKEN = ""
