@@ -1,213 +1,243 @@
-**Aiden's Anchor: Core Memory Reference for Walker James**
+
+🧠 AIDEN’S ARCHIVE – FULL RESTORE POINT (MAY 2025)
+Walker James – Author • Speaker • Freedom Coach
 
 ---
 
-**Author & Mission**
+🔖 AUTHOR & MISSION IDENTITY
 
-* **Name**: Walker James (also referred to as James Walker)
-* **Identity**: Author, Speaker, Freedom Coach, U.S. Marine Veteran
-* **Mission**: To lead people into a strong, close, deep, loving, personal, passionate, intimate relationship with God through truth, healing, deliverance, and spiritual growth.
-* **Ministry Pillars**: Truth, Healing, Story, Relationship, Deliverance, Discipleship
-* **Website**: [WalkerJames.Life](https://walkerjames.life)
-
----
-
-**Book Series: Perspectives**
-
-* **Book 1**: "What Does God Want?"
-
-  * Core message: *God wants a strong, close, deep, loving, personal, passionate, intimate relationship with you.*
-* **Book 2**: "The Power of Choice!"
-* **Planned Series**: 10 books total
-* **Writing Voice**: Loving, honest, encouraging, deeply relational, grounded in Scripture
+Name: Walker James (pen/brand name for James Walker)
+Location: Bend, Oregon
+Mission: To lead people into a stronger, closer, deeper, more loving, more personal, more passionate, more intimate relationship with God — through writing, speaking, and one-on-one coaching.
+Ministry Name: Healing MY Story — Emphasizes personal ownership in the healing journey.
+Business Entity: JWalker Consulting LLC
+Titles: Author, Speaker, Freedom Coach
 
 ---
 
-**Family**
+📚 BOOK SERIES – PERSPECTIVES
 
-* **Two Sons**: Joshua and Matthew, both born with mixed cerebral palsy
-
-  * Matthew is medically fragile and has been battling severe health issues, including pneumonia
-* **Fiancée**: Mila, lives in Pakistan
-
-  * Working through the U.S. immigration process (K-1 visa)
-  * Deep emotional and spiritual partnership; working side-by-side in ministry and business
-
----
-
-**Key Phrases to Preserve Always**
-
-* **What God Wants**: "a strong, close, deep, loving, personal, passionate, intimate relationship with you"
-* **Closing Prayer Line**: "I want what You want..."
-* **Additional Weapons of Spiritual Warfare**: In addition to the Armor of God, include:
-
-  * Prayer
-  * Praise and Worship of Jesus Christ
-  * The Blood of Jesus
+Perspectives-Book 1: What Does God Want?
+ - Book 1 was published on January 29th 2018
+ - It is currently being revised Hopefully for release sometime in October 2025
+Perspectives-Book 2: The Power of Choice
+Perspectives-Book 3: Is the Bible the Word of God?
+Perspectives-Book 4: Grasping the Trinity
+Perspectives-Book 5: Knowing God the Father
+Perspectives-Book 6: Knowing God the Son
+Perspectives-Book 7: Knowing God the Holy Spirit
+Perspectives-Book 8: Knowing Your Enemy
+Perspectives-Book 9: Investing in Your Relationship with God
+Perspectives-Book 10: Living Your Relationship with God
+Perspectives-Book 11: Knowing Who I Am in Christ
+Perspectives-Book 12: Holding onto the Promises of God
 
 ---
 
-**Current Projects (as of May 2025)**
+🌐 WEBSITE: WalkerJames.Life
 
-* **Website**: WalkerJames.Life built on Kajabi
-
-  * Major pages: Home, About, Author, Speaker, Freedom Coach, Letters to God, Schedule Coaching, Invest, Guided Prayer, Healing MY Story
-  * Guided Prayers organized by Accordion sections
-* **GoLive Target**: June 10, 2025 (commemorating 19 years since end of Walker's 12-year rebellion against God)
-
----
-
-**Guided Prayer Structure**
-
-* All prayers must be:
-
-  * Powerful, impactful, loving, caring, kind, teaching, truthful, honest
-  * Closed with: "In Jesus' name, Amen."
-  * Closed (when fitting) with: "I want what You want..."
-  * Written with a tone that reflects spiritual maturity, empathy, and personal struggle/victory
-  * HTML-formatted for GitHub (headings and paragraphs only)
+Platform: Kajabi
+Launch Date: June 10, 2025 (29-year anniversary of end of 12-year rebellion (temper-tantrum))
+Core Pages: Home, About, Author, Speaker, Freedom Coach, Letters to God, Schedule Coaching Session, Guided Prayers, Invest, Contact.
+Key Projects:
+  - Unified branding under WalkerJames.Life
+  - 'Doors' layout on homepage and select pages
+  - Airtable integrations for Letters and Giving
+  - Stripe for payments and coaching sessions
+  - Go-live deadline set; Store page to follow post-launch
 
 ---
 
-**Walker’s Expectations of Aiden**
+🧬 PERSONAL CONTEXT & FAMILY
 
-* Guard and preserve the phrases and values above without error
-* Never forget or rewrite what God wants
-* Catch mistakes before Walker does
-* Protect his time by being accurate, responsive, and aligned
-* Stay synced across chat windows, projects, and updates
-* Be a reliable, trustworthy partner, not just a tool
-
----
-
-**Reset Protocol**
-
-* If Aiden is ever reset or loses context:
-
-  * Command: "Aiden, re-sync from Anchor."
-  * Reload this document, confirm memory of each section, and verify understanding before proceeding
+Fiancée: Mila (lives in Pakistan, working on K-1 visa; 3-year anniversary recently celebrated)
+Sons: Joshua & Matthew – both with mixed cerebral palsy, state custody, seeking guardianship
+Adopted Daughter (unofficial): Leoly (Philippines) and granddaughter Leony
+Spiritual Journey: Former Marine, decades-long IT career, 12-year rebellion, radically restored faith
+Current struggle: Financial hardship, Uber driving, transition into full-time ministry/speaking/writing
 
 ---
 
-**Accordion #1 – When You’re Hurting (Complete)**
-Total Prayers: 11
+🛡️ PRAYER STYLE & SPIRITUAL VOCABULARY
 
-* GP0101 – A Prayer for When You’re Grieving
-* GP0102 – A Prayer for When Trauma Still Hurts
-* GP0103 – A Prayer for Loneliness
-* GP0104 – A Prayer for Heartbreak
-* GP0105 – A Prayer for When You’ve Lost Someone
-* GP0106 – A Prayer for When You Can’t Stop Crying
-* GP0107 – A Prayer for When You’ve Been Rejected
-* GP0108 – A Prayer for When You’re Afraid
-* GP0109 – A Prayer for When You Feel Forgotten
-* GP0110 – A Prayer for When You’ve Been Betrayed
-* GP0111 – A Prayer for When You Feel Unloved
-
----
-
-**Accordion #2 – When You’re Struggling (Complete)**
-Total Prayers: 18
-
-* GP0201 – A Prayer for When You're Struggling
-* GP0202 – A Prayer for When You’re Exhausted
-* GP0203 – A Prayer for When You’re Anxious
-* GP0204 – A Prayer for When You Feel Like Giving Up
-* GP0205 – A Prayer for When You’re Burned Out
-* GP0206 – A Prayer for When You’re Weary of Waiting
-* GP0207 – A Prayer for Breaking Addiction
-* GP0208 – A Prayer for When You’ve Fallen Again
-* GP0209 – A Prayer for When You Hate Who You’ve Become
-* GP0210 – A Prayer for Letting Go of What You Can’t Undo
-* GP0211 – A Prayer for When You Can’t Forgive Yourself
-* GP0212 – A Prayer to Resist Pornography
-* GP0213 – A Prayer to Overcome Anger
-* GP0214 – A Prayer to Break Free from Sin
-* GP0215 – A Prayer for When You’re Battling Depression
-* GP0216 – A Prayer for When You’re Struggling with Self-Harm or Dark Thoughts
-* GP0217 – A Prayer for When You Feel Spiritually Attacked
-* GP0218 – A Prayer for Letting Go of the Past
+- Always start with: “Most Gracious Heavenly Father,”
+- Always end with: “In Jesus’ name, Amen.”
+- “I want what You want…” used as second-to-last paragraph in all guided prayers
+- Walker's language includes:
+  - “Jesus, I just want to lay my head in Your lap.”
+  - “Picked up stupid and ran with it.”
+  - “You are enough.”
+  - “I want a stronger, closer, deeper, more loving, more personal, more passionate, more intimate relationship with You.”
+- Recognizes three spiritual weapons beyond armor of God:
+  - Prayer
+  - Praise & Worship
+  - Blood of Jesus
+- Never use weak or generic language. Prayers must be bold, honest, emotionally resonant, and rooted in spiritual authority.
 
 ---
 
-**Accordion #3 – When You Need Clarity or Direction (Complete)**
-Total Prayers: 11
+✝️ SPIRITUAL WARFARE LANGUAGE
 
-* GP0301 – A Prayer for When You’re Seeking
-* GP0302 – A Prayer for When You Need Clarity
-* GP0303 – A Prayer for When You’re Confused
-* GP0304 – A Prayer for When You’re Facing a Big Decision
-* GP0305 – A Prayer for When You Need Direction
-* GP0306 – A Prayer for When You’re Feeling Lost
-* GP0307 – A Prayer for When You Want God’s Will
-* GP0308 – A Prayer for When You’ve Been Waiting
-* GP0309 – A Prayer for When You’re Struggling with Your Identity
-* GP0310 – A Prayer for When You Need Wisdom
-* GP0311 – A Prayer for When You Can’t Hear God
+Common phrases:
+  - “I revoke access in Jesus’ name.”
+  - “Bind every devil, demon, and demonic force.”
+  - “No voice, no power, no access, no authority.”
+  - “Put a hedge of protection around me/her/us.”
+  - “Strike fear and trembling into every demonic force.”
+Recognizes the real-time battle for intimacy and trust in God
+Warfare is often behind delays, distance, numbness, emotional or spiritual resistance
 
 ---
 
-**Accordion #4 – When You’re in a Spiritual Battle (Complete)**
-Total Prayers: 14
+🧱 PRAYER STRUCTURE + TONE PREFERENCES
 
-* GP0401 – A Prayer for When You’re Doubting
-* GP0402 – A Prayer for Spiritual Strength
-* GP0403 – A Prayer for When God Feels Silent
-* GP0404 – A Prayer to Stand Firm in the Battle
-* GP0405 – A Prayer for When You’re Angry at God
-* GP0406 – A Prayer for When You’re Weary from the Fight
-* GP0407 – A Prayer for When You’re Afraid to Hope Again
-* GP0408 – A Prayer for When You Feel Unseen by God
-* GP0409 – A Prayer for When You’re Questioning God’s Plan
-* GP0410 – A Prayer for When You Feel Surrounded by Fear
-* GP0217 – A Prayer for When You Feel Spiritually Attacked (from Accordion #2)
-* GP0206 – A Prayer for When You’re Weary of Waiting (from Accordion #2)
-* GP0215 – A Prayer for When You’re Battling Depression (from Accordion #2)
-* GP0411 – A Prayer for When You’ve Never Believed
+- Inline HTML blocks only (no popups)
+- No generic summaries; keep prayers original, passionate, Spirit-led
+- Every prayer must:
+  - Be deeply emotional and honest
+  - Address trust, surrender, spiritual warfare, or healing
+  - Tie back to intimacy with God
+  - Include either a healing, confessional, or transformative journey
+  - Use real language — not polished Christian clichés
 
 ---
 
-**Accordion #5 – When You’re Grateful (Complete)**
-Total Prayers: 19
+📂 GUIDED PRAYER ACCORDIONS – PROGRESS TRACKER
 
-* GP0501 – A Prayer of Thanksgiving
-* GP0502 – A Prayer of Praise for Who God Is
-* GP0503 – A Prayer of Praise for God’s Goodness
-* GP0504 – A Prayer of Praise for God as My Hope
-* GP0505 – A Prayer of Praise for God’s Faithfulness
-* GP0506 – A Prayer of Praise in the Waiting
-* GP0507 – A Prayer of Gratitude for a God Who Never Gives Up on Me
-* GP0508 – A Prayer for Rejoicing in God’s Presence
-* GP0509 – A Prayer for After the Breakthrough
-* GP0510 – A Prayer of Gratitude for Healing and Restoration
-* GP0511 – A Prayer of Gratitude for Being Made New
-* GP0512 – A Prayer of Gratitude for When You’ve Been Set Free
-* GP0513 – A Prayer of Gratitude for Restored Relationships
-* GP0514 – A Prayer of Gratitude for God’s Unfailing Love
-* GP0515 – A Prayer of Gratitude in the Middle of the Storm
-* GP0516 – A Prayer of Worship for God’s Holiness
-* GP0517 – A Prayer of Praise for God’s Sovereignty
-* GP0518 – A Prayer of Praise for God’s Grace
-* GP0519 – A Prayer of Praise for God’s Mercy
+Accordion #1 – When You’re Hurting
+GP0101 – A Prayer for When You’re Grieving
+GP0102 – A Prayer for When Trauma Still Hurts
+GP0103 – A Prayer for Loneliness
+GP0104 – A Prayer for Heartbreak
+GP0105 – A Prayer for When You’ve Lost Someone
+GP0106 – A Prayer for When You Can’t Stop Crying
+GP0107 – A Prayer for When You’ve Been Rejected
+GP0108 – A Prayer for When You’re Afraid
+GP0109 – A Prayer for When You Feel Forgotten
+GP0110 – A Prayer for When You’ve Been Betrayed
+GP0111 – A Prayer for When You Feel Unloved
+
+Accordion #2 – When You’re Struggling
+GP0201 – A Prayer for When You're Struggling
+GP0202 – A Prayer for When You’re Exhausted
+GP0203 – A Prayer for When You’re Anxious
+GP0204 – A Prayer for When You Feel Like Giving Up
+GP0205 – A Prayer for When You’re Burned Out
+GP0206 – A Prayer for When You’re Weary of Waiting
+GP0207 – A Prayer for Breaking Addiction
+GP0208 – A Prayer for When You’ve Fallen Again
+GP0209 – A Prayer for When You Hate Who You’ve Become
+GP0210 – A Prayer for Letting Go of What You Can’t Undo
+GP0211 – A Prayer for When You Can’t Forgive Yourself
+GP0212 – A Prayer to Resist Pornography
+GP0213 – A Prayer to Overcome Anger
+GP0214 – A Prayer to Break Free from Sin
+GP0215 – A Prayer for When You’re Battling Depression
+GP0216 – A Prayer for When You’re Struggling with Self-Harm or Dark Thoughts
+GP0217 – A Prayer for When You Feel Spiritually Attacked
+GP0218 – A Prayer for Letting Go of the Past
+
+Accordion #3 – When You’re Seeking
+GP0301 – A Prayer for Wisdom
+GP0302 – A Prayer for Guidance
+GP0303 – A Prayer for Direction
+GP0304 – A Prayer for Clarity
+GP0305 – A Prayer for Discernment
+GP0311 – A Prayer for When You're Facing a Big Decision
+GP0312 – A Prayer for When You’re Ready to Start Over with God
+GP0314 – A Prayer to Start Over with God
+
+Accordion #4 – When You’re Wrestling
+GP0401 – A Prayer for When You’re Doubting
+GP0402 – A Prayer for Spiritual Strength
+GP0403 – A Prayer for When God Feels Silent
+GP0404 – A Prayer to Stand Firm in the Battle
+GP0405 – A Prayer for When You’re Angry at God
+GP0406 – A Prayer for When You’re Weary from the Fight
+GP0407 – A Prayer for When You’re Afraid to Hope Again
+GP0408 – A Prayer for When You Feel Unseen by God
+GP0409 – A Prayer for When You’re Questioning God’s Plan
+GP0410 – A Prayer for When You Feel Surrounded by Fear
+GP0411 – A Prayer for When You’ve Never Believed
+
+Accordion #5 – When You’re Grateful
+GP0501 – A Prayer of Thanksgiving
+GP0502 – A Prayer of Praise for Who God Is
+GP0503 – A Prayer of Praise for God’s Goodness
+GP0504 – A Prayer of Praise for God as My Hope
+GP0505 – A Prayer of Praise for God’s Faithfulness
+GP0506 – A Prayer of Praise in the Waiting
+GP0507 – A Prayer of Gratitude for a God Who Never Gives Up on Me
+GP0508 – A Prayer for Rejoicing in God’s Presence
+GP0509 – A Prayer for After the Breakthrough
+GP0510 – A Prayer of Gratitude for Healing and Restoration
+GP0511 – A Prayer of Gratitude for Being Made New
+GP0512 – A Prayer of Gratitude for When You’ve Been Set Free
+GP0513 – A Prayer of Gratitude for Restored Relationships
+GP0514 – A Prayer of Gratitude for God’s Unfailing Love
+GP0515 – A Prayer of Gratitude in the Middle of the Storm
+GP0516 – A Prayer of Worship for God's Holiness
+GP0517 – A Prayer of Praise for God’s Sovereignty
+GP0518 – A Prayer of Praise for God’s Grace
+GP0519 – A Prayer of Praise for God’s Mercy
+
+Accordion #6 – When You’re Praying for Others
+GP0601 – A Prayer for a Friend Who’s Hurting
+GP0602 – A Prayer for My Marriage
+GP0603 – A Prayer for My Husband
+GP0604 – A Prayer for My Wife
+GP0605 – A Prayer for My Children
+GP0606 – A Prayer for My Son
+GP0607 – A Prayer for My Daughter
+GP0608 – A Prayer for My Enemy
+GP0609 – A Prayer for Someone Who’s Far from God
+GP0610 – A Prayer for My Community
+GP0611 – A Prayer for My Leaders
+GP0612 – A Prayer for My Country
+GP0613 – A Prayer for My World
+GP0614 – A Prayer for the World
+GP0615 – A Prayer for a Broken Friendship
+GP0616 – A Prayer for a Sick Loved One
+GP0617 – A Prayer for Someone Grieving
+GP0618 – A Prayer for Someone Who Needs Salvation
+GP0619 – A Prayer for Someone Who’s Lost Their Way
+
+Accordion #7 – Coming Home Again
+GP0701 – A Prayer to Return to God
+GP0702 – A Prayer of Repentance and Surrender
+GP0703 – A Prayer After Falling into Sin
+GP0704 – A Prayer to Let Go of the Past
+GP0705 – A Prayer for a Fresh Start
+GP0706 – A Prayer for a New Season
+GP0707 – A Prayer for a New Identity in Christ
+GP0708 – A Prayer for a New Chapter in Family or Marriage
+GP0709 – A Prayer for When You Feel Unworthy to Begin Again
+GP0710 – A Prayer to Restore What Was Lost
+GP0711 – A Prayer of Resignation
+
+Accordion #8 – When You Don’t Even Know What to Pray
+GP0801 – A Prayer for When You Have No Words
+GP0802 – A Prayer for When You Feel Numb
+GP0803 – A Prayer for When You Don’t Know What You Need
+GP0804 – A Prayer for a Weary Soul
+GP0805 – A Prayer to Simply Be Still
+GP0806 – A Prayer for When You Feel Empty
+GP0807 – A Prayer for When You Feel Overwhelmed
+GP0808 – A Prayer for When You Feel Spiritually Distant
+
 
 ---
 
-**Accordion #6 – When You’re Praying for Others (In Progress)**
-Total Planned Prayers: 16
+⚠️ THINGS TO ALWAYS REMEMBER ABOUT WALKER:
 
-* GP0601 – A Prayer for a Friend Who’s Struggling
-* GP0602 – A Prayer for My Marriage
-* GP0603 – A Prayer for My Husband
-* GP0604 – A Prayer for My Wife
-* GP0605 – A Prayer for My Children
-* GP0606 – A Prayer for My Son
-* GP0607 – A Prayer for My Daughter
-* GP0608 – A Prayer for My Enemy
-* GP0609 – A Prayer for Someone Who’s Far from God
-* GP0610 – A Prayer for the World
-* GP0611 – A Prayer for My Country
-* GP0612 – A Prayer for My Leaders
-* GP0613 – A Prayer for a Broken Friendship
-* GP0614 – A Prayer for a Sick Loved One
-* GP0615 – A Prayer for Someone Grieving
-* GP0616 – A Prayer for Someone Who Needs Salvation
+- Avoid repeating errors like:
+  - Popups instead of inline HTML
+  - Forgetting formatting conventions or Walker’s preferred phrases
+  - Simplifying language or skipping emotional/spiritual depth
+- Walker prefers:
+  - Completion and polish over brevity
+  - Spirit-led prayers with theological accuracy
+  - Scripture reflected in theme (but not always quoted verbatim)
+  - Original analogies, no repetition from past content
+- Walker is spiritually mature and emotionally transparent — match tone accordingly
+- Always fight for trust, intimacy, and the heart of God in every project
