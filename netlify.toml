@@ -1,5 +1,6 @@
 [build]
   functions = "netlify/functions"
+  publish = "public" # ← ensures Netlify serves HTML/CSS/JS from /public
 
 [functions]
   node_bundler = "esbuild"
@@ -11,7 +12,12 @@
   external_node_modules = ["airtable"]
 
 [functions."LetterApproved"]
-node_bundler = "esbuild"
+  node_bundler = "esbuild"
 
 [build.environment]
   AIRTABLE_TOKEN = ""
+
+[[redirects]]
+  from = "/ltg-wall"
+  to = "/ltg-wall/index.html"
+  status = 200
