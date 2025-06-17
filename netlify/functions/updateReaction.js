@@ -1,7 +1,7 @@
 // Netlify Function: updateReaction.js
 const Airtable = require("airtable");
 
-const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base("appaA8MFWiiWjXwSQ");
+const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base("pattF9yPGTxfq5DLR");
 const tableName = "Letters";
 
 exports.handler = async (event) => {
