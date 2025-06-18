@@ -3,7 +3,6 @@
     #ltg-wall-container {
       padding: 2rem;
       font-family: sans-serif;
-      overflow-x: auto;
     }
     #ltg-modal {
       display: none;
@@ -22,8 +21,8 @@
       border-radius: 8px;
     }
     table {
-      width: 100%;
-      max-width: 1400px;
+      width: 100vw;
+      max-width: 100%;
       margin: 0 auto;
       border-collapse: collapse;
       table-layout: fixed;
@@ -33,16 +32,22 @@
       padding: 0.5rem;
       text-align: left;
       vertical-align: top;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
-    th:nth-child(1), td:nth-child(1) { width: 130px; }
-    th:nth-child(2), td:nth-child(2) { width: 120px; }
-    th:nth-child(3), td:nth-child(3) { width: 360px; white-space: normal; }
-    th:nth-child(4), td:nth-child(4) { width: 420px; white-space: normal; }
+    th:nth-child(1), td:nth-child(1) {
+      width: 140px;
+      white-space: nowrap;
+    }
+    th:nth-child(2), td:nth-child(2) {
+      width: 180px;
+    }
+    th:nth-child(3), td:nth-child(3) {
+      width: 500px;
+    }
+    th:nth-child(4), td:nth-child(4) {
+      width: 500px;
+    }
     th:nth-child(n+5), td:nth-child(n+5) {
-      width: 50px;
+      width: 60px;
       text-align: center;
     }
     tr:hover {
@@ -99,7 +104,7 @@
         row.innerHTML = `
           <td>${fields['Submission Date'] || ''}</td>
           <td>${fields['Display Name'] || 'Anonymous'}</td>
-          <td>${fields['Letter Content'].substring(0, 60)}...</td>
+          <td>${fields['Letter Content'].substring(0, 80)}...</td>
           <td>${fields['Moderator Comments'] || ''}</td>
           <td>${fields['Hearts Count'] || 0}</td>
           <td>${fields['Prayer Count'] || 0}</td>
