@@ -31,7 +31,7 @@
       cursor: pointer;
     }
     .scroll-box {
-      max-height: 12em;
+      max-height: 8.5em;
       overflow-y: auto;
       margin-bottom: 1rem;
       padding: 0.5rem;
@@ -39,14 +39,13 @@
       border-radius: 4px;
     }
     .table-wrapper {
-      max-width: 1400px;
-      margin: 0 auto;
+      min-width: 1300px;
     }
     table {
       width: 100%;
       margin: 0 auto;
       border-collapse: collapse;
-      table-layout: auto;
+      table-layout: fixed;
     }
     th, td {
       border-bottom: 1px solid #ccc;
@@ -55,7 +54,21 @@
       vertical-align: top;
       font-size: 1rem;
     }
+    th:nth-child(1), td:nth-child(1) {
+      width: 140px;
+      white-space: nowrap;
+    }
+    th:nth-child(2), td:nth-child(2) {
+      width: 180px;
+    }
+    th:nth-child(3), td:nth-child(3) {
+      width: 300px;
+    }
+    th:nth-child(4), td:nth-child(4) {
+      width: 300px;
+    }
     th:nth-child(n+5), td:nth-child(n+5) {
+      width: 60px;
       text-align: center;
       font-size: 1rem;
     }
@@ -68,6 +81,9 @@
       cursor: pointer;
       font-size: 1.5rem;
     }
+    .reaction-icon {
+      font-size: 1rem;
+    }
   `;
 
   const style = document.createElement('style');
@@ -77,7 +93,9 @@
   const container = document.getElementById('ltg-wall-container');
   container.innerHTML = `
     <div id="ltg-modal">
-      <div id="ltg-modal-body"></div>
+      <div id="ltg-modal-body">
+        <span id="ltg-close">×</span>
+      </div>
     </div>
     <div class="table-wrapper">
       <table>
@@ -101,14 +119,21 @@
   const grid = document.getElementById('letters-grid');
   const modal = document.getElementById('ltg-modal');
   const modalBody = document.getElementById('ltg-modal-body');
+  const closeBtn = document.getElementById('ltg-close');
+
   const API_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/updateReaction?list=true';
   const REACT_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/updateReaction';
+
   let currentReactionBuffer = {};
 
   fetch(API_URL)
     .then(res => res.json())
     .then(({ records }) => {
-      const sorted = records.sort((a, b) => new Date(b.fields['Submission Date']) - new Date(a.fields['Submission Date']));
+      const sorted = records.sort((a, b) => {
+        const dateA = new Date(a.fields['Submission Date']);
+        const dateB = new Date(b.fields['Submission Date']);
+        return dateB - dateA;
+      });
 
       sorted.forEach(({ id, fields }) => {
         if (!fields || !fields['Letter Content']) return;
@@ -122,12 +147,13 @@
           <td>${fields['Hearts Count'] || 0}</td>
           <td>${fields['Prayer Count'] || 0}</td>
           <td>${fields['Broken Heart Count'] || 0}</td>
-          <td>${fields['View Count'] || 0}</td>
+          <td class="reaction-icon">${fields['View Count'] || 0}</td>
         `;
 
         row.addEventListener('click', () => {
-          currentReactionBuffer = { id, reactions: { 'View Count': 1 } };
+          currentReactionBuffer = { id, reactions: {} };
           const incrementedViewCount = (fields['View Count'] || 0) + 1;
+          currentReactionBuffer.reactions['View Count'] = true;
 
           modalBody.innerHTML = `
             <span id="ltg-close">×</span>
@@ -137,7 +163,7 @@
               <span class="reaction-button" data-id="${id}" data-type="Hearts Count">❤️ ${fields['Hearts Count'] || 0}</span>
               <span class="reaction-button" data-id="${id}" data-type="Prayer Count">🙏 ${fields['Prayer Count'] || 0}</span>
               <span class="reaction-button" data-id="${id}" data-type="Broken Heart Count">💔 ${fields['Broken Heart Count'] || 0}</span>
-              <span class="reaction-button">📖 ${incrementedViewCount}</span>
+              <span class="reaction-button reaction-icon">📖 ${incrementedViewCount}</span>
             </p>
             <p><strong>Moderator Comment:</strong></p>
             <div class="scroll-box">${fields['Moderator Comments'] || 'None'}</div>
@@ -146,18 +172,13 @@
 
           modal.style.display = 'flex';
 
-          document.getElementById('ltg-close')?.addEventListener('click', async e => {
-            e.stopPropagation();
-            await closeModalAndSync();
-          });
-
           modalBody.querySelectorAll('.reaction-button').forEach(btn => {
             btn.addEventListener('click', e => {
               e.stopPropagation();
               const recordId = btn.getAttribute('data-id');
               const reaction = btn.getAttribute('data-type');
               if (!reaction || currentReactionBuffer.reactions[reaction]) return;
-              currentReactionBuffer.reactions[reaction] = 1;
+              currentReactionBuffer.reactions[reaction] = true;
               const current = parseInt(btn.textContent.match(/\d+/)[0]);
               btn.innerHTML = btn.innerHTML.replace(/\d+/, current + 1);
             });
@@ -172,30 +193,29 @@
       grid.innerHTML = '<tr><td colspan="8">Failed to load letters. Please try again later.</td></tr>';
     });
 
-  async function closeModalAndSync() {
+  function closeModalAndSync() {
     if (currentReactionBuffer.id && Object.keys(currentReactionBuffer.reactions).length > 0) {
-      try {
-        console.log("🛰️ Syncing to Airtable:", JSON.stringify({
-          recordId: currentReactionBuffer.id,
-          reactions: currentReactionBuffer.reactions
-        }, null, 2));
-
-        const res = await fetch(REACT_URL, {
+      Object.keys(currentReactionBuffer.reactions).forEach(reaction => {
+        fetch(REACT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            recordId: currentReactionBuffer.id,
-            reactions: currentReactionBuffer.reactions
-          })
-        });
-
-        if (!res.ok) throw new Error(`Failed with status ${res.status}`);
-        else console.log('✅ Reaction successfully synced.');
-      } catch (err) {
-        console.error('Failed to sync reactions:', err);
-      }
+          body: JSON.stringify({ recordId: currentReactionBuffer.id, reaction })
+        }).catch(console.error);
+      });
     }
     currentReactionBuffer = {};
     modal.style.display = 'none';
   }
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModalAndSync();
+    }
+  });
+
+  document.body.addEventListener('click', e => {
+    if (e.target.id === 'ltg-close') {
+      closeModalAndSync();
+    }
+  });
 })();
