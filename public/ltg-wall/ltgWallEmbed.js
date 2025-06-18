@@ -6,6 +6,8 @@
     }
     table {
       width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
       border-collapse: collapse;
       table-layout: fixed;
     }
@@ -16,18 +18,20 @@
       vertical-align: top;
     }
     th:nth-child(1), td:nth-child(1) {
-      width: 100px;
+      width: 120px;
       white-space: nowrap;
     }
     th:nth-child(2), td:nth-child(2) {
-      width: 120px;
+      width: 150px;
     }
-    th:nth-child(3), td:nth-child(3),
+    th:nth-child(3), td:nth-child(3) {
+      width: 300px;
+    }
     th:nth-child(4), td:nth-child(4) {
-      width: 260px;
+      width: 340px;
     }
     th:nth-child(n+5), td:nth-child(n+5) {
-      width: 40px;
+      width: 50px;
       text-align: center;
     }
     tr:hover {
@@ -68,7 +72,7 @@
         const dateA = new Date(a.fields['Submission Date']);
         const dateB = new Date(b.fields['Submission Date']);
         return dateB - dateA;
-      });
+      }).reverse();
 
       sorted.forEach(({ fields }) => {
         if (!fields || !fields['Letter Content']) return;
