@@ -1,28 +1,26 @@
 const Airtable = require('airtable');
 
 exports.handler = async (event) => {
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: 'Method Not Allowed'
-    };
-  }
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS'
+  };
 
   // Handle preflight
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: 'OK'
+      headers,
+      body: JSON.stringify({ message: 'Preflight OK' })
+    };
+  }
+
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers,
+      body: JSON.stringify({ error: 'Method Not Allowed' })
     };
   }
 
@@ -32,14 +30,13 @@ exports.handler = async (event) => {
     if (!recordId || !reactions || typeof reactions !== 'object') {
       return {
         statusCode: 400,
-        headers: { 'Access-Control-Allow-Origin': '*' },
+        headers,
         body: JSON.stringify({ error: 'Missing or invalid data' })
       };
     }
 
     const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
-    // Prepare update object
     const fieldsToUpdate = {};
     for (let key in reactions) {
       if (typeof reactions[key] === 'number') {
@@ -50,25 +47,23 @@ exports.handler = async (event) => {
     if (Object.keys(fieldsToUpdate).length === 0) {
       return {
         statusCode: 400,
-        headers: { 'Access-Control-Allow-Origin': '*' },
-        body: JSON.stringify({ error: 'No valid reaction fields found' })
+        headers,
+        body: JSON.stringify({ error: 'No valid reaction fields' })
       };
     }
 
-    await base('Letters').update(recordId, {
-      fields: fieldsToUpdate
-    });
+    await base('Letters').update(recordId, { fields: fieldsToUpdate });
 
     return {
       statusCode: 200,
-      headers: { 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ message: 'Reaction(s) updated successfully' })
+      headers,
+      body: JSON.stringify({ message: 'Reactions updated successfully' })
     };
   } catch (err) {
     console.error('❌ updateReaction error:', err.message);
     return {
       statusCode: 500,
-      headers: { 'Access-Control-Allow-Origin': '*' },
+      headers,
       body: JSON.stringify({ error: 'Server error', details: err.message })
     };
   }
