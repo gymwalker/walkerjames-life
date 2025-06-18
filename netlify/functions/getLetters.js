@@ -1,23 +1,21 @@
+// getLetters.js
 import Airtable from 'airtable';
-
-const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
+import dotenv from 'dotenv';
+dotenv.config();
 
 export default async (req, res) => {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
-  }
-
   try {
-    const records = [];
-    await base('Letters').select({ view: 'Grid view' }).eachPage((page, fetchNext) => {
-      records.push(...page);
-      fetchNext();
-    });
+    const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
+
+    const records = await base('Letters').select({
+      view: 'Approved Letters'
+    }).all();
 
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.status(200).json({ records });
+    res.setHeader('Content-Type', 'application/json');
+    res.status(200).json({ records: records.map(r => ({ id: r.id, fields: r.fields })) });
   } catch (err) {
-    console.error('Fetch error:', err);
+    console.error(err);
     res.status(500).json({ error: 'Failed to fetch letters' });
   }
 };
