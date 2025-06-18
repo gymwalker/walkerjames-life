@@ -3,8 +3,6 @@
     #ltg-wall-container {
       padding: 2rem;
       font-family: sans-serif;
-      width: 100vw !important;
-      max-width: 100vw !important;
       overflow-x: auto;
     }
     #ltg-modal {
@@ -23,13 +21,12 @@
       max-width: 600px;
       border-radius: 8px;
     }
-    #ltg-table-scroll {
-      overflow-x: auto;
-      width: 100%;
+    .table-wrapper {
+      min-width: 1300px;
     }
     table {
-      width: 1200px;
-      min-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
       border-collapse: collapse;
       table-layout: fixed;
     }
@@ -40,11 +37,11 @@
       vertical-align: top;
     }
     th:nth-child(1), td:nth-child(1) {
-      width: 120px;
+      width: 140px;
       white-space: nowrap;
     }
     th:nth-child(2), td:nth-child(2) {
-      width: 150px;
+      width: 180px;
     }
     th:nth-child(3), td:nth-child(3) {
       width: 300px;
@@ -71,7 +68,7 @@
     <div id="ltg-modal">
       <div id="ltg-modal-body"></div>
     </div>
-    <div id="ltg-table-scroll">
+    <div class="table-wrapper">
       <table>
         <thead>
           <tr>
