@@ -1,31 +1,29 @@
-import Airtable from "airtable";
+const Airtable = require("airtable");
 
-export default async function handler(req, res) {
-  if (req.method !== "GET") {
-    return res.status(405).json({ error: "Method Not Allowed" });
-  }
-
+exports.handler = async () => {
   try {
     const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(
       process.env.AIRTABLE_BASE_ID
     );
 
     const records = await base("Letters")
-      .select({
-        filterByFormula: "AND({Approved} = TRUE(), {PublicURL} != '')",
-        sort: [{ field: "Date", direction: "desc" }],
-        maxRecords: 100,
-      })
+      .select({ filterByFormula: `Approved = TRUE()` })
       .all();
 
-    const formatted = records.map((record) => ({
+    const letters = records.map((record) => ({
       id: record.id,
       ...record.fields,
     }));
 
-    res.status(200).json({ letters: formatted });
+    return {
+      statusCode: 200,
+      body: JSON.stringify(letters),
+    };
   } catch (err) {
     console.error("❌ Error fetching letters:", err);
-    res.status(500).json({ error: "Failed to fetch letters." });
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message || "Failed to fetch letters" }),
+    };
   }
-}
+};
