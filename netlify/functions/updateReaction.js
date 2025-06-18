@@ -1,60 +1,61 @@
-const fetch = require('node-fetch');
+// updateReaction.js
+const Airtable = require('airtable');
+require('dotenv').config();
 
-exports.handler = async function(event) {
+const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
+
+exports.handler = async function (event) {
+  // Handle CORS preflight request
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+      },
+      body: ''
+    };
+  }
+
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
-      body: JSON.stringify({ message: 'Method Not Allowed' })
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ error: 'Method Not Allowed' })
     };
   }
 
   try {
-    const { recordId, reactions } = JSON.parse(event.body || '{}');
-
-    if (!recordId || typeof reactions !== 'object') {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: 'Invalid payload structure' })
-      };
+    const { recordId, reactions } = JSON.parse(event.body);
+    if (!recordId || !reactions || typeof reactions !== 'object') {
+      throw new Error('Invalid input');
     }
 
-    const fieldsToUpdate = {};
-    for (const [key, value] of Object.entries(reactions)) {
-      fieldsToUpdate[key] = { increment: value };
-    }
-
-    const airtableRes = await fetch('https://api.airtable.com/v0/appaA8MFWiiWjXwSQ/Letters', {
-      method: 'PATCH',
-      headers: {
-        Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        records: [
-          {
-            id: recordId,
-            fields: fieldsToUpdate
-          }
-        ]
-      })
-    });
-
-    if (!airtableRes.ok) {
-      const errorText = await airtableRes.text();
-      return {
-        statusCode: airtableRes.status,
-        body: JSON.stringify({ message: 'Airtable error', details: errorText })
-      };
-    }
+    await base('Letters').update([{
+      id: recordId,
+      fields: reactions
+    }]);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'Reaction updated successfully.' })
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+      },
+      body: JSON.stringify({ message: 'Reaction updated!' })
     };
   } catch (err) {
+    console.error(err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: 'Server error', error: err.message })
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ error: err.message || 'Internal Server Error' })
     };
   }
 };
