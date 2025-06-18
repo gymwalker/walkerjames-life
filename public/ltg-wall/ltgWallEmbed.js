@@ -3,10 +3,6 @@
     #ltg-wall-container {
       padding: 2rem;
       font-family: sans-serif;
-      width: 100vw !important;
-      max-width: 100vw !important;
-      overflow-x: auto;
-      margin-left: calc(-50vw + 50%);
     }
     #ltg-modal {
       display: none;
@@ -24,11 +20,15 @@
       max-width: 600px;
       border-radius: 8px;
     }
+    #ltg-table-scroll {
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
     table {
-      width: 95vw;
+      min-width: 1000px;
       border-collapse: collapse;
+      width: 100%;
       table-layout: fixed;
-      margin: 0 auto;
     }
     th, td {
       border-bottom: 1px solid #ccc;
@@ -36,10 +36,19 @@
       text-align: left;
       vertical-align: top;
     }
-    th:nth-child(1), td:nth-child(1) { width: 140px; white-space: nowrap; }
-    th:nth-child(2), td:nth-child(2) { width: 180px; }
-    th:nth-child(3), td:nth-child(3) { width: 360px; }
-    th:nth-child(4), td:nth-child(4) { width: 360px; }
+    th:nth-child(1), td:nth-child(1) {
+      width: 120px;
+      white-space: nowrap;
+    }
+    th:nth-child(2), td:nth-child(2) {
+      width: 150px;
+    }
+    th:nth-child(3), td:nth-child(3) {
+      width: 280px;
+    }
+    th:nth-child(4), td:nth-child(4) {
+      width: 300px;
+    }
     th:nth-child(n+5), td:nth-child(n+5) {
       width: 60px;
       text-align: center;
@@ -59,21 +68,23 @@
     <div id="ltg-modal">
       <div id="ltg-modal-body"></div>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Name</th>
-          <th>Letter</th>
-          <th>Moderator Comment</th>
-          <th>❤️</th>
-          <th>🙏</th>
-          <th>💔</th>
-          <th>📖</th>
-        </tr>
-      </thead>
-      <tbody id="letters-grid"></tbody>
-    </table>
+    <div id="ltg-table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Letter</th>
+            <th>Moderator Comment</th>
+            <th>❤️</th>
+            <th>🙏</th>
+            <th>💔</th>
+            <th>📖</th>
+          </tr>
+        </thead>
+        <tbody id="letters-grid"></tbody>
+      </table>
+    </div>
   `;
 
   const grid = document.getElementById('letters-grid');
