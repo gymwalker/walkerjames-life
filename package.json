@@ -5,7 +5,6 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "echo 'No start script necessary — Netlify handles execution'",
     "build": "echo 'No build step required'"
   },
   "dependencies": {
