@@ -21,8 +21,8 @@
       border-radius: 8px;
     }
     table {
-      width: 100%;
-      max-width: 1280px;
+      width: 95vw;
+      max-width: 1400px;
       margin: 0 auto;
       border-collapse: collapse;
       table-layout: fixed;
@@ -34,20 +34,20 @@
       vertical-align: top;
     }
     th:nth-child(1), td:nth-child(1) {
-      width: 120px;
+      width: 140px;
       white-space: nowrap;
     }
     th:nth-child(2), td:nth-child(2) {
-      width: 150px;
+      width: 180px;
     }
     th:nth-child(3), td:nth-child(3) {
-      width: 300px;
+      width: 360px;
     }
     th:nth-child(4), td:nth-child(4) {
-      width: 340px;
+      width: 400px;
     }
     th:nth-child(n+5), td:nth-child(n+5) {
-      width: 50px;
+      width: 60px;
       text-align: center;
     }
     tr:hover {
