@@ -3,11 +3,26 @@ const Airtable = require('airtable');
 const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base('appaA8MFWiiWjXwSQ');
 
 exports.handler = async function(event, context) {
-  const shouldList = event.queryStringParameters?.list === 'true';
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Content-Type': 'application/json'
+  };
 
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers,
+      body: ''
+    };
+  }
+
+  const shouldList = event.queryStringParameters?.list === 'true';
   if (!shouldList) {
     return {
       statusCode: 400,
+      headers,
       body: JSON.stringify({ error: 'Missing or invalid list parameter' })
     };
   }
@@ -32,15 +47,15 @@ exports.handler = async function(event, context) {
 
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ records }) // ✅ JSON-wrapped result
+      headers,
+      body: JSON.stringify({ records })
     };
   } catch (error) {
     console.error('Error fetching Airtable records:', error);
 
     return {
       statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ error: 'Failed to load letters.' })
     };
   }
