@@ -11,6 +11,7 @@ async function fetchLetters() {
       throw new Error(`Failed to fetch letters: ${response.statusText}`);
     }
     const data = await response.json();
+    console.log("Fetched letters:", data); // <-- ADDED LOG
     if (!Array.isArray(data)) throw new Error("Invalid data format from API");
     return data;
   } catch (error) {
