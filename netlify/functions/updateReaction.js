@@ -1,62 +1,37 @@
 const Airtable = require('airtable');
+const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
-const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base('appaA8MFWiiWjXwSQ');
-
-exports.handler = async function(event, context) {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Content-Type': 'application/json'
-  };
-
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: ''
-    };
-  }
-
-  const shouldList = event.queryStringParameters?.list === 'true';
-  if (!shouldList) {
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify({ error: 'Missing or invalid list parameter' })
-    };
+exports.handler = async (event) => {
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
   try {
-    const records = [];
-    await base('Letters')
-      .select({
-        view: 'Grid view',
-        sort: [{ field: 'Submission Date', direction: 'desc' }],
-        filterByFormula: "AND({Approval Status} = 'Approved', {Visibility} = 'Under Review')"
-      })
-      .eachPage((fetchedRecords, fetchNextPage) => {
-        fetchedRecords.forEach(record => {
-          records.push({
-            id: record.id,
-            fields: record.fields
-          });
-        });
-        fetchNextPage();
-      });
+    const { recordId, reactions } = JSON.parse(event.body || '{}');
+
+    if (!recordId || typeof reactions !== 'object') {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Missing or invalid recordId or reactions object' }),
+      };
+    }
+
+    const updates = {};
+    for (const [key, increment] of Object.entries(reactions)) {
+      updates[key] = increment; // Airtable will treat this as an override unless you fetch current value and add
+    }
+
+    await base('Letters').update(recordId, updates);
 
     return {
       statusCode: 200,
-      headers,
-      body: JSON.stringify({ records })
+      body: JSON.stringify({ success: true }),
     };
-  } catch (error) {
-    console.error('Error fetching Airtable records:', error);
-
+  } catch (err) {
+    console.error(err);
     return {
       statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: 'Failed to load letters.' })
+      body: JSON.stringify({ error: 'Server error', details: err.message }),
     };
   }
 };
