@@ -1,61 +1,47 @@
-const Airtable = require("airtable");
+const Airtable = require('airtable');
 
-const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base("appaA8MFWiiWjXwSQ");
-const tableName = "Letters";
+const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base('appaA8MFWiiWjXwSQ');
 
-exports.handler = async (event) => {
-  const headers = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "GET,POST,PATCH,OPTIONS"
-  };
+exports.handler = async function(event, context) {
+  const shouldList = event.queryStringParameters?.list === 'true';
 
-  if (event.httpMethod === "OPTIONS") {
-    return { statusCode: 200, headers, body: "" };
+  if (!shouldList) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Missing or invalid list parameter' })
+    };
   }
 
   try {
-    // List all records
-    if (event.httpMethod === "GET" && event.queryStringParameters.list === "true") {
-      const records = await base(tableName).select({}).all();
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ records: records.map((r) => ({ id: r.id, fields: r.fields })) })
-      };
-    }
-
-    // Get a specific record
-    if (event.httpMethod === "GET" && event.queryStringParameters.recordId) {
-      const record = await base(tableName).find(event.queryStringParameters.recordId);
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ id: record.id, fields: record.fields })
-      };
-    }
-
-    // Update a record
-    if (event.httpMethod === "PATCH") {
-      const { recordId, fields } = JSON.parse(event.body);
-      const updated = await base(tableName).update(recordId, fields);
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ id: updated.id, fields: updated.fields })
-      };
-    }
+    const records = [];
+    await base('Letters')
+      .select({
+        view: 'Grid view',
+        sort: [{ field: 'Submission Date', direction: 'desc' }],
+        filterByFormula: "AND({Approval Status} = 'Approved', {Visibility} = 'Under Review')"
+      })
+      .eachPage((fetchedRecords, fetchNextPage) => {
+        fetchedRecords.forEach(record => {
+          records.push({
+            id: record.id,
+            fields: record.fields
+          });
+        });
+        fetchNextPage();
+      });
 
     return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: "Method Not Allowed" })
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ records }) // ✅ JSON-wrapped result
     };
-  } catch (err) {
+  } catch (error) {
+    console.error('Error fetching Airtable records:', error);
+
     return {
       statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: err.message })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Failed to load letters.' })
     };
   }
 };
