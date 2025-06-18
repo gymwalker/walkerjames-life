@@ -1,57 +1,37 @@
-exports.handler = async function (event, context) {
+
+const Airtable = require("airtable");
+
+exports.handler = async function(event, context) {
+  if (event.httpMethod !== "GET") {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ error: "Method Not Allowed" })
+    };
+  }
+
+  const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
+  const table = base(process.env.AIRTABLE_TABLE_NAME);
+
   try {
-    if (event.httpMethod !== 'GET') {
-      return {
-        statusCode: 405,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Content-Type'
-        },
-        body: JSON.stringify({ message: 'Method Not Allowed' })
-      };
-    }
+    const records = await table.select({ view: "Grid view" }).all();
 
-    const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
-    const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
-    const AIRTABLE_TABLE_NAME = 'Letters';
-
-    const response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}?view=Approved`, {
-      headers: {
-        Authorization: `Bearer ${AIRTABLE_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (!response.ok) {
-      return {
-        statusCode: response.status,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Content-Type'
-        },
-        body: JSON.stringify({ message: 'Failed to fetch Airtable records' })
-      };
-    }
-
-    const data = await response.json();
+    const data = records.map(record => ({
+      id: record.id,
+      fields: record.fields
+    }));
 
     return {
       statusCode: 200,
       headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type'
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
       },
-      body: JSON.stringify({ records: data.records })
+      body: JSON.stringify({ records: data })
     };
-  } catch (error) {
-    console.error('Error fetching letters:', error);
+  } catch (err) {
     return {
       statusCode: 500,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type'
-      },
-      body: JSON.stringify({ message: 'Internal Server Error' })
+      body: JSON.stringify({ error: "Failed to fetch records", details: err.toString() })
     };
   }
 };
