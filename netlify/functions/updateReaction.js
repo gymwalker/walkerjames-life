@@ -1,11 +1,10 @@
-// updateReaction.js
+// netlify/functions/updateReaction.js
 const Airtable = require('airtable');
 require('dotenv').config();
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
 exports.handler = async function (event) {
-  // Handle CORS preflight request
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -29,9 +28,15 @@ exports.handler = async function (event) {
   }
 
   try {
-    const { recordId, reactions } = JSON.parse(event.body);
-    if (!recordId || !reactions || typeof reactions !== 'object') {
-      throw new Error('Invalid input');
+    const parsed = JSON.parse(event.body || '{}');
+    const { recordId, reactions } = parsed;
+
+    if (!recordId || typeof reactions !== 'object' || Object.keys(reactions).length === 0) {
+      return {
+        statusCode: 400,
+        headers: { 'Access-Control-Allow-Origin': '*' },
+        body: JSON.stringify({ error: 'Missing or invalid recordId or reactions' })
+      };
     }
 
     await base('Letters').update([{
