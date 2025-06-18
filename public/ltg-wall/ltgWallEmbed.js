@@ -1,5 +1,3 @@
-// ltgWallEmbed.js
-
 const baseUrl = "https://walkerjames-life.netlify.app/.netlify/functions";
 const getLettersUrl = `${baseUrl}/getLetters`;
 const updateReactionUrl = `${baseUrl}/updateReaction`;
@@ -8,10 +6,10 @@ async function fetchLetters() {
   try {
     const response = await fetch(getLettersUrl);
     if (!response.ok) {
-      throw new Error(`Failed to fetch letters: ${response.statusText}`);
+      throw new Error(\`Failed to fetch letters: \${response.statusText}\`);
     }
     const data = await response.json();
-    console.log("Fetched letters:", data); // <-- ADDED LOG
+    console.log("Fetched letters:", data);
     if (!Array.isArray(data)) throw new Error("Invalid data format from API");
     return data;
   } catch (error) {
@@ -30,7 +28,7 @@ function createReactionButtons(letter, container) {
 
   emojis.forEach(({ label, field }) => {
     const btn = document.createElement("button");
-    btn.textContent = `${label} ${letter.reactions[field] || 0}`;
+    btn.textContent = \`\${label} \${letter.reactions[field] || 0}\`;
     btn.addEventListener("click", async () => {
       await sendReaction(letter.id, field);
     });
@@ -47,7 +45,7 @@ async function sendReaction(letterId, field) {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to update reaction: ${response.statusText}`);
+      throw new Error(\`Failed to update reaction: \${response.statusText}\`);
     }
   } catch (error) {
     console.error("Error sending reaction:", error);
@@ -60,10 +58,10 @@ function createLetterCard(letter) {
 
   const summary = document.createElement("div");
   summary.className = "letter-summary";
-  summary.innerHTML = `
-    <div><strong>${letter.date}</strong> – <em>${letter.name}</em></div>
-    <div>${letter.letter.slice(0, 100)}...</div>
-  `;
+  summary.innerHTML = \`
+    <div><strong>\${letter.date}</strong> – <em>\${letter.name}</em></div>
+    <div>\${letter.letter.slice(0, 100)}...</div>
+  \`;
   card.appendChild(summary);
 
   const buttonContainer = document.createElement("div");
@@ -79,14 +77,14 @@ function showModal(letter) {
   const modal = document.createElement("div");
   modal.className = "modal";
 
-  modal.innerHTML = `
+  modal.innerHTML = \`
     <div class="modal-content">
       <span class="close">&times;</span>
-      <h2>${letter.name}</h2>
-      <p>${letter.letter}</p>
-      <div><strong>Moderator Comment:</strong> ${letter.moderatorComment || "None"}</div>
+      <h2>\${letter.name}</h2>
+      <p>\${letter.letter}</p>
+      <div><strong>Moderator Comment:</strong> \${letter.moderatorComment || "None"}</div>
     </div>
-  `;
+  \`;
 
   const btns = modal.querySelector(".modal-content");
   createReactionButtons(letter, btns);
