@@ -3,6 +3,7 @@
     #ltg-wall-container {
       padding: 2rem;
       font-family: sans-serif;
+      overflow-x: auto;
     }
     #ltg-modal {
       display: none;
@@ -21,8 +22,8 @@
       border-radius: 8px;
     }
     table {
-      width: 95vw;
-      max-width: 2500px;
+      width: 100%;
+      max-width: 1400px;
       margin: 0 auto;
       border-collapse: collapse;
       table-layout: fixed;
@@ -32,22 +33,16 @@
       padding: 0.5rem;
       text-align: left;
       vertical-align: top;
-    }
-    th:nth-child(1), td:nth-child(1) {
-      width: 140px;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    th:nth-child(2), td:nth-child(2) {
-      width: 180px;
-    }
-    th:nth-child(3), td:nth-child(3) {
-      width: 360px;
-    }
-    th:nth-child(4), td:nth-child(4) {
-      width: 400px;
-    }
+    th:nth-child(1), td:nth-child(1) { width: 130px; }
+    th:nth-child(2), td:nth-child(2) { width: 120px; }
+    th:nth-child(3), td:nth-child(3) { width: 360px; white-space: normal; }
+    th:nth-child(4), td:nth-child(4) { width: 420px; white-space: normal; }
     th:nth-child(n+5), td:nth-child(n+5) {
-      width: 60px;
+      width: 50px;
       text-align: center;
     }
     tr:hover {
