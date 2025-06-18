@@ -1,39 +1,23 @@
-// netlify/functions/getLetters.js
-const Airtable = require('airtable');
-require('dotenv').config();
+import Airtable from 'airtable';
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
-exports.handler = async function () {
+export default async (req, res) => {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
+  }
+
   try {
     const records = [];
-    await base('Letters')
-      .select({ view: 'Approved' })
-      .eachPage((fetched, fetchNext) => {
-        records.push(...fetched);
-        fetchNext();
-      });
+    await base('Letters').select({ view: 'Grid view' }).eachPage((page, fetchNext) => {
+      records.push(...page);
+      fetchNext();
+    });
 
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({
-        records: records.map(record => ({
-          id: record.id,
-          fields: record.fields
-        }))
-      })
-    };
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.status(200).json({ records });
   } catch (err) {
-    console.error('getLetters error:', err);
-    return {
-      statusCode: 500,
-      headers: {
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({ error: 'Failed to fetch letters.' })
-    };
+    console.error('Fetch error:', err);
+    res.status(500).json({ error: 'Failed to fetch letters' });
   }
 };
