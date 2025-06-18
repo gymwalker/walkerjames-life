@@ -39,11 +39,10 @@
 
   fetch(API_URL)
     .then(res => {
-      if (!res.ok) throw new Error(`Fetch failed with status: ${res.status}`);
+      if (!res.ok) throw new Error(`Failed to fetch letters: ${res.status}`);
       return res.json();
     })
     .then(({ records }) => {
-      if (!Array.isArray(records)) throw new Error('Invalid records data');
       const sorted = records.sort((a, b) => new Date(b.fields['Submission Date']) - new Date(a.fields['Submission Date']));
       sorted.forEach(({ id, fields }) => {
         if (!fields || !fields['Letter Content']) return;
@@ -103,7 +102,7 @@
       });
     })
     .catch(err => {
-      console.error('[ERROR] Letter loading failed:', err);
+      console.error(err);
       grid.innerHTML = '<tr><td colspan="8">Failed to load letters. Please try again later.</td></tr>';
     });
 
@@ -121,7 +120,7 @@
         if (!res.ok) throw new Error(`Failed with status ${res.status}`);
         else console.log('✅ Reaction successfully synced.');
       } catch (err) {
-        console.error('❌ Failed to sync reactions:', err);
+        console.error('Failed to sync reactions:', err);
       }
     }
     currentReactionBuffer = {};
