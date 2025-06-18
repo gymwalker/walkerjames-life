@@ -21,9 +21,17 @@
       max-width: 600px;
       border-radius: 8px;
       overflow: hidden;
+      position: relative;
+    }
+    #ltg-close {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      font-size: 1.5rem;
+      cursor: pointer;
     }
     .scroll-box {
-      max-height: 5.5em;
+      max-height: 8.5em;
       overflow-y: auto;
       margin-bottom: 1rem;
       padding: 0.5rem;
@@ -74,7 +82,7 @@
       font-size: 1.5rem;
     }
     .reaction-icon {
-      font-size: 1.5rem;
+      font-size: 1rem;
     }
   `;
 
@@ -85,7 +93,9 @@
   const container = document.getElementById('ltg-wall-container');
   container.innerHTML = `
     <div id="ltg-modal">
-      <div id="ltg-modal-body"></div>
+      <div id="ltg-modal-body">
+        <span id="ltg-close">×</span>
+      </div>
     </div>
     <div class="table-wrapper">
       <table>
@@ -109,6 +119,7 @@
   const grid = document.getElementById('letters-grid');
   const modal = document.getElementById('ltg-modal');
   const modalBody = document.getElementById('ltg-modal-body');
+  const closeBtn = document.getElementById('ltg-close');
 
   const API_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/updateReaction?list=true';
   const REACT_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/updateReaction';
@@ -145,13 +156,14 @@
           currentReactionBuffer.reactions['View Count'] = true;
 
           modalBody.innerHTML = `
+            <span id="ltg-close">×</span>
             <h3>${fields['Display Name'] || 'Anonymous'}</h3>
             <div class="scroll-box" id="ltg-letter">${fields['Letter Content']}</div>
             <p>
               <span class="reaction-button" data-id="${id}" data-type="Hearts Count">❤️ ${fields['Hearts Count'] || 0}</span>
               <span class="reaction-button" data-id="${id}" data-type="Prayer Count">🙏 ${fields['Prayer Count'] || 0}</span>
               <span class="reaction-button" data-id="${id}" data-type="Broken Heart Count">💔 ${fields['Broken Heart Count'] || 0}</span>
-              <span class="reaction-button" style="font-size:1.5rem">📖 ${incrementedViewCount}</span>
+              <span class="reaction-button reaction-icon">📖 ${incrementedViewCount}</span>
             </p>
             <p><strong>Moderator Comment:</strong></p>
             <div class="scroll-box">${fields['Moderator Comments'] || 'None'}</div>
@@ -181,7 +193,7 @@
       grid.innerHTML = '<tr><td colspan="8">Failed to load letters. Please try again later.</td></tr>';
     });
 
-  modal.addEventListener('click', () => {
+  function closeModalAndSync() {
     if (currentReactionBuffer.id && Object.keys(currentReactionBuffer.reactions).length > 0) {
       Object.keys(currentReactionBuffer.reactions).forEach(reaction => {
         fetch(REACT_URL, {
@@ -193,5 +205,17 @@
     }
     currentReactionBuffer = {};
     modal.style.display = 'none';
+  }
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModalAndSync();
+    }
+  });
+
+  document.body.addEventListener('click', e => {
+    if (e.target.id === 'ltg-close') {
+      closeModalAndSync();
+    }
   });
 })();
