@@ -1,43 +1,54 @@
-// updateReaction.js
-import Airtable from 'airtable';
-import dotenv from 'dotenv';
-dotenv.config();
+const Airtable = require("airtable");
 
-export default async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end(); // handle preflight
-  }
-
+exports.handler = async (event) => {
   try {
-    if (req.method !== 'POST') {
-      res.setHeader('Allow', ['POST']);
-      return res.status(405).json({ error: 'Method Not Allowed' });
+    if (event.httpMethod !== "POST") {
+      return {
+        statusCode: 405,
+        body: JSON.stringify({ error: "Method Not Allowed" }),
+      };
     }
 
-    const { recordId, reactions } = req.body;
+    const { recordId, reactions } = JSON.parse(event.body);
 
-    if (!recordId || !reactions || typeof reactions !== 'object') {
-      return res.status(400).json({ error: 'Invalid payload' });
+    if (!recordId || typeof reactions !== "object") {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Missing recordId or reactions" }),
+      };
     }
 
-    const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
-    const record = await base('Letters').find(recordId);
-    const updatedFields = {};
+    const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(
+      process.env.AIRTABLE_BASE_ID
+    );
 
+    // Map fields to ensure numeric updates only
+    const updateFields = {};
     for (const [field, increment] of Object.entries(reactions)) {
-      const current = record.fields[field] || 0;
-      updatedFields[field] = current + increment;
+      if (typeof increment !== "number") continue;
+      updateFields[field] = increment;
     }
 
-    await base('Letters').update(recordId, updatedFields);
+    const existingRecord = await base("Letters").find(recordId);
+    const currentFields = existingRecord.fields;
+    const newFields = {};
 
-    return res.status(200).json({ message: 'Reactions updated successfully' });
+    for (const [field, increment] of Object.entries(updateFields)) {
+      const existing = parseInt(currentFields[field] || 0);
+      newFields[field] = existing + increment;
+    }
+
+    await base("Letters").update(recordId, newFields);
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ success: true, updated: newFields }),
+    };
   } catch (err) {
-    console.error('❌ Error updating reactions:', err);
-    return res.status(500).json({ error: 'Failed to update reactions' });
+    console.error("❌ Error updating reactions:", err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message || "Internal Server Error" }),
+    };
   }
 };
