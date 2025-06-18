@@ -1,60 +1,60 @@
 (function () {
-  const css = `
-    #ltg-wall-container {
-      padding: 2rem;
-      font-family: sans-serif;
-    }
-    #ltg-modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6);
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
-    #ltg-modal-body {
-      background: white;
-      padding: 2rem;
-      max-width: 600px;
-      border-radius: 8px;
-    }
-    table {
-      width: 100vw;
-      max-width: 100%;
-      margin: 0 auto;
-      border-collapse: collapse;
-      table-layout: fixed;
-    }
-    th, td {
-      border-bottom: 1px solid #ccc;
-      padding: 0.5rem;
-      text-align: left;
-      vertical-align: top;
-    }
-    th:nth-child(1), td:nth-child(1) {
-      width: 140px;
-      white-space: nowrap;
-    }
-    th:nth-child(2), td:nth-child(2) {
-      width: 180px;
-    }
-    th:nth-child(3), td:nth-child(3) {
-      width: 500px;
-    }
-    th:nth-child(4), td:nth-child(4) {
-      width: 500px;
-    }
-    th:nth-child(n+5), td:nth-child(n+5) {
-      width: 60px;
-      text-align: center;
-    }
-    tr:hover {
-      background-color: #f9f9f9;
-      cursor: pointer;
-    }
-  `;
+ const css = `
+  #ltg-wall-container {
+    padding: 2rem;
+    font-family: sans-serif;
+    max-width: 95vw;
+    margin: 0 auto;
+  }
+  #ltg-modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+  #ltg-modal-body {
+    background: white;
+    padding: 2rem;
+    max-width: 600px;
+    border-radius: 8px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  th, td {
+    border-bottom: 1px solid #ccc;
+    padding: 0.5rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  th:nth-child(1), td:nth-child(1) {
+    width: 130px;
+    white-space: nowrap;
+  }
+  th:nth-child(2), td:nth-child(2) {
+    width: 160px;
+  }
+  th:nth-child(3), td:nth-child(3) {
+    width: 300px;
+  }
+  th:nth-child(4), td:nth-child(4) {
+    width: 300px;
+  }
+  th:nth-child(n+5), td:nth-child(n+5) {
+    width: 60px;
+    text-align: center;
+  }
+  tr:hover {
+    background-color: #f9f9f9;
+    cursor: pointer;
+  }
+`;
 
   const style = document.createElement('style');
   style.innerHTML = css;
