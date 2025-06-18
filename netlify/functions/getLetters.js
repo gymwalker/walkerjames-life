@@ -17,14 +17,16 @@ exports.handler = async (event) => {
       const fields = record.fields;
       return {
         id: record.id,
-        name: fields.Name || "Anonymous",
-        content: fields["Letter Content"] || "",
-        comment: fields["Moderator Comment"] || "",
         date: fields["Submission Date"] || null,
-        emoji1: fields["Heart Count"] || 0,
-        emoji2: fields["Prayer Count"] || 0,
-        emoji3: fields["Broken Heart Count"] || 0,
-        emoji4: fields["Bible Count"] || 0,
+        name: fields.Name || "Anonymous",
+        letter: fields["Letter Content"] || "",
+        moderatorComment: fields["Moderator Comment"] || "",
+        reactions: {
+          Love: fields["Heart Count"] || 0,
+          Prayer: fields["Prayer Count"] || 0,
+          Broken: fields["Broken Heart Count"] || 0,
+          Bible: fields["Bible Count"] || 0
+        }
       };
     });
 
@@ -34,7 +36,7 @@ exports.handler = async (event) => {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Headers": "Content-Type"
       },
-      body: JSON.stringify({ letters })
+      body: JSON.stringify(letters)
     };
   } catch (err) {
     console.error("❌ Error loading letters:", err);
