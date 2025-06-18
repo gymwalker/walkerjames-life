@@ -1,37 +1,61 @@
+// updateReaction.js
+const Airtable = require('airtable');
+require('dotenv').config();
 
-const Airtable = require("airtable");
+const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
-exports.handler = async function(event, context) {
-  if (event.httpMethod !== "GET") {
+exports.handler = async function (event) {
+  // Handle CORS preflight request
+  if (event.httpMethod === 'OPTIONS') {
     return {
-      statusCode: 405,
-      body: JSON.stringify({ error: "Method Not Allowed" })
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+      },
+      body: ''
     };
   }
 
-  const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
-  const table = base(process.env.AIRTABLE_TABLE_NAME);
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ error: 'Method Not Allowed' })
+    };
+  }
 
   try {
-    const records = await table.select({ view: "Grid view" }).all();
+    const { recordId, reactions } = JSON.parse(event.body);
+    if (!recordId || !reactions || typeof reactions !== 'object') {
+      throw new Error('Invalid input');
+    }
 
-    const data = records.map(record => ({
-      id: record.id,
-      fields: record.fields
-    }));
+    await base('Letters').update([{
+      id: recordId,
+      fields: reactions
+    }]);
 
     return {
       statusCode: 200,
       headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*"
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
       },
-      body: JSON.stringify({ records: data })
+      body: JSON.stringify({ message: 'Reaction updated!' })
     };
   } catch (err) {
+    console.error(err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Failed to fetch records", details: err.toString() })
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ error: err.message || 'Internal Server Error' })
     };
   }
 };
