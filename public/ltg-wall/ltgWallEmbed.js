@@ -91,8 +91,14 @@
           modalBody.innerHTML = `
             <h3>${fields["Display Name"] || "Anonymous"}</h3>
             <p style="white-space: pre-wrap;">${fields["Letter Content"]}</p>
-            <p>❤️ ${fields["Hearts Count"] || 0} &nbsp; 🙏 ${fields["Prayer Count"] || 0}</p>
+            <p>
+              ❤️ ${fields["Hearts Count"] || 0} &nbsp;
+              🙏 ${fields["Prayer Count"] || 0} &nbsp;
+              💔 ${fields["Broken Heart Count"] || 0} &nbsp;
+              👁️ ${fields["View Count"] || 0}
+            </p>
           `;
+
           modal.style.display = 'flex';
         });
 
