@@ -31,7 +31,7 @@
       cursor: pointer;
     }
     .scroll-box {
-      max-height: 10em;
+      max-height: 12em;
       overflow-y: auto;
       margin-bottom: 1rem;
       padding: 0.5rem;
@@ -39,13 +39,14 @@
       border-radius: 4px;
     }
     .table-wrapper {
-      min-width: 1300px;
+      max-width: 1400px;
+      margin: 0 auto;
     }
     table {
       width: 100%;
       margin: 0 auto;
       border-collapse: collapse;
-      table-layout: fixed;
+      table-layout: auto;
     }
     th, td {
       border-bottom: 1px solid #ccc;
@@ -174,7 +175,12 @@
   async function closeModalAndSync() {
     if (currentReactionBuffer.id && Object.keys(currentReactionBuffer.reactions).length > 0) {
       try {
-        await fetch(REACT_URL, {
+        console.log("🛰️ Syncing to Airtable:", JSON.stringify({
+          recordId: currentReactionBuffer.id,
+          reactions: currentReactionBuffer.reactions
+        }, null, 2));
+
+        const res = await fetch(REACT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -182,6 +188,9 @@
             reactions: currentReactionBuffer.reactions
           })
         });
+
+        if (!res.ok) throw new Error(`Failed with status ${res.status}`);
+        else console.log('✅ Reaction successfully synced.');
       } catch (err) {
         console.error('Failed to sync reactions:', err);
       }
