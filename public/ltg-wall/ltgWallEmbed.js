@@ -23,7 +23,7 @@
       overflow: hidden;
     }
     .scroll-box {
-      max-height: 10em;
+      max-height: 7em;
       overflow-y: auto;
       margin-bottom: 1rem;
       padding: 0.5rem;
@@ -110,7 +110,8 @@
 
   const API_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/updateReaction?list=true';
   const REACT_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/updateReaction';
-  const reacted = new Set();
+
+  let currentReactionBuffer = {};
 
   fetch(API_URL)
     .then(res => res.json())
@@ -143,9 +144,11 @@
             body: JSON.stringify({ recordId: id, reaction: 'View Count' })
           }).catch(console.error);
 
+          currentReactionBuffer = { id, reactions: {} };
+
           modalBody.innerHTML = `
             <h3>${fields['Display Name'] || 'Anonymous'}</h3>
-            <div class="scroll-box">${fields['Letter Content']}</div>
+            <div class="scroll-box" id="ltg-letter">${fields['Letter Content']}</div>
             <p>
               <span class="reaction-button" data-id="${id}" data-type="Hearts Count">❤️ ${fields['Hearts Count'] || 0}</span>
               <span class="reaction-button" data-id="${id}" data-type="Prayer Count">🙏 ${fields['Prayer Count'] || 0}</span>
@@ -164,17 +167,10 @@
               e.stopPropagation();
               const recordId = btn.getAttribute('data-id');
               const reaction = btn.getAttribute('data-type');
-              const key = `${recordId}-${reaction}`;
-              if (!reaction || reacted.has(key)) return;
-              reacted.add(key);
-              fetch(REACT_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ recordId, reaction })
-              }).then(() => {
-                const current = parseInt(btn.textContent.match(/\d+/)[0]);
-                btn.innerHTML = btn.innerHTML.replace(/\d+/, current + 1);
-              });
+              if (!reaction || currentReactionBuffer.reactions[reaction]) return;
+              currentReactionBuffer.reactions[reaction] = true;
+              const current = parseInt(btn.textContent.match(/\d+/)[0]);
+              btn.innerHTML = btn.innerHTML.replace(/\d+/, current + 1);
             });
           });
         });
@@ -188,6 +184,16 @@
     });
 
   modal.addEventListener('click', () => {
+    if (currentReactionBuffer.id && Object.keys(currentReactionBuffer.reactions).length > 0) {
+      Object.keys(currentReactionBuffer.reactions).forEach(reaction => {
+        fetch(REACT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ recordId: currentReactionBuffer.id, reaction })
+        }).catch(console.error);
+      });
+    }
+    currentReactionBuffer = {};
     modal.style.display = 'none';
   });
 })();
