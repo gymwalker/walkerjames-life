@@ -1,66 +1,35 @@
-// netlify/functions/updateReaction.js
-const Airtable = require('airtable');
-require('dotenv').config();
+// updateReaction.js
+import Airtable from 'airtable';
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
-exports.handler = async function (event) {
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: ''
-    };
-  }
-
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers: {
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({ error: 'Method Not Allowed' })
-    };
+export default async (req, res) => {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
   try {
-    const parsed = JSON.parse(event.body || '{}');
-    const { recordId, reactions } = parsed;
+    const { recordId, reactions } = req.body;
 
-    if (!recordId || typeof reactions !== 'object' || Object.keys(reactions).length === 0) {
-      return {
-        statusCode: 400,
-        headers: { 'Access-Control-Allow-Origin': '*' },
-        body: JSON.stringify({ error: 'Missing or invalid recordId or reactions' })
-      };
+    if (!recordId || !reactions || typeof reactions !== 'object') {
+      return res.status(400).json({ error: 'Invalid request payload' });
     }
 
-    await base('Letters').update([{
-      id: recordId,
-      fields: reactions
-    }]);
+    const fieldsToUpdate = {};
 
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: JSON.stringify({ message: 'Reaction updated!' })
-    };
-  } catch (err) {
-    console.error(err);
-    return {
-      statusCode: 500,
-      headers: {
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({ error: err.message || 'Internal Server Error' })
-    };
+    for (const [field, increment] of Object.entries(reactions)) {
+      if (typeof increment !== 'number') continue;
+
+      const record = await base('Letters').find(recordId);
+      const currentValue = record.fields[field] || 0;
+      fieldsToUpdate[field] = currentValue + increment;
+    }
+
+    await base('Letters').update(recordId, { fields: fieldsToUpdate });
+
+    res.status(200).json({ success: true, updated: fieldsToUpdate });
+  } catch (error) {
+    console.error('Error in updateReaction.js:', error);
+    res.status(500).json({ error: 'Server Error', details: error.message });
   }
 };
