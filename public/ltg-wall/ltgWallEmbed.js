@@ -39,8 +39,9 @@
 
   fetch(API_URL)
     .then(res => res.json())
-    .then(({ records }) => {
-      const sorted = records.sort((a, b) => new Date(b.fields['Submission Date']) - new Date(a.fields['Submission Date']));
+    .then(data => {
+      if (!data || !Array.isArray(data.records)) throw new Error('Invalid response format');
+      const sorted = data.records.sort((a, b) => new Date(b.fields['Submission Date']) - new Date(a.fields['Submission Date']));
       sorted.forEach(({ id, fields }) => {
         if (!fields || !fields['Letter Content']) return;
 
@@ -99,7 +100,7 @@
       });
     })
     .catch(err => {
-      console.error(err);
+      console.error('[LTG WALL] Load error:', err);
       grid.innerHTML = '<tr><td colspan="8">Failed to load letters. Please try again later.</td></tr>';
     });
 
@@ -117,7 +118,7 @@
         if (!res.ok) throw new Error(`Failed with status ${res.status}`);
         else console.log('✅ Reaction successfully synced.');
       } catch (err) {
-        console.error('Failed to sync reactions:', err);
+        console.error('[LTG WALL] Failed to sync reactions:', err);
       }
     }
     currentReactionBuffer = {};
