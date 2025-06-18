@@ -5,9 +5,11 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "echo 'No start script necessary — Netlify handles execution'",
     "build": "echo 'No build step required'"
   },
   "dependencies": {
-    "airtable": "^0.11.6"
+    "airtable": "^0.11.6",
+    "dotenv": "^16.3.1"
   }
 }
