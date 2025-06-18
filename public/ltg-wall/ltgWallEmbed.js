@@ -3,6 +3,9 @@
     #ltg-wall-container {
       padding: 2rem;
       font-family: sans-serif;
+      width: 100vw !important;
+      max-width: 100vw !important;
+      overflow-x: auto;
     }
     #ltg-modal {
       display: none;
@@ -22,12 +25,12 @@
     }
     #ltg-table-scroll {
       overflow-x: auto;
-      margin-top: 1rem;
+      width: 100%;
     }
     table {
-      min-width: 1000px;
+      width: 1200px;
+      min-width: 1200px;
       border-collapse: collapse;
-      width: 100%;
       table-layout: fixed;
     }
     th, td {
@@ -44,7 +47,7 @@
       width: 150px;
     }
     th:nth-child(3), td:nth-child(3) {
-      width: 280px;
+      width: 300px;
     }
     th:nth-child(4), td:nth-child(4) {
       width: 300px;
