@@ -31,7 +31,7 @@
       cursor: pointer;
     }
     .scroll-box {
-      max-height: 10.5em;
+      max-height: 13em;
       overflow-y: auto;
       margin-bottom: 1rem;
       padding: 0.5rem;
@@ -54,21 +54,7 @@
       vertical-align: top;
       font-size: 1rem;
     }
-    th:nth-child(1), td:nth-child(1) {
-      width: 140px;
-      white-space: nowrap;
-    }
-    th:nth-child(2), td:nth-child(2) {
-      width: 180px;
-    }
-    th:nth-child(3), td:nth-child(3) {
-      width: 300px;
-    }
-    th:nth-child(4), td:nth-child(4) {
-      width: 300px;
-    }
     th:nth-child(n+5), td:nth-child(n+5) {
-      width: 60px;
       text-align: center;
       font-size: 1rem;
     }
@@ -143,7 +129,7 @@
         row.addEventListener('click', () => {
           currentReactionBuffer = { id, reactions: {} };
           const incrementedViewCount = (fields['View Count'] || 0) + 1;
-          currentReactionBuffer.reactions['View Count'] = true;
+          currentReactionBuffer.reactions['View Count'] = 1;
 
           modalBody.innerHTML = `
             <span id="ltg-close">×</span>
@@ -168,7 +154,7 @@
               const recordId = btn.getAttribute('data-id');
               const reaction = btn.getAttribute('data-type');
               if (!reaction || currentReactionBuffer.reactions[reaction]) return;
-              currentReactionBuffer.reactions[reaction] = true;
+              currentReactionBuffer.reactions[reaction] = 1;
               const current = parseInt(btn.textContent.match(/\d+/)[0]);
               btn.innerHTML = btn.innerHTML.replace(/\d+/, current + 1);
             });
@@ -185,13 +171,14 @@
 
   function closeModalAndSync() {
     if (currentReactionBuffer.id && Object.keys(currentReactionBuffer.reactions).length > 0) {
-      Object.keys(currentReactionBuffer.reactions).forEach(reaction => {
-        fetch(REACT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ recordId: currentReactionBuffer.id, reaction })
-        }).catch(console.error);
-      });
+      fetch(REACT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recordId: currentReactionBuffer.id,
+          reactions: currentReactionBuffer.reactions
+        })
+      }).catch(console.error);
     }
     currentReactionBuffer = {};
     modal.style.display = 'none';
