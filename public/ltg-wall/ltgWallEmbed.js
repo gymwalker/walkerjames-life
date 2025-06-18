@@ -22,7 +22,7 @@
     }
     table {
       width: 95vw;
-      max-width: 1400px;
+      max-width: 2500px;
       margin: 0 auto;
       border-collapse: collapse;
       table-layout: fixed;
