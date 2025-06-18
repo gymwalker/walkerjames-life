@@ -23,7 +23,7 @@
       overflow: hidden;
     }
     .scroll-box {
-      max-height: 18em;
+      max-height: 10em;
       overflow-y: auto;
       margin-bottom: 1rem;
       padding: 0.5rem;
@@ -110,6 +110,7 @@
 
   const API_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/updateReaction?list=true';
   const REACT_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/updateReaction';
+  const reacted = new Set();
 
   fetch(API_URL)
     .then(res => res.json())
@@ -136,7 +137,6 @@
         `;
 
         row.addEventListener('click', () => {
-          // Increment view count
           fetch(REACT_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -150,7 +150,7 @@
               <span class="reaction-button" data-id="${id}" data-type="Hearts Count">❤️ ${fields['Hearts Count'] || 0}</span>
               <span class="reaction-button" data-id="${id}" data-type="Prayer Count">🙏 ${fields['Prayer Count'] || 0}</span>
               <span class="reaction-button" data-id="${id}" data-type="Broken Heart Count">💔 ${fields['Broken Heart Count'] || 0}</span>
-              <span class="reaction-icon">📖 ${fields['View Count'] + 1 || 1}</span>
+              <span class="reaction-button" style="font-size:1.5rem">📖 ${fields['View Count'] + 1 || 1}</span>
             </p>
             <p><strong>Moderator Comment:</strong></p>
             <div class="scroll-box">${fields['Moderator Comments'] || 'None'}</div>
@@ -164,6 +164,9 @@
               e.stopPropagation();
               const recordId = btn.getAttribute('data-id');
               const reaction = btn.getAttribute('data-type');
+              const key = `${recordId}-${reaction}`;
+              if (!reaction || reacted.has(key)) return;
+              reacted.add(key);
               fetch(REACT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
