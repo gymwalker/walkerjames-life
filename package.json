@@ -3,12 +3,11 @@
   "version": "1.0.0",
   "description": "Netlify functions for Letters to God",
   "main": "index.js",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "build": "echo 'No build step required'"
   },
   "dependencies": {
-    "airtable": "^0.11.6",
-    "dotenv": "^16.3.1"
+    "airtable": "^0.11.6"
   }
 }
