@@ -5,14 +5,12 @@
 [functions]
   node_bundler = "esbuild"
 
-[functions.getLetters]
-  name = "getLetters"
-  included_files = ["netlify/functions/getLetters.js"]
+[functions.get-letters]
+  included_files = ["netlify/functions/get-letters.js"]
   external_node_modules = ["airtable"]
 
-[functions.updateReaction]
-  name = "updateReaction"
-  included_files = ["netlify/functions/updateReaction.js"]
+[functions.update-reaction]
+  included_files = ["netlify/functions/update-reaction.js"]
   external_node_modules = ["airtable"]
 
 [functions.LetterApproved]
