@@ -37,9 +37,13 @@
   const modalBody = document.getElementById('ltg-modal-body');
   let currentReactionBuffer = {};
 
-  fetch(API_URL, { mode: 'cors' })
-    .then(res => res.json())
+  fetch(API_URL)
+    .then(res => {
+      if (!res.ok) throw new Error(`Fetch failed with status: ${res.status}`);
+      return res.json();
+    })
     .then(({ records }) => {
+      if (!Array.isArray(records)) throw new Error('Invalid records data');
       const sorted = records.sort((a, b) => new Date(b.fields['Submission Date']) - new Date(a.fields['Submission Date']));
       sorted.forEach(({ id, fields }) => {
         if (!fields || !fields['Letter Content']) return;
@@ -99,7 +103,7 @@
       });
     })
     .catch(err => {
-      console.error(err);
+      console.error('[ERROR] Letter loading failed:', err);
       grid.innerHTML = '<tr><td colspan="8">Failed to load letters. Please try again later.</td></tr>';
     });
 
@@ -108,7 +112,6 @@
       try {
         const res = await fetch(REACT_URL, {
           method: 'POST',
-          mode: 'cors',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             recordId: currentReactionBuffer.id,
@@ -118,7 +121,7 @@
         if (!res.ok) throw new Error(`Failed with status ${res.status}`);
         else console.log('✅ Reaction successfully synced.');
       } catch (err) {
-        console.error('Failed to sync reactions:', err);
+        console.error('❌ Failed to sync reactions:', err);
       }
     }
     currentReactionBuffer = {};
