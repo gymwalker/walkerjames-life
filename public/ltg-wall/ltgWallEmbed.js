@@ -31,7 +31,7 @@
       cursor: pointer;
     }
     .scroll-box {
-      max-height: 13em;
+      max-height: 10em;
       overflow-y: auto;
       margin-bottom: 1rem;
       padding: 0.5rem;
@@ -76,9 +76,7 @@
   const container = document.getElementById('ltg-wall-container');
   container.innerHTML = `
     <div id="ltg-modal">
-      <div id="ltg-modal-body">
-        <span id="ltg-close">×</span>
-      </div>
+      <div id="ltg-modal-body"></div>
     </div>
     <div class="table-wrapper">
       <table>
@@ -127,9 +125,8 @@
         `;
 
         row.addEventListener('click', () => {
-          currentReactionBuffer = { id, reactions: {} };
+          currentReactionBuffer = { id, reactions: { 'View Count': 1 } };
           const incrementedViewCount = (fields['View Count'] || 0) + 1;
-          currentReactionBuffer.reactions['View Count'] = 1;
 
           modalBody.innerHTML = `
             <span id="ltg-close">×</span>
@@ -147,6 +144,11 @@
           `;
 
           modal.style.display = 'flex';
+
+          document.getElementById('ltg-close')?.addEventListener('click', async e => {
+            e.stopPropagation();
+            await closeModalAndSync();
+          });
 
           modalBody.querySelectorAll('.reaction-button').forEach(btn => {
             btn.addEventListener('click', e => {
@@ -169,24 +171,22 @@
       grid.innerHTML = '<tr><td colspan="8">Failed to load letters. Please try again later.</td></tr>';
     });
 
-  function closeModalAndSync() {
+  async function closeModalAndSync() {
     if (currentReactionBuffer.id && Object.keys(currentReactionBuffer.reactions).length > 0) {
-      fetch(REACT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          recordId: currentReactionBuffer.id,
-          reactions: currentReactionBuffer.reactions
-        })
-      }).catch(console.error);
+      try {
+        await fetch(REACT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            recordId: currentReactionBuffer.id,
+            reactions: currentReactionBuffer.reactions
+          })
+        });
+      } catch (err) {
+        console.error('Failed to sync reactions:', err);
+      }
     }
     currentReactionBuffer = {};
     modal.style.display = 'none';
   }
-
-  document.body.addEventListener('click', e => {
-    if (e.target.id === 'ltg-close') {
-      closeModalAndSync();
-    }
-  });
 })();
