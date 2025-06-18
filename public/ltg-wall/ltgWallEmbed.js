@@ -1,47 +1,47 @@
-
 (function () {
   const css = `
     #ltg-wall-container {
-      font-family: 'Georgia', serif;
-      background-color: #fffaf4;
-      max-width: 1000px;
-      margin: 2rem auto;
-      padding: 1rem;
+      padding: 2rem;
+      font-family: "Century Gothic", sans-serif;
     }
-    table#letters-table {
+    #letters-grid {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 1rem;
     }
-    table#letters-table th, table#letters-table td {
-      border-bottom: 1px solid #ddd;
+    #letters-grid th, #letters-grid td {
       padding: 0.75rem;
+      border: 1px solid #ddd;
       text-align: left;
+      vertical-align: top;
     }
-    table#letters-table tr:hover {
-      background-color: #f5f5f5;
+    #letters-grid tr:hover {
+      background-color: #f9f9f9;
       cursor: pointer;
     }
-    #ltg-modal {
+    .modal {
       display: none;
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: rgba(0,0,0,0.6);
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
       justify-content: center;
       align-items: center;
-      z-index: 10000;
+      z-index: 1000;
     }
-    #ltg-modal-content {
+    .modal-content {
       background: white;
       padding: 2rem;
       max-width: 600px;
-      max-height: 80vh;
-      overflow-y: auto;
+      width: 90%;
       border-radius: 8px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      position: relative;
     }
-    #ltg-modal-close {
-      float: right;
+    .modal-content h3 {
+      margin-top: 0;
+    }
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
       font-size: 1.5rem;
       cursor: pointer;
     }
@@ -52,71 +52,94 @@
   document.head.appendChild(style);
 
   const container = document.getElementById('ltg-wall-container');
-  container.innerHTML = '<table id="letters-table"><thead><tr><th>Preview</th><th>Name</th><th>❤️</th><th>🙏</th></tr></thead><tbody id="letters-grid"></tbody></table><div id="ltg-modal"><div id="ltg-modal-content"><span id="ltg-modal-close">&times;</span><div id="ltg-modal-body"></div></div></div>';
-  const grid = document.getElementById('letters-grid');
+  container.innerHTML = `
+    <table id="letters-grid">
+      <thead>
+        <tr>
+          <th>Preview</th>
+          <th>Name</th>
+          <th>❤️</th>
+          <th>🙏</th>
+          <th>💔</th>
+          <th>📖</th>
+          <th>Response</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div id="ltg-modal" class="modal">
+      <div class="modal-content">
+        <span class="modal-close" onclick="document.getElementById('ltg-modal').style.display='none'">&times;</span>
+        <div id="ltg-modal-body"></div>
+      </div>
+    </div>
+  `;
 
+  const grid = container.querySelector('tbody');
   const API_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/updateReaction?list=true';
 
   fetch(API_URL)
-    .then(res => res.json())
+    .then(res => {
+      const ct = res.headers.get('content-type') || '';
+      if (ct.includes('application/json')) return res.json();
+      throw new Error('Unexpected response');
+    })
     .then(({ records }) => {
       if (!records || !records.length) {
-        grid.innerHTML = '<tr><td colspan="4">No letters found.</td></tr>';
+        grid.innerHTML = `<tr><td colspan="8">No letters found.</td></tr>`;
         return;
       }
 
-      // Sort by Submission Date descending
-      records.sort((a, b) => {
-        const da = new Date(a.fields["Submission Date"] || 0);
-        const db = new Date(b.fields["Submission Date"] || 0);
-        return db - da;
-      });
+      records
+        .filter(r => r.fields && r.fields["Letter Content"])
+        .sort((a, b) => new Date(b.fields["Submission Date"]) - new Date(a.fields["Submission Date"]))
+        .forEach(({ fields }) => {
+          const row = document.createElement('tr');
 
-      records.forEach(({ fields }) => {
-        if (!fields || !fields["Letter Content"]) return;
+          const preview = fields["Letter Content"].slice(0, 60).replace(/\n/g, ' ') + '...';
+          const name = fields["Display Name"] || "Anonymous";
+          const hearts = fields["Hearts Count"] || 0;
+          const prayers = fields["Prayer Count"] || 0;
+          const broken = fields["Broken Heart Count"] || 0;
+          const views = fields["View Count"] || 0;
+          const response = fields["Moderator Comments"] || '';
+          const submitted = fields["Submission Date"] || '';
 
-        const row = document.createElement('tr');
-        const preview = fields["Letter Content"].slice(0, 60).replace(/\n/g, ' ') + (fields["Letter Content"].length > 60 ? "..." : "");
-
-        row.innerHTML = `
-          <td>${preview}</td>
-          <td>${fields["Display Name"] || "Anonymous"}</td>
-          <td>${fields["Hearts Count"] || 0}</td>
-          <td>${fields["Prayer Count"] || 0}</td>
-        `;
-
-        row.addEventListener('click', () => {
-          const modal = document.getElementById('ltg-modal');
-          const modalBody = document.getElementById('ltg-modal-body');
-          modalBody.innerHTML = `
-            <h3>${fields["Display Name"] || "Anonymous"}</h3>
-            <p style="white-space: pre-wrap;">${fields["Letter Content"]}</p>
-            <p>
-              ❤️ ${fields["Hearts Count"] || 0} &nbsp;
-              🙏 ${fields["Prayer Count"] || 0} &nbsp;
-              💔 ${fields["Broken Heart Count"] || 0} &nbsp;
-              👁️ ${fields["View Count"] || 0}
-            </p>
+          row.innerHTML = `
+            <td>${preview}</td>
+            <td>${name}</td>
+            <td>${hearts}</td>
+            <td>${prayers}</td>
+            <td>${broken}</td>
+            <td>${views}</td>
+            <td>${response ? '✓' : ''}</td>
+            <td>${submitted}</td>
           `;
 
-          modal.style.display = 'flex';
+          row.addEventListener('click', () => {
+            const modal = document.getElementById('ltg-modal');
+            const modalBody = document.getElementById('ltg-modal-body');
+            modalBody.innerHTML = `
+              <h3>${name}</h3>
+              <p style="white-space: pre-wrap;">${fields["Letter Content"]}</p>
+              <p>
+                ❤️ ${hearts} &nbsp;
+                🙏 ${prayers} &nbsp;
+                💔 ${broken} &nbsp;
+                📖 ${views}
+              </p>
+              ${response ? `<p><strong>Moderator:</strong> ${response}</p>` : ''}
+              <p><small><em>Submitted: ${submitted}</em></small></p>
+            `;
+            modal.style.display = 'flex';
+          });
+
+          grid.appendChild(row);
         });
-
-        grid.appendChild(row);
-      });
-
-      document.getElementById('ltg-modal-close').onclick = () => {
-        document.getElementById('ltg-modal').style.display = 'none';
-      };
-      window.onclick = function(event) {
-        const modal = document.getElementById('ltg-modal');
-        if (event.target === modal) {
-          modal.style.display = 'none';
-        }
-      };
     })
     .catch(err => {
       console.error(err);
-      grid.innerHTML = '<tr><td colspan="4" style="color:red;">Failed to load letters. Please try again later.</td></tr>';
+      grid.innerHTML = `<tr><td colspan="8" style="color: red;">Failed to load letters. Please try again later.</td></tr>`;
     });
 })();
