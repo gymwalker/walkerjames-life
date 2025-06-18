@@ -5,7 +5,11 @@ exports.handler = async (event) => {
     if (event.httpMethod !== "POST") {
       return {
         statusCode: 405,
-        body: JSON.stringify({ error: "Method Not Allowed" }),
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "Content-Type"
+        },
+        body: JSON.stringify({ error: "Method Not Allowed" })
       };
     }
 
@@ -14,7 +18,11 @@ exports.handler = async (event) => {
     if (!recordId || typeof reactions !== "object") {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Missing recordId or reactions" }),
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "Content-Type"
+        },
+        body: JSON.stringify({ error: "Missing recordId or reactions" })
       };
     }
 
@@ -22,27 +30,41 @@ exports.handler = async (event) => {
       process.env.AIRTABLE_BASE_ID
     );
 
-    const existingRecord = await base("Letters").find(recordId);
-    const currentFields = existingRecord.fields;
-
+    // Map fields to ensure numeric updates only
     const updateFields = {};
     for (const [field, increment] of Object.entries(reactions)) {
       if (typeof increment !== "number") continue;
-      const existing = parseInt(currentFields[field] || 0, 10);
-      updateFields[field] = existing + increment;
+      updateFields[field] = increment;
     }
 
-    await base("Letters").update(recordId, updateFields);
+    const existingRecord = await base("Letters").find(recordId);
+    const currentFields = existingRecord.fields;
+    const newFields = {};
+
+    for (const [field, increment] of Object.entries(updateFields)) {
+      const existing = parseInt(currentFields[field] || 0);
+      newFields[field] = existing + increment;
+    }
+
+    await base("Letters").update(recordId, newFields);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ success: true, updated: updateFields }),
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type"
+      },
+      body: JSON.stringify({ success: true, updated: newFields })
     };
   } catch (err) {
     console.error("❌ Error updating reactions:", err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message || "Internal Server Error" }),
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type"
+      },
+      body: JSON.stringify({ error: err.message || "Internal Server Error" })
     };
   }
 };
