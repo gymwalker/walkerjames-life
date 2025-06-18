@@ -23,7 +23,7 @@
       overflow: hidden;
     }
     .scroll-box {
-      max-height: 7em;
+      max-height: 5.5em;
       overflow-y: auto;
       margin-bottom: 1rem;
       padding: 0.5rem;
@@ -44,6 +44,7 @@
       padding: 0.5rem;
       text-align: left;
       vertical-align: top;
+      font-size: 1rem;
     }
     th:nth-child(1), td:nth-child(1) {
       width: 140px;
@@ -61,6 +62,7 @@
     th:nth-child(n+5), td:nth-child(n+5) {
       width: 60px;
       text-align: center;
+      font-size: 1rem;
     }
     tr:hover {
       background-color: #f9f9f9;
@@ -138,13 +140,9 @@
         `;
 
         row.addEventListener('click', () => {
-          fetch(REACT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ recordId: id, reaction: 'View Count' })
-          }).catch(console.error);
-
           currentReactionBuffer = { id, reactions: {} };
+          const incrementedViewCount = (fields['View Count'] || 0) + 1;
+          currentReactionBuffer.reactions['View Count'] = true;
 
           modalBody.innerHTML = `
             <h3>${fields['Display Name'] || 'Anonymous'}</h3>
@@ -153,7 +151,7 @@
               <span class="reaction-button" data-id="${id}" data-type="Hearts Count">❤️ ${fields['Hearts Count'] || 0}</span>
               <span class="reaction-button" data-id="${id}" data-type="Prayer Count">🙏 ${fields['Prayer Count'] || 0}</span>
               <span class="reaction-button" data-id="${id}" data-type="Broken Heart Count">💔 ${fields['Broken Heart Count'] || 0}</span>
-              <span class="reaction-button" style="font-size:1.5rem">📖 ${fields['View Count'] + 1 || 1}</span>
+              <span class="reaction-button" style="font-size:1.5rem">📖 ${incrementedViewCount}</span>
             </p>
             <p><strong>Moderator Comment:</strong></p>
             <div class="scroll-box">${fields['Moderator Comments'] || 'None'}</div>
