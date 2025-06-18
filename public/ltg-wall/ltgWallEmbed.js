@@ -3,8 +3,10 @@
     #ltg-wall-container {
       padding: 2rem;
       font-family: sans-serif;
-      width: 100%;
+      width: 100vw !important;
+      max-width: 100vw !important;
       overflow-x: auto;
+      margin-left: calc(-50vw + 50%);
     }
     #ltg-modal {
       display: none;
@@ -24,9 +26,9 @@
     }
     table {
       width: 95vw;
-      margin: 0 auto;
       border-collapse: collapse;
       table-layout: fixed;
+      margin: 0 auto;
     }
     th, td {
       border-bottom: 1px solid #ccc;
