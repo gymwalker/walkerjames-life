@@ -1,10 +1,16 @@
-const Airtable = require("airtable");
+import Airtable from "airtable";
 
-exports.handler = async (event) => {
+export async function handler(event) {
+  const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+  };
+
   try {
     if (event.httpMethod !== "POST") {
       return {
         statusCode: 405,
+        headers: corsHeaders,
         body: JSON.stringify({ error: "Method Not Allowed" }),
       };
     }
@@ -14,6 +20,7 @@ exports.handler = async (event) => {
     if (!recordId || typeof reactions !== "object") {
       return {
         statusCode: 400,
+        headers: corsHeaders,
         body: JSON.stringify({ error: "Missing recordId or reactions" }),
       };
     }
@@ -22,7 +29,6 @@ exports.handler = async (event) => {
       process.env.AIRTABLE_BASE_ID
     );
 
-    // Map fields to ensure numeric updates only
     const updateFields = {};
     for (const [field, increment] of Object.entries(reactions)) {
       if (typeof increment !== "number") continue;
@@ -42,13 +48,15 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 200,
+      headers: corsHeaders,
       body: JSON.stringify({ success: true, updated: newFields }),
     };
   } catch (err) {
     console.error("❌ Error updating reactions:", err);
     return {
       statusCode: 500,
+      headers: corsHeaders,
       body: JSON.stringify({ error: err.message || "Internal Server Error" }),
     };
   }
-};
+}
