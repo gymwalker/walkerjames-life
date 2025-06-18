@@ -23,7 +23,7 @@
       overflow: hidden;
     }
     .scroll-box {
-      max-height: 6em;
+      max-height: 14em;
       overflow-y: auto;
       margin-bottom: 1rem;
       padding: 0.5rem;
@@ -66,6 +66,11 @@
       background-color: #f9f9f9;
       cursor: pointer;
     }
+    .reaction-button {
+      margin: 0 5px;
+      cursor: pointer;
+      font-size: 1.5rem;
+    }
   `;
 
   const style = document.createElement('style');
@@ -101,6 +106,7 @@
   const modalBody = document.getElementById('ltg-modal-body');
 
   const API_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/updateReaction?list=true';
+  const REACT_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/updateReaction';
 
   fetch(API_URL)
     .then(res => res.json())
@@ -111,7 +117,7 @@
         return dateB - dateA;
       });
 
-      sorted.forEach(({ fields }) => {
+      sorted.forEach(({ id, fields }) => {
         if (!fields || !fields['Letter Content']) return;
 
         const row = document.createElement('tr');
@@ -127,19 +133,41 @@
         `;
 
         row.addEventListener('click', () => {
+          // Increment view count
+          fetch(REACT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ recordId: id, reaction: 'View Count' })
+          }).catch(console.error);
+
           modalBody.innerHTML = `
             <h3>${fields['Display Name'] || 'Anonymous'}</h3>
             <div class="scroll-box">${fields['Letter Content']}</div>
             <p>
-              ❤️ ${fields['Hearts Count'] || 0} &nbsp;
-              🙏 ${fields['Prayer Count'] || 0} &nbsp;
-              💔 ${fields['Broken Heart Count'] || 0} &nbsp;
-              📖 ${fields['View Count'] || 0}
+              <span class="reaction-button" data-id="${id}" data-type="Hearts Count">❤️ ${fields['Hearts Count'] || 0}</span>
+              <span class="reaction-button" data-id="${id}" data-type="Prayer Count">🙏 ${fields['Prayer Count'] || 0}</span>
+              <span class="reaction-button" data-id="${id}" data-type="Broken Heart Count">💔 ${fields['Broken Heart Count'] || 0}</span>
+              <span>📖 ${fields['View Count'] + 1 || 1}</span>
             </p>
             <p><strong>Moderator Comment:</strong></p>
             <div class="scroll-box">${fields['Moderator Comments'] || 'None'}</div>
             <p><strong>Date:</strong> ${fields['Submission Date'] || ''}</p>
           `;
+
+          // Attach reactions
+          modalBody.querySelectorAll('.reaction-button').forEach(btn => {
+            btn.addEventListener('click', e => {
+              e.stopPropagation();
+              const recordId = btn.getAttribute('data-id');
+              const reaction = btn.getAttribute('data-type');
+              fetch(REACT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ recordId, reaction })
+              }).then(() => location.reload());
+            });
+          });
+
           modal.style.display = 'flex';
         });
 
