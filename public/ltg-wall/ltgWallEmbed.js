@@ -8,28 +8,33 @@
       margin: 2rem auto;
       padding: 1rem;
     }
+
     #letters-grid {
       display: grid;
       grid-template-columns: 1fr;
       gap: 1.5rem;
     }
+
     .letter-card {
       border: 1px solid #ddd;
       background: #fff;
       border-radius: 8px;
       padding: 1rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
+
     .letter-meta {
       display: flex;
       justify-content: space-between;
       margin-top: 1rem;
     }
+
     .icon-btn {
       cursor: pointer;
       font-size: 1.2rem;
       margin-right: 1rem;
     }
+
     .icon-btn span {
       margin-left: 0.25rem;
     }
@@ -43,49 +48,54 @@
   container.innerHTML = '<div id="letters-grid"></div>';
   const grid = document.getElementById("letters-grid");
 
-  const API_URL = "https://walkerjames-life.netlify.app/.netlify/functions/updateReaction?list=true";
+  fetch('/.netlify/functions/updateReaction?list=true')
+    .then((res) => {
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        return res.json();
+      } else {
+        throw new Error("Unexpected response type (not JSON)");
+      }
+    })
+    .then((data) => {
+      const records = data.records;
+      if (!records || !records.length) {
+        grid.innerHTML = "<p>No letters found.</p>";
+        return;
+      }
 
-  fetch(API_URL)
-    .then(res => res.json())
-    .then(({ records }) => {
-      records.forEach(({ fields, id }) => {
-        if (!fields["Approved"]) return;
+      records.forEach((record) => {
+        const fields = record.fields;
+        if (!fields || !fields["Letter Content"]) return;
 
-        const card = document.createElement("div");
-        card.className = "letter-card";
-        card.innerHTML = `
-          <p>${fields.LetterContent}</p>
-          <div class="letter-meta">
-            <div>
-              <span class="icon-btn" onclick="updateReaction('${id}', 'Hearts', this)">❤️ <span>${fields.Hearts || 0}</span></span>
-              <span class="icon-btn" onclick="updateReaction('${id}', 'BrokenHearts', this)">💔 <span>${fields.BrokenHearts || 0}</span></span>
-              <span class="icon-btn" onclick="updateReaction('${id}', 'Prayers', this)">🙏 <span>${fields.Prayers || 0}</span></span>
-            </div>
-            <div>
-              <span class="icon-btn" onclick="updateReaction('${id}', 'Views', this)">📖 <span>${fields.Views || 0}</span></span>
-            </div>
-          </div>
+        const letter = document.createElement("div");
+        letter.className = "letter-card";
+
+        const content = document.createElement("p");
+        content.textContent = fields["Letter Content"];
+        letter.appendChild(content);
+
+        const meta = document.createElement("div");
+        meta.className = "letter-meta";
+
+        const displayName = document.createElement("span");
+        displayName.textContent = fields["Display Name"] || "Anonymous";
+        meta.appendChild(displayName);
+
+        const reactions = document.createElement("div");
+        reactions.className = "reactions";
+        reactions.innerHTML = `
+          ❤️ ${fields["Hearts Count"] || 0}
+          🙏 ${fields["Prayer Count"] || 0}
         `;
-        grid.appendChild(card);
+        meta.appendChild(reactions);
+
+        letter.appendChild(meta);
+        grid.appendChild(letter);
       });
     })
-    .catch(err => {
-      container.innerHTML = "<p>Failed to load letters. Please try again later.</p>";
+    .catch((err) => {
+      console.error("Fetch error:", err);
+      grid.innerHTML = "<p>Failed to load letters. Please try again later.</p>";
     });
-
-  window.updateReaction = function (recordId, field, el) {
-    const PATCH_URL = "https://walkerjames-life.netlify.app/.netlify/functions/updateReaction";
-    const span = el.querySelector("span");
-    let currentValue = parseInt(span.textContent) || 0;
-    span.textContent = currentValue + 1;
-
-    fetch(PATCH_URL, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        recordId,
-        fields: { [field]: currentValue + 1 }
-      })
-    });
-  };
 })();
