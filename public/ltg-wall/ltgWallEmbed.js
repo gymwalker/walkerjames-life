@@ -31,7 +31,7 @@
       cursor: pointer;
     }
     .scroll-box {
-      max-height: 8.5em;
+      max-height: 10.5em;
       overflow-y: auto;
       margin-bottom: 1rem;
       padding: 0.5rem;
@@ -81,9 +81,6 @@
       cursor: pointer;
       font-size: 1.5rem;
     }
-    .reaction-icon {
-      font-size: 1rem;
-    }
   `;
 
   const style = document.createElement('style');
@@ -119,21 +116,14 @@
   const grid = document.getElementById('letters-grid');
   const modal = document.getElementById('ltg-modal');
   const modalBody = document.getElementById('ltg-modal-body');
-  const closeBtn = document.getElementById('ltg-close');
-
   const API_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/updateReaction?list=true';
   const REACT_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/updateReaction';
-
   let currentReactionBuffer = {};
 
   fetch(API_URL)
     .then(res => res.json())
     .then(({ records }) => {
-      const sorted = records.sort((a, b) => {
-        const dateA = new Date(a.fields['Submission Date']);
-        const dateB = new Date(b.fields['Submission Date']);
-        return dateB - dateA;
-      });
+      const sorted = records.sort((a, b) => new Date(b.fields['Submission Date']) - new Date(a.fields['Submission Date']));
 
       sorted.forEach(({ id, fields }) => {
         if (!fields || !fields['Letter Content']) return;
@@ -147,7 +137,7 @@
           <td>${fields['Hearts Count'] || 0}</td>
           <td>${fields['Prayer Count'] || 0}</td>
           <td>${fields['Broken Heart Count'] || 0}</td>
-          <td class="reaction-icon">${fields['View Count'] || 0}</td>
+          <td>${fields['View Count'] || 0}</td>
         `;
 
         row.addEventListener('click', () => {
@@ -163,7 +153,7 @@
               <span class="reaction-button" data-id="${id}" data-type="Hearts Count">❤️ ${fields['Hearts Count'] || 0}</span>
               <span class="reaction-button" data-id="${id}" data-type="Prayer Count">🙏 ${fields['Prayer Count'] || 0}</span>
               <span class="reaction-button" data-id="${id}" data-type="Broken Heart Count">💔 ${fields['Broken Heart Count'] || 0}</span>
-              <span class="reaction-button reaction-icon">📖 ${incrementedViewCount}</span>
+              <span class="reaction-button">📖 ${incrementedViewCount}</span>
             </p>
             <p><strong>Moderator Comment:</strong></p>
             <div class="scroll-box">${fields['Moderator Comments'] || 'None'}</div>
@@ -206,12 +196,6 @@
     currentReactionBuffer = {};
     modal.style.display = 'none';
   }
-
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      closeModalAndSync();
-    }
-  });
 
   document.body.addEventListener('click', e => {
     if (e.target.id === 'ltg-close') {
