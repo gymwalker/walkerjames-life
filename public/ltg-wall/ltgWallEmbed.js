@@ -20,6 +20,15 @@
       padding: 2rem;
       max-width: 600px;
       border-radius: 8px;
+      overflow: hidden;
+    }
+    .scroll-box {
+      max-height: 6em;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      background: #f4f4f4;
+      border-radius: 4px;
     }
     .table-wrapper {
       min-width: 1300px;
@@ -120,14 +129,15 @@
         row.addEventListener('click', () => {
           modalBody.innerHTML = `
             <h3>${fields['Display Name'] || 'Anonymous'}</h3>
-            <p style="white-space: pre-wrap;">${fields['Letter Content']}</p>
+            <div class="scroll-box">${fields['Letter Content']}</div>
             <p>
               ❤️ ${fields['Hearts Count'] || 0} &nbsp;
               🙏 ${fields['Prayer Count'] || 0} &nbsp;
               💔 ${fields['Broken Heart Count'] || 0} &nbsp;
               📖 ${fields['View Count'] || 0}
             </p>
-            <p><strong>Moderator Comment:</strong> ${fields['Moderator Comments'] || 'None'}</p>
+            <p><strong>Moderator Comment:</strong></p>
+            <div class="scroll-box">${fields['Moderator Comments'] || 'None'}</div>
             <p><strong>Date:</strong> ${fields['Submission Date'] || ''}</p>
           `;
           modal.style.display = 'flex';
