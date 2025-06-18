@@ -23,7 +23,7 @@
       overflow: hidden;
     }
     .scroll-box {
-      max-height: 14em;
+      max-height: 18em;
       overflow-y: auto;
       margin-bottom: 1rem;
       padding: 0.5rem;
@@ -69,6 +69,9 @@
     .reaction-button {
       margin: 0 5px;
       cursor: pointer;
+      font-size: 1.5rem;
+    }
+    .reaction-icon {
       font-size: 1.5rem;
     }
   `;
@@ -129,7 +132,7 @@
           <td>${fields['Hearts Count'] || 0}</td>
           <td>${fields['Prayer Count'] || 0}</td>
           <td>${fields['Broken Heart Count'] || 0}</td>
-          <td>${fields['View Count'] || 0}</td>
+          <td class="reaction-icon">${fields['View Count'] || 0}</td>
         `;
 
         row.addEventListener('click', () => {
@@ -147,14 +150,15 @@
               <span class="reaction-button" data-id="${id}" data-type="Hearts Count">❤️ ${fields['Hearts Count'] || 0}</span>
               <span class="reaction-button" data-id="${id}" data-type="Prayer Count">🙏 ${fields['Prayer Count'] || 0}</span>
               <span class="reaction-button" data-id="${id}" data-type="Broken Heart Count">💔 ${fields['Broken Heart Count'] || 0}</span>
-              <span>📖 ${fields['View Count'] + 1 || 1}</span>
+              <span class="reaction-icon">📖 ${fields['View Count'] + 1 || 1}</span>
             </p>
             <p><strong>Moderator Comment:</strong></p>
             <div class="scroll-box">${fields['Moderator Comments'] || 'None'}</div>
             <p><strong>Date:</strong> ${fields['Submission Date'] || ''}</p>
           `;
 
-          // Attach reactions
+          modal.style.display = 'flex';
+
           modalBody.querySelectorAll('.reaction-button').forEach(btn => {
             btn.addEventListener('click', e => {
               e.stopPropagation();
@@ -164,11 +168,12 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ recordId, reaction })
-              }).then(() => location.reload());
+              }).then(() => {
+                const current = parseInt(btn.textContent.match(/\d+/)[0]);
+                btn.innerHTML = btn.innerHTML.replace(/\d+/, current + 1);
+              });
             });
           });
-
-          modal.style.display = 'flex';
         });
 
         grid.appendChild(row);
