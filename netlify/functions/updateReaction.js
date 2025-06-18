@@ -4,6 +4,14 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export default async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end(); // handle preflight
+  }
+
   try {
     if (req.method !== 'POST') {
       res.setHeader('Allow', ['POST']);
@@ -17,26 +25,19 @@ export default async (req, res) => {
     }
 
     const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
-
-    const updates = Object.entries(reactions).map(([field, increment]) => ({
-      field,
-      increment
-    }));
-
     const record = await base('Letters').find(recordId);
     const updatedFields = {};
 
-    updates.forEach(({ field, increment }) => {
+    for (const [field, increment] of Object.entries(reactions)) {
       const current = record.fields[field] || 0;
       updatedFields[field] = current + increment;
-    });
+    }
 
     await base('Letters').update(recordId, updatedFields);
 
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.status(200).json({ message: 'Reactions updated successfully' });
+    return res.status(200).json({ message: 'Reactions updated successfully' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to update reactions' });
+    console.error('❌ Error updating reactions:', err);
+    return res.status(500).json({ error: 'Failed to update reactions' });
   }
 };
