@@ -1,4 +1,3 @@
-// updateReaction.js
 import Airtable from 'airtable';
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
@@ -15,12 +14,10 @@ export default async (req, res) => {
       return res.status(400).json({ error: 'Invalid request payload' });
     }
 
+    const record = await base('Letters').find(recordId);
     const fieldsToUpdate = {};
 
     for (const [field, increment] of Object.entries(reactions)) {
-      if (typeof increment !== 'number') continue;
-
-      const record = await base('Letters').find(recordId);
       const currentValue = record.fields[field] || 0;
       fieldsToUpdate[field] = currentValue + increment;
     }
@@ -29,7 +26,7 @@ export default async (req, res) => {
 
     res.status(200).json({ success: true, updated: fieldsToUpdate });
   } catch (error) {
-    console.error('Error in updateReaction.js:', error);
-    res.status(500).json({ error: 'Server Error', details: error.message });
+    console.error('Update error:', error);
+    res.status(500).json({ error: 'Server error', details: error.message });
   }
 };
