@@ -1,3 +1,5 @@
+// getLetters.js
+
 const Airtable = require('airtable');
 const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base('appaA8MFWiiWjXwSQ');
 
@@ -13,43 +15,50 @@ exports.handler = async function (event) {
     return { statusCode: 200, headers, body: '' };
   }
 
-  if (event.httpMethod !== 'GET') {
-    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
-  }
-
   try {
-    const records = await base('Letters')
+    const records = [];
+    await base('Letters')
       .select({
-        filterByFormula: `AND({Approval Status} = "Approved", {Visibility} = "Public")`,
-        sort: [{ field: 'Submission Date', direction: 'desc' }]
+        view: 'Grid view',
+        filterByFormula: `AND(
+          {Approval Status} = "Approved",
+          OR(
+            {Share Publicly} = "Yes, share publicly (first name only)",
+            {Share Publicly} = "Yes, but anonymously"
+          )
+        )`
       })
-      .all();
-
-    const letters = records.map((record) => ({
-      id: record.id,
-      date: record.fields['Submission Date'] || '',
-      name: record.fields['Display Name'] || 'Anonymous',
-      letter: record.fields['Letter Content'] || '',
-      moderatorComment: record.fields['Moderator Comments'] || '',
-      reactions: {
-        'Hearts Count': record.fields['Hearts Count'] || 0,
-        'Prayer Count': record.fields['Prayer Count'] || 0,
-        'Broken Hearts Count': record.fields['Broken Hearts Count'] || 0,
-        'View Count': record.fields['View Count'] || 0
-      }
-    }));
+      .eachPage((fetchedRecords, fetchNextPage) => {
+        fetchedRecords.forEach(record => {
+          const fields = record.fields;
+          records.push({
+            id: record.id,
+            name: fields['Display Name'] || 'Anonymous',
+            date: fields['Submission Date'] || '',
+            letter: fields['Letter Content'] || '',
+            moderatorComment: fields['Moderator Comments'] || '',
+            reactions: {
+              'View Count': fields['View Count'] || 0,
+              'Prayer Count': fields['Prayer Count'] || 0,
+              'Hearts Count': fields['Hearts Count'] || 0,
+              'Broken Hearts Count': fields['Broken Hearts Count'] || 0
+            }
+          });
+        });
+        fetchNextPage();
+      });
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ letters })
+      body: JSON.stringify({ records })
     };
   } catch (err) {
-    console.error('Error loading letters:', err);
+    console.error('Error fetching letters:', err);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Failed to load letters' })
+      body: JSON.stringify({ error: 'Failed to fetch letters' })
     };
   }
 };
