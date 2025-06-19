@@ -1,13 +1,12 @@
 {
-  "name": "ltg-netlify-functions",
+  "name": "walkerjames-life",
   "version": "1.0.0",
-  "description": "Netlify functions for Letters to God",
+  "description": "WalkerJames.Life Netlify Functions",
   "main": "index.js",
-  "type": "module",
   "scripts": {
-    "build": "echo 'No build step required'"
+    "start": "netlify dev"
   },
   "dependencies": {
-    "airtable": "^0.11.6"
+    "airtable": "^0.11.1"
   }
 }
