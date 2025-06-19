@@ -1,45 +1,61 @@
-const Airtable = require("airtable");
+const Airtable = require('airtable');
 
-const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base("pat0rNlezikkjBKM4.1e9161d0ad2f7c619af8d74ad1982f2aa752fdd90b6a768687912a40b41751a8");
-const table = base("Letters");
+// Configure Airtable base
+const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
-exports.handler = async (event) => {
+exports.handler = async function (event) {
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ message: 'Method Not Allowed' }),
+    };
+  }
+
   try {
-    if (event.httpMethod !== "POST") {
-      return {
-        statusCode: 405,
-        body: JSON.stringify({ error: "Method Not Allowed" }),
-      };
-    }
-
     const { recordId, emoji } = JSON.parse(event.body);
 
     if (!recordId || !emoji) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Missing recordId or emoji field" }),
+        body: JSON.stringify({ message: 'Missing recordId or emoji' }),
       };
     }
 
-    // Get the current record
-    const record = await table.find(recordId);
-    const currentCount = record.get(emoji) || 0;
+    // Map emoji labels to Airtable field names
+    const validFields = {
+      "Love Count": "Love Count",
+      "Prayer Count": "Prayer Count",
+      "Broken Heart Count": "Broken Heart Count",
+      "Read Count": "Read Count",
+    };
 
-    // Update the field
-    const updatedRecord = await table.update(recordId, {
-      [emoji]: currentCount + 1,
+    const fieldName = validFields[emoji];
+
+    if (!fieldName) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: `Invalid emoji field: ${emoji}` }),
+      };
+    }
+
+    // Fetch current count
+    const record = await base('Letters').find(recordId);
+    const currentCount = record.fields[fieldName] || 0;
+
+    // Update count
+    await base('Letters').update(recordId, {
+      [fieldName]: currentCount + 1,
     });
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ success: true, updated: updatedRecord.fields }),
+      body: JSON.stringify({ message: `${fieldName} updated` }),
     };
-
   } catch (error) {
-    console.error("Error updating reaction:", error);
+    console.error('Error updating reaction:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Internal Server Error", details: error.message }),
+      body: JSON.stringify({ message: 'Internal Server Error' }),
     };
   }
 };
