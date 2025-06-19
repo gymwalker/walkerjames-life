@@ -3,7 +3,6 @@
 const wallContainer = document.getElementById('ltg-wall-container');
 const modal = document.getElementById('ltg-modal');
 const modalContent = document.getElementById('ltg-modal-content');
-const closeModalBtn = document.getElementById('closeModalBtn');
 
 async function loadLetters() {
   try {
@@ -28,7 +27,12 @@ async function loadLetters() {
         </div>
       `;
 
-      row.addEventListener('click', () => showLetter(letter));
+      row.addEventListener('click', (e) => {
+        if (!e.target.classList.contains('ltg-icon')) {
+          showLetter(letter);
+        }
+      });
+
       wallContainer.appendChild(row);
     });
   } catch (err) {
@@ -54,6 +58,11 @@ function showLetter(letter) {
 
   modal.style.display = 'block';
   incrementReaction(letter.id, 'View Count');
+
+  document.getElementById('closeModalBtn').addEventListener('click', () => {
+    modal.style.display = 'none';
+    loadLetters();
+  });
 }
 
 async function incrementReaction(recordId, type) {
@@ -86,14 +95,6 @@ wallContainer.addEventListener('click', (e) => {
     incrementReaction(recordId, type);
   }
 });
-
-// Close modal and refresh wall
-if (closeModalBtn) {
-  closeModalBtn.addEventListener('click', () => {
-    modal.style.display = 'none';
-    loadLetters();
-  });
-}
 
 // Initial load
 loadLetters();
