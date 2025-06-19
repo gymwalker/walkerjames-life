@@ -1,33 +1,62 @@
-const Airtable = require("airtable");
+const Airtable = require('airtable');
 
-const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
+const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base('appaA8MFWiiWjXwSQ');
 
-exports.handler = async (event) => {
+exports.handler = async function(event, context) {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Content-Type': 'application/json'
+  };
+
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers,
+      body: ''
+    };
+  }
+
+  const shouldList = event.queryStringParameters?.list === 'true';
+  if (!shouldList) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ error: 'Missing or invalid list parameter' })
+    };
+  }
+
   try {
-    const records = await base("Letters")
+    const records = [];
+    await base('Letters')
       .select({
-        filterByFormula: `AND(
-          OR({Share Publicly} = "Yes, share publicly (first name only)", {Share Publicly} = "Yes, but anonymously"),
-          {Approval Status} = "Approved"
-        )`,
-        sort: [{ field: "Date", direction: "desc" }],
+        view: 'Grid view',
+        sort: [{ field: 'Submission Date', direction: 'desc' }],
+        filterByFormula: "AND({Approval Status} = 'Approved', {Visibility} = 'Under Review')"
       })
-      .all();
-
-    const output = records.map((r) => ({
-      id: r.id,
-      fields: r.fields,
-    }));
+      .eachPage((fetchedRecords, fetchNextPage) => {
+        fetchedRecords.forEach(record => {
+          records.push({
+            id: record.id,
+            fields: record.fields
+          });
+        });
+        fetchNextPage();
+      });
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ records: output }),
+      headers,
+      body: JSON.stringify({ records })
     };
-  } catch (err) {
-    console.error("Airtable fetch failed:", err);
+  } catch (error) {
+    console.error('Error fetching Airtable records:', error);
+
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Failed to retrieve records" }),
+      headers,
+      body: JSON.stringify({ error: 'Failed to load letters.' })
     };
   }
 };
