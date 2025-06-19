@@ -1,26 +1,32 @@
-const Airtable = require('airtable');
+// getLetters.js
 
-exports.handler = async function (event) {
+const Airtable = require("airtable");
+
+exports.handler = async function () {
   const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
   try {
-    const records = await base('Letters')
-      .select({ view: 'Grid view' })
+    const records = await base("Letters")
+      .select({
+        view: "Grid view",
+        filterByFormula: `AND({Approval Status} = "Approved", OR({Share Publicly} = "Yes, share publicly (first name only)", {Share Publicly} = "Yes, but anonymously"))`
+      })
       .all();
 
-    const publicRecords = records
-      .filter(r => r.fields['Approval Status'] === 'Approved')
-      .filter(r => ['Yes, share publicly (first name only)', 'Yes, but anonymously'].includes(r.fields['Share Publicly']));
+    const letters = records.map(record => ({
+      id: record.id,
+      ...record.fields
+    }));
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ records: publicRecords })
+      body: JSON.stringify(letters)
     };
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error("❌ Error in getLetters.js:", error.message);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message })
+      body: JSON.stringify({ error: "Failed to fetch letters", details: error.message })
     };
   }
 };
