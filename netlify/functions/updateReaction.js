@@ -1,99 +1,99 @@
-const Airtable = require("airtable");
+const Airtable = require('airtable');
 
-exports.handler = async (event) => {
-  if (event.httpMethod === "GET") {
+const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base('appaA8MFWiiWjXwSQ');
+
+exports.handler = async function(event, context) {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Content-Type': 'application/json'
+  };
+
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers,
+      body: ''
+    };
+  }
+
+  const shouldList = event.queryStringParameters?.list === 'true';
+  
+  if (event.httpMethod === 'POST') {
     try {
-      const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
-      const records = await base("Letters")
-        .select({
-          filterByFormula: `AND(
-            {Approval Status} = "Approved",
-            OR(
-              {Share Publicly} = "Yes, share publicly (first name only)",
-              {Share Publicly} = "Yes, but anonymously"
-            )
-          )`,
-          sort: [{ field: "Created", direction: "desc" }]
-        })
-        .all();
+      const { recordId, reactions } = JSON.parse(event.body || '{}');
+      if (!recordId || !reactions || typeof reactions !== 'object') {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Missing or invalid POST payload' })
+        };
+      }
 
-      const result = records.map((record) => ({
-        id: record.id,
-        name: record.get("Display Name") || "Anonymous",
-        content: record.get("Letter"),
-        date: record.get("Created"),
-        comment: record.get("Moderator Comment") || "",
-        heartCount: record.get("Hearts Count") || 0,
-        prayerCount: record.get("Prayer Count") || 0,
-        brokenCount: record.get("Broken Heart Count") || 0,
-        readCount: record.get("View Count") || 0,
-      }));
+      const updateFields = {};
+      for (const [field, increment] of Object.entries(reactions)) {
+        if (typeof increment === 'number') {
+          updateFields[field] = increment;
+        }
+      }
+
+      await base('Letters').update(recordId, { ...updateFields });
 
       return {
         statusCode: 200,
-        body: JSON.stringify(result),
+        headers,
+        body: JSON.stringify({ success: true })
       };
     } catch (error) {
+      console.error('POST error:', error);
       return {
         statusCode: 500,
-        body: `Error fetching records: ${error}`,
+        headers,
+        body: JSON.stringify({ error: 'Failed to update record' })
       };
     }
   }
 
-  if (event.httpMethod === "POST") {
-    try {
-      const body = JSON.parse(event.body);
-      const { recordId, reaction } = body;
+  // Fallback to GET (original logic continues below)
+  if (!shouldList) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ error: 'Missing or invalid list parameter' })
+    };
+  }
 
-      if (!recordId || !reaction) {
-        return {
-          statusCode: 400,
-          body: "Missing recordId or reaction type",
-        };
-      }
-
-      const fieldMap = {
-        heart: "Hearts Count",
-        prayer: "Prayer Count",
-        broken: "Broken Heart Count",
-        read: "View Count",
-      };
-
-      const fieldName = fieldMap[reaction];
-
-      if (!fieldName) {
-        return {
-          statusCode: 400,
-          body: "Invalid reaction type",
-        };
-      }
-
-      const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
-
-      // First retrieve the current value
-      const record = await base("Letters").find(recordId);
-      const currentValue = record.get(fieldName) || 0;
-
-      // Update with incremented value
-      await base("Letters").update(recordId, {
-        [fieldName]: currentValue + 1,
+  try {
+    const records = [];
+    await base('Letters')
+      .select({
+        view: 'Grid view',
+        sort: [{ field: 'Submission Date', direction: 'desc' }],
+        filterByFormula: "AND({Approval Status} = 'Approved', {Visibility} = 'Under Review')"
+      })
+      .eachPage((fetchedRecords, fetchNextPage) => {
+        fetchedRecords.forEach(record => {
+          records.push({
+            id: record.id,
+            fields: record.fields
+          });
+        });
+        fetchNextPage();
       });
 
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ message: "Reaction count updated successfully" }),
-      };
-    } catch (error) {
-      return {
-        statusCode: 500,
-        body: `Error updating reaction count: ${error}`,
-      };
-    }
-  }
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ records })
+    };
+  } catch (error) {
+    console.error('Error fetching Airtable records:', error);
 
-  return {
-    statusCode: 405,
-    body: "Method Not Allowed",
-  };
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: 'Failed to load letters.' })
+    };
+  }
 };
