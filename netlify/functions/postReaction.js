@@ -1,7 +1,7 @@
 const Airtable = require('airtable');
 const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base('appaA8MFWiiWjXwSQ');
 
-exports.handler = async function (event) {
+exports.handler = async function (event, context) {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -14,11 +14,7 @@ exports.handler = async function (event) {
   }
 
   if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method Not Allowed' })
-    };
+    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
   }
 
   try {
@@ -32,26 +28,25 @@ exports.handler = async function (event) {
       };
     }
 
-    const validFields = ['View Count', 'Prayer Count', 'Hearts Count', 'Broken Hearts Count'];
     const currentRecord = await base('Letters').find(recordId);
     const updatedFields = {};
 
     for (const [reaction, count] of Object.entries(reactions)) {
-      if (validFields.includes(reaction)) {
-        const current = currentRecord.fields[reaction] || 0;
-        updatedFields[reaction] = current + count;
+      const current = currentRecord.fields[reaction] || 0;
+      updatedFields[reaction] = current + count;
+    }
+
+    await base('Letters').update([
+      {
+        id: recordId,
+        fields: {
+          'View Count': updatedFields['View Count'] || 0,
+          'Prayer Count': updatedFields['Prayer Count'] || 0,
+          'Hearts Count': updatedFields['Hearts Count'] || 0,
+          'Broken Hearts Count': updatedFields['Broken Hearts Count'] || 0
+        }
       }
-    }
-
-    if (Object.keys(updatedFields).length === 0) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'No valid reactions to update' })
-      };
-    }
-
-    await base('Letters').update([{ id: recordId, fields: updatedFields }]);
+    ]);
 
     return {
       statusCode: 200,
