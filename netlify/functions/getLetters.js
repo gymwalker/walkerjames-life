@@ -1,5 +1,3 @@
-// getLetters.js
-
 const Airtable = require('airtable');
 const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base('appaA8MFWiiWjXwSQ');
 
@@ -23,55 +21,50 @@ exports.handler = async function (event, context) {
     };
   }
 
-  const showList = event.queryStringParameters?.List === 'true';
-  if (!showList) {
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify({ error: 'Missing or invalid list parameter' })
-    };
-  }
+  const isList = event.queryStringParameters?.list === 'true';
 
   try {
-    const records = [];
-
-    await base('Letters')
+    const records = await base('Letters')
       .select({
-        view: 'Grid view',
-        sort: [{ field: 'Submission Date', direction: 'desc' }],
-        filterByFormula: "AND({Approval Status} = 'Approved', {Visibility} = 'Under Review')"
+        filterByFormula: "AND({Approval Status}='Approved', {Visibility}='Public')",
+        sort: [{ field: 'Submission Date', direction: 'desc' }]
       })
-      .eachPage((fetchedRecords, fetchNextPage) => {
-        fetchedRecords.forEach((record) => {
-          records.push({
-            id: record.id,
-            name: record.get('Display Name') || 'Anonymous',
-            preview: (record.get('Letter Content') || '').substring(0, 80) + '...',
-            letter: record.get('Letter Content') || '',
-            date: record.get('Submission Date') || '',
-            moderatorComment: record.get('Moderator Comment') || '',
-            reactions: {
-              'View Count': record.get('View Count') || 0,
-              'Prayer Count': record.get('Prayer Count') || 0,
-              'Hearts Count': record.get('Hearts Count') || 0,
-              'Broken Hearts Count': record.get('Broken Hearts Count') || 0
-            }
-          });
-        });
-        fetchNextPage();
-      });
+      .all();
+
+    if (!isList) {
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ records })
+      };
+    }
+
+    const mapped = records.map((r) => ({
+      id: r.id,
+      date: r.fields['Submission Date'],
+      name: r.fields['Display Name'] || 'Anonymous',
+      preview: r.fields['Letter Content']?.slice(0, 80) || '',
+      letter: r.fields['Letter Content'] || '',
+      moderatorComment: r.fields['Moderator Comments'] || '',
+      reactions: {
+        'Hearts Count': r.fields['Hearts Count'] || 0,
+        'Prayer Count': r.fields['Prayer Count'] || 0,
+        'Broken Heart Count': r.fields['Broken Heart Count'] || 0,
+        'View Count': r.fields['View Count'] || 0
+      }
+    }));
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ letters: records })
+      body: JSON.stringify({ letters: mapped })
     };
   } catch (err) {
-    console.error('Error fetching letters:', err);
+    console.error('Error loading letters:', err);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Failed to fetch letters' })
+      body: JSON.stringify({ error: 'Failed to load letters' })
     };
   }
 };
