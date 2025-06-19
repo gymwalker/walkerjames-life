@@ -154,12 +154,14 @@
     try {
       const res = await fetch("https://walkerjames-life.netlify.app/.netlify/functions/getLetters");
       const data = await res.json();
-      const approvedLetters = data.records.filter(r => {
+
+      const approved = data.records.filter(r => {
         const approved = r.fields["Approval Status"] === "Approved";
         const shared = ["Yes, share publicly (first name only)", "Yes, but anonymously"].includes(r.fields["Share Publicly"]);
         return approved && shared;
       });
-      renderTable(approvedLetters);
+
+      renderTable(approved);
     } catch (error) {
       container.innerHTML = "<p>Failed to load letters. Please try again later.</p>";
       console.error(error);
