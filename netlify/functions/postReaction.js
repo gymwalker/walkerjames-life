@@ -1,48 +1,85 @@
-const Airtable = require("airtable");
+// ltgWallEmbed.js (validated 1:31 PM restore point with full display + reaction sync)
 
-exports.handler = async function (event) {
-  if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: "Method Not Allowed" })
-    };
-  }
+document.addEventListener("DOMContentLoaded", async () => {
+  const lettersTable = document.getElementById("ltg-wall-entries");
+  const detailModal = document.getElementById("letterModal");
+  const modalContent = document.getElementById("modalContent");
+  const closeModalBtn = document.getElementById("closeModal");
 
-  const { recordId, reactions } = JSON.parse(event.body || '{}');
+  const getReactions = (letter) => ({
+    "❤️": letter.fields["Hearts Count"] || 0,
+    "🙏": letter.fields["Prayer Count"] || 0,
+    "💔": letter.fields["Broken Hearts Count"] || 0,
+    "📖": letter.fields["View Count"] || 0
+  });
 
-  if (!recordId || !reactions) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Missing recordId or reactions" })
-    };
-  }
+  const renderLetters = (records) => {
+    if (!lettersTable) return;
 
-  const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
+    lettersTable.innerHTML = "";
+    records.forEach((letter) => {
+      const row = document.createElement("tr");
+      row.className = "ltg-row";
+      row.innerHTML = `
+        <td>${letter.fields["Date"] || ""}</td>
+        <td>${letter.fields["Display Name"] || "Anonymous"}</td>
+        <td>${letter.fields["Letter"]?.slice(0, 100) || ""}...</td>
+        <td>${letter.fields["Moderator Comment"] || ""}</td>
+        <td>${Object.entries(getReactions(letter))
+          .map(([emoji, count]) => `${emoji} ${count}`)
+          .join(" ")}</td>
+      `;
 
-  try {
-    const fieldsToUpdate = {};
-    for (const key in reactions) {
-      const count = reactions[key];
-      if (typeof count === 'number') {
-        fieldsToUpdate[key] = count;
-      }
-    }
-
-    console.log("📤 Updating record", recordId, fieldsToUpdate);
-
-    const updated = await base("Letters").update(recordId, {
-      ...fieldsToUpdate
+      row.addEventListener("click", () => showModal(letter));
+      lettersTable.appendChild(row);
     });
+  };
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ message: "Record updated successfully", updated })
-    };
-  } catch (err) {
-    console.error("❌ Failed to update record:", err);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Failed to update record", details: err.message })
-    };
-  }
-};
+  const showModal = (letter) => {
+    if (!modalContent) return;
+    const reactions = getReactions(letter);
+    modalContent.innerHTML = `
+      <h2>${letter.fields["Display Name"] || "Anonymous"}</h2>
+      <p>${letter.fields["Letter"] || ""}</p>
+      <p><strong>Moderator Comment:</strong> ${letter.fields["Moderator Comment"] || "None"}</p>
+      <p><strong>Date:</strong> ${letter.fields["Date"] || ""}</p>
+      <p>${Object.entries(reactions)
+        .map(([emoji, count]) => `${emoji} ${count}`)
+        .join(" ")}</p>
+    `;
+    detailModal.style.display = "block";
+
+    postReaction(letter.id, { "View Count": reactions["📖"] + 1 });
+  };
+
+  closeModalBtn?.addEventListener("click", () => {
+    detailModal.style.display = "none";
+  });
+
+  const postReaction = async (recordId, reactions) => {
+    try {
+      const res = await fetch("/.netlify/functions/postReaction", {
+        method: "POST",
+        body: JSON.stringify({ recordId, reactions })
+      });
+      const data = await res.json();
+      console.log("✅ Reaction successfully synced.", data);
+      await refreshLetters();
+    } catch (err) {
+      console.error("❌ Failed to sync reactions:", err);
+    }
+  };
+
+  const refreshLetters = async () => {
+    try {
+      const res = await fetch("/.netlify/functions/getLetters?list=true");
+      const data = await res.json();
+      renderLetters(data.records);
+    } catch (err) {
+      console.error("❌ Failed to refresh letters:", err);
+      lettersTable.innerHTML = `<tr><td colspan="5">Failed to load letters. Please try again later.</td></tr>`;
+    }
+  };
+
+  await refreshLetters();
+});
