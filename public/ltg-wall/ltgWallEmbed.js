@@ -41,7 +41,7 @@
     .table-wrapper {
       overflow-x: auto;
       display: block;
-      max-width: 100%;
+      max-width: 100%;  
     }
     table {
       min-width: 900px;
@@ -55,7 +55,6 @@
     }
     th:nth-child(n+5), td:nth-child(n+5) {
       text-align: center;
-      font-size: 1rem;
     }
     tr:hover {
       background-color: #f9f9f9;
@@ -106,18 +105,17 @@
   fetch(API_URL)
     .then(res => res.json())
     .then(({ records }) => {
-      const filtered = records.filter(r => {
-        const f = r.fields || {};
-        return (
-          f['Approval Status'] === 'Approved' &&
-          (
-            f['Share Publicly'] === 'Yes, share publicly (first name only)' ||
-            f['Share Publicly'] === 'Yes, but anonymously'
-          )
-        );
-      });
+      const filtered = records.filter(({ fields }) =>
+        fields['Approval Status'] === 'Approved' &&
+        (
+          fields['Share Publicly'] === 'Yes, share publicly (first name only)' ||
+          fields['Share Publicly'] === 'Yes, but anonymously'
+        )
+      );
 
-      const sorted = filtered.sort((a, b) => new Date(b.fields['Submission Date']) - new Date(a.fields['Submission Date']));
+      const sorted = filtered.sort((a, b) =>
+        new Date(b.fields['Submission Date']) - new Date(a.fields['Submission Date'])
+      );
 
       sorted.forEach(({ id, fields }) => {
         if (!fields || !fields['Letter Content']) return;
@@ -141,7 +139,7 @@
           modalBody.innerHTML = `
             <span id="ltg-close">×</span>
             <h3>${fields['Display Name'] || 'Anonymous'}</h3>
-            <div class="scroll-box" id="ltg-letter">${fields['Letter Content']}</div>
+            <div class="scroll-box">${fields['Letter Content']}</div>
             <p>
               <span class="reaction-button" data-id="${id}" data-type="Hearts Count">❤️ ${fields['Hearts Count'] || 0}</span>
               <span class="reaction-button" data-id="${id}" data-type="Prayer Count">🙏 ${fields['Prayer Count'] || 0}</span>
@@ -184,18 +182,10 @@
   async function closeModalAndSync() {
     if (currentReactionBuffer.id && Object.keys(currentReactionBuffer.reactions).length > 0) {
       try {
-        console.log("🛰️ Syncing to Airtable:", JSON.stringify({
-          recordId: currentReactionBuffer.id,
-          reactions: currentReactionBuffer.reactions
-        }, null, 2));
-
         const res = await fetch(REACT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            recordId: currentReactionBuffer.id,
-            reactions: currentReactionBuffer.reactions
-          })
+          body: JSON.stringify(currentReactionBuffer)
         });
 
         if (!res.ok) throw new Error(`Failed with status ${res.status}`);
