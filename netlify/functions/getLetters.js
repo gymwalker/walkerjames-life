@@ -1,54 +1,39 @@
 const Airtable = require('airtable');
-const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base('appaA8MFWiiWjXwSQ');
+const base = new Airtable({ apiKey: process.env.AIRTABLE_API_TOKEN }).base(process.env.AIRTABLE_BASE_ID);
 
-exports.handler = async function (event, context) {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, OPTIONS',
-    'Content-Type': 'application/json'
-  };
-
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
-  }
-
-  if (event.httpMethod !== 'GET') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method Not Allowed' })
-    };
-  }
-
+exports.handler = async (event) => {
   try {
-    const records = await base('Letters').select({
-      filterByFormula: `AND(
-        {Approval Status} = "Approved",
-        OR(
-          {Share Publicly} = "Yes, share publicly (first name only)",
-          {Share Publicly} = "Yes, but anonymously"
-        )
-      )`,
-      sort: [{ field: 'Submission Date', direction: 'desc' }]
-    }).all();
+    const result = [];
 
-    const result = records.map(record => ({
-      id: record.id,
-      fields: record.fields
-    }));
+    await base('Letters')
+      .select({
+        view: 'Grid view'
+      })
+      .eachPage((records, fetchNextPage) => {
+        records.forEach(record => {
+          const fields = record.fields;
+          if (
+            fields['Approval Status'] === 'Approved' &&
+            (fields['Share Publicly'] === 'Yes, share publicly (first name only)' ||
+             fields['Share Publicly'] === 'Yes, but anonymously')
+          ) {
+            result.push({
+              id: record.id,
+              fields
+            });
+          }
+        });
+        fetchNextPage();
+      });
 
     return {
       statusCode: 200,
-      headers,
       body: JSON.stringify({ records: result })
     };
   } catch (err) {
-    console.error('Error fetching letters:', err);
     return {
       statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: 'Failed to fetch letters' })
+      body: JSON.stringify({ error: err.message })
     };
   }
 };
