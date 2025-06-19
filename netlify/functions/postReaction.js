@@ -28,6 +28,8 @@ exports.handler = async function (event) {
       }
     }
 
+    console.log("📤 Updating record", recordId, fieldsToUpdate);
+
     const updated = await base("Letters").update(recordId, {
       ...fieldsToUpdate
     });
@@ -37,6 +39,7 @@ exports.handler = async function (event) {
       body: JSON.stringify({ message: "Record updated successfully", updated })
     };
   } catch (err) {
+    console.error("❌ Failed to update record:", err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Failed to update record", details: err.message })
