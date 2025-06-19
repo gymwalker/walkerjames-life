@@ -1,99 +1,62 @@
-const Airtable = require('airtable');
+document.addEventListener("DOMContentLoaded", function () {
+  const modal = document.getElementById("ltg-modal");
+  if (!modal) return;
 
-const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base('appaA8MFWiiWjXwSQ');
+  const reactionBar = document.getElementById("ltg-reactions");
+  if (!reactionBar) return;
 
-exports.handler = async function(event, context) {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Content-Type': 'application/json'
-  };
+  // Extract record ID from dataset (you must add data-record-id to modal if not already)
+  let recordId = null;
 
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: ''
-    };
-  }
-
-  const shouldList = event.queryStringParameters?.list === 'true';
-  
-  if (event.httpMethod === 'POST') {
-    try {
-      const { recordId, reactions } = JSON.parse(event.body || '{}');
-      if (!recordId || !reactions || typeof reactions !== 'object') {
-        return {
-          statusCode: 400,
-          headers,
-          body: JSON.stringify({ error: 'Missing or invalid POST payload' })
-        };
-      }
-
-      const updateFields = {};
-      for (const [field, increment] of Object.entries(reactions)) {
-        if (typeof increment === 'number') {
-          updateFields[field] = increment;
-        }
-      }
-
-      await base('Letters').update(recordId, { ...updateFields });
-
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ success: true })
-      };
-    } catch (error) {
-      console.error('POST error:', error);
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'Failed to update record' })
-      };
+  const observer = new MutationObserver(() => {
+    const modalBody = document.getElementById("ltg-modal-body");
+    if (modalBody) {
+      recordId = modalBody.dataset.recordId || null;
     }
-  }
+  });
 
-  // Fallback to GET (original logic continues below)
-  if (!shouldList) {
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify({ error: 'Missing or invalid list parameter' })
+  observer.observe(modal, { attributes: true, childList: true, subtree: true });
+
+  reactionBar.addEventListener("click", async (e) => {
+    const target = e.target;
+    if (!target || !recordId) return;
+
+    const emojiText = target.textContent.trim().charAt(0);
+    const emojiMap = {
+      "❤️": "Love Count",
+      "🙏": "Prayer Count",
+      "💔": "Broken Heart Count",
+      "📖": "Read Count"
     };
-  }
 
-  try {
-    const records = [];
-    await base('Letters')
-      .select({
-        view: 'Grid view',
-        sort: [{ field: 'Submission Date', direction: 'desc' }],
-        filterByFormula: "AND({Approval Status} = 'Approved', {Visibility} = 'Under Review')"
-      })
-      .eachPage((fetchedRecords, fetchNextPage) => {
-        fetchedRecords.forEach(record => {
-          records.push({
-            id: record.id,
-            fields: record.fields
-          });
-        });
-        fetchNextPage();
+    const fieldName = emojiMap[emojiText];
+    if (!fieldName) return;
+
+    try {
+      const res = await fetch("/.netlify/functions/updateReactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recordId, emoji: fieldName })
       });
 
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ records })
-    };
-  } catch (error) {
-    console.error('Error fetching Airtable records:', error);
+      const data = await res.json();
 
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: 'Failed to load letters.' })
-    };
-  }
-};
+      if (!res.ok) throw new Error(data.error || "Unknown error");
+
+      // Update count visually
+      const emojiSpan = Array.from(reactionBar.children).find(span =>
+        span.textContent.trim().startsWith(emojiText)
+      );
+
+      if (emojiSpan) {
+        const parts = emojiSpan.textContent.trim().split(" ");
+        const count = parseInt(parts[1], 10) || 0;
+        emojiSpan.innerHTML = `${emojiText} ${count + 1}`;
+      }
+
+    } catch (err) {
+      console.error("Reaction update failed:", err);
+      alert("Sorry, we couldn't register your reaction. Please try again.");
+    }
+  });
+});
