@@ -1,39 +1,40 @@
-// getLetters.js
+// getLetters.js (verified version)
 
-const Airtable = require('airtable');
+const Airtable = require("airtable");
 
-exports.handler = async (event) => {
+exports.handler = async function (event) {
+  const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
+  const table = base("Letters");
+  const isListMode = event.queryStringParameters && event.queryStringParameters.list === "true";
+
   try {
-    const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY })
-      .base(process.env.AIRTABLE_BASE_ID);
+    const records = await table.select({
+      view: "Grid view"
+    }).all();
 
-    const records = [];
-    await base('Letters')
-      .select({
-        filterByFormula: `AND({Approval Status} = 'Approved', OR({Share Publicly} = 'Yes, share publicly (first name only)', {Share Publicly} = 'Yes, but anonymously'))`,
-        sort: [{ field: 'Submission Date', direction: 'desc' }]
-      })
-      .eachPage((fetchedRecords, fetchNextPage) => {
-        records.push(...fetchedRecords);
-        fetchNextPage();
-      });
+    const parsed = records.map(record => {
+      return {
+        id: record.id,
+        fields: record.fields
+      };
+    });
 
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ records })
-    };
+    if (isListMode) {
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ records: parsed })
+      };
+    } else {
+      return {
+        statusCode: 200,
+        body: JSON.stringify(parsed)
+      };
+    }
   } catch (err) {
-    console.error('Error in getLetters:', err);
+    console.error("❌ Error fetching records:", err);
     return {
       statusCode: 500,
-      headers: {
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({ error: 'Failed to fetch letters.' })
+      body: JSON.stringify({ error: "Failed to fetch letters.", details: err.message })
     };
   }
 };
