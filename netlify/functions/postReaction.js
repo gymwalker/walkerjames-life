@@ -40,7 +40,12 @@ exports.handler = async function (event, context) {
     await base('Letters').update([
       {
         id: recordId,
-        fields: updatedFields
+        fields: {
+          'View Count': reactions['View Count'] || 0,
+          'Prayer Count': reactions['Prayer Count'] || 0,
+          'Hearts Count': reactions['Hearts Count'] || 0,
+          'Broken Hearts Count': reactions['Broken Hearts Count'] || 0
+        }
       }
     ]);
 
