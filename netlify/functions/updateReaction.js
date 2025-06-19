@@ -18,6 +18,41 @@ exports.handler = async function(event, context) {
     };
   }
 
+  if (event.httpMethod === 'POST') {
+    try {
+      const { recordId, reactions } = JSON.parse(event.body || '{}');
+
+      if (!recordId || !reactions || typeof reactions !== 'object') {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Invalid request format' })
+        };
+      }
+
+      const updates = {};
+      for (let field in reactions) {
+        updates[field] = Airtable.FieldValue.increment(reactions[field]);
+      }
+
+      await base('Letters').update(recordId, updates);
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ success: true })
+      };
+    } catch (err) {
+      console.error('Error updating record:', err);
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: 'Failed to update record' })
+      };
+    }
+  }
+
+  // Handle GET (list) request
   const shouldList = event.queryStringParameters?.list === 'true';
   if (!shouldList) {
     return {
@@ -36,8 +71,8 @@ exports.handler = async function(event, context) {
         filterByFormula: "AND({Approval Status} = 'Approved', {Visibility} = 'Under Review')"
       })
       .eachPage((fetchedRecords, fetchNextPage) => {
-        fetchedRecords.forEach((record) => {
-          records.push(record);
+        fetchedRecords.forEach(record => {
+          records.push({ id: record.id, fields: record.fields });
         });
         fetchNextPage();
       });
@@ -47,11 +82,12 @@ exports.handler = async function(event, context) {
       headers,
       body: JSON.stringify({ records })
     };
-  } catch (err) {
+  } catch (error) {
+    console.error('Error fetching Airtable records:', error);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: err.message })
+      body: JSON.stringify({ error: 'Failed to load letters.' })
     };
   }
 };
