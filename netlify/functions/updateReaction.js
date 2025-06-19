@@ -1,62 +1,45 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const modal = document.getElementById("ltg-modal");
-  if (!modal) return;
+const Airtable = require("airtable");
 
-  const reactionBar = document.getElementById("ltg-reactions");
-  if (!reactionBar) return;
+const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base("appaA8MFWiiWjXwSQ");
+const table = base("Letters");
 
-  // Extract record ID from dataset (you must add data-record-id to modal if not already)
-  let recordId = null;
-
-  const observer = new MutationObserver(() => {
-    const modalBody = document.getElementById("ltg-modal-body");
-    if (modalBody) {
-      recordId = modalBody.dataset.recordId || null;
+exports.handler = async (event) => {
+  try {
+    if (event.httpMethod !== "POST") {
+      return {
+        statusCode: 405,
+        body: JSON.stringify({ error: "Method Not Allowed" }),
+      };
     }
-  });
 
-  observer.observe(modal, { attributes: true, childList: true, subtree: true });
+    const { recordId, emoji } = JSON.parse(event.body);
 
-  reactionBar.addEventListener("click", async (e) => {
-    const target = e.target;
-    if (!target || !recordId) return;
+    if (!recordId || !emoji) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Missing recordId or emoji field" }),
+      };
+    }
 
-    const emojiText = target.textContent.trim().charAt(0);
-    const emojiMap = {
-      "❤️": "Love Count",
-      "🙏": "Prayer Count",
-      "💔": "Broken Heart Count",
-      "📖": "Read Count"
+    // Get the current record
+    const record = await table.find(recordId);
+    const currentCount = record.get(emoji) || 0;
+
+    // Update the field
+    const updatedRecord = await table.update(recordId, {
+      [emoji]: currentCount + 1,
+    });
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ success: true, updated: updatedRecord.fields }),
     };
 
-    const fieldName = emojiMap[emojiText];
-    if (!fieldName) return;
-
-    try {
-      const res = await fetch("/.netlify/functions/updateReactions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ recordId, emoji: fieldName })
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.error || "Unknown error");
-
-      // Update count visually
-      const emojiSpan = Array.from(reactionBar.children).find(span =>
-        span.textContent.trim().startsWith(emojiText)
-      );
-
-      if (emojiSpan) {
-        const parts = emojiSpan.textContent.trim().split(" ");
-        const count = parseInt(parts[1], 10) || 0;
-        emojiSpan.innerHTML = `${emojiText} ${count + 1}`;
-      }
-
-    } catch (err) {
-      console.error("Reaction update failed:", err);
-      alert("Sorry, we couldn't register your reaction. Please try again.");
-    }
-  });
-});
+  } catch (error) {
+    console.error("Error updating reaction:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "Internal Server Error", details: error.message }),
+    };
+  }
+};
