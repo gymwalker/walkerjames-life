@@ -25,20 +25,21 @@
     #ltg-modal {
       display: none;
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       background: rgba(0,0,0,0.6);
       justify-content: center;
       align-items: center;
-      z-index: 99999;
+      z-index: 9999;
     }
     #ltg-modal-body {
       background: white;
       padding: 2rem;
       max-width: 600px;
       border-radius: 8px;
-      overflow: auto;
-      max-height: 90vh;
+      overflow: hidden;
       position: relative;
     }
     #ltg-close {
@@ -47,6 +48,11 @@
       right: 14px;
       font-size: 1.5rem;
       cursor: pointer;
+    }
+    .scroll-box {
+      max-height: 12em;
+      overflow-y: auto;
+      padding-right: 1em;
     }
   `;
 
@@ -72,7 +78,7 @@
     try {
       container.innerHTML = "<p>Loading letters...</p>";
 
-      const response = await fetch("/airtableRead");
+      const response = await fetch("/.netlify/functions/airtableRead");
       const data = await response.json();
 
       if (!data.records || data.records.length === 0) {
@@ -95,26 +101,19 @@
       data.records.forEach((record) => {
         const row = document.createElement("tr");
         row.id = "ltg-letter-row";
-
-        const date = record.fields["Date"] || "";
-        const name = record.fields["Display Name"] || "Anonymous";
-        const letter = record.fields["Letter Content"] || "";
-
         row.innerHTML = `
-          <td>${date}</td>
-          <td>${name}</td>
-          <td>${letter.substring(0, 60)}...</td>
+          <td>${record.fields.Date || ""}</td>
+          <td>${record.fields["Display Name"] || "Anonymous"}</td>
+          <td>${(record.fields.Letter || "").substring(0, 50)}...</td>
         `;
-
-        row.addEventListener("click", () => {
+        row.onclick = function () {
           document.getElementById("ltg-modal-content").innerHTML = `
-            <h2>${name}</h2>
-            <p><strong>Date:</strong> ${date}</p>
-            <p>${letter.replace(/\n/g, "<br>")}</p>
+            <h3>${record.fields["Display Name"] || "Anonymous"}</h3>
+            <p><strong>Date:</strong> ${record.fields.Date || ""}</p>
+            <div class="scroll-box">${record.fields.Letter || ""}</div>
           `;
           modal.style.display = "flex";
-        });
-
+        };
         tbody.appendChild(row);
       });
 
