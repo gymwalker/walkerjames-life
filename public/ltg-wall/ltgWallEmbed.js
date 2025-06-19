@@ -78,7 +78,7 @@
     try {
       container.innerHTML = "<p>Loading letters...</p>";
 
-      const response = await fetch("https://walkerjames-life.netlify.app/.netlify/functions/airtableRead");
+      const response = await fetch("/.netlify/functions/updateReaction");
       const data = await response.json();
 
       if (!data.records || data.records.length === 0) {
