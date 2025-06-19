@@ -1,3 +1,5 @@
+// ltgWallEmbed.js
+
 (function () {
   const css = `
     #ltg-wall-container {
@@ -43,11 +45,9 @@
       display: block;
       max-width: 100%;  
     }
-
     table {
       min-width: 900px;
     }
-
     th, td {
       border-bottom: 1px solid #ccc;
       padding: 0.5rem;
@@ -101,14 +101,13 @@
   const grid = document.getElementById('letters-grid');
   const modal = document.getElementById('ltg-modal');
   const modalBody = document.getElementById('ltg-modal-body');
-  const API_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/getLetters?List=true';
+  const API_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/getLetters?list=true';
   const REACT_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/postReaction';
   let currentReactionBuffer = {};
 
   fetch(API_URL)
     .then(res => res.json())
-    .then((data) => {
-      const records = data.records || [];
+    .then(({ records }) => {
       const sorted = records.sort((a, b) => new Date(b.fields['Submission Date']) - new Date(a.fields['Submission Date']));
 
       sorted.forEach(({ id, fields }) => {
@@ -122,7 +121,7 @@
           <td>${fields['Moderator Comments'] || ''}</td>
           <td>${fields['Hearts Count'] || 0}</td>
           <td>${fields['Prayer Count'] || 0}</td>
-          <td>${fields['Broken Heart Count'] || 0}</td>
+          <td>${fields['Broken Hearts Count'] || 0}</td>
           <td>${fields['View Count'] || 0}</td>
         `;
 
@@ -137,7 +136,7 @@
             <p>
               <span class="reaction-button" data-id="${id}" data-type="Hearts Count">❤️ ${fields['Hearts Count'] || 0}</span>
               <span class="reaction-button" data-id="${id}" data-type="Prayer Count">🙏 ${fields['Prayer Count'] || 0}</span>
-              <span class="reaction-button" data-id="${id}" data-type="Broken Heart Count">💔 ${fields['Broken Heart Count'] || 0}</span>
+              <span class="reaction-button" data-id="${id}" data-type="Broken Hearts Count">💔 ${fields['Broken Hearts Count'] || 0}</span>
               <span class="reaction-button">📖 ${incrementedViewCount}</span>
             </p>
             <p><strong>Moderator Comment:</strong></p>
