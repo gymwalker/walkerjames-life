@@ -1,64 +1,37 @@
 const Airtable = require('airtable');
-const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base('appaA8MFWiiWjXwSQ');
+const base = new Airtable({ apiKey: process.env.AIRTABLE_API_TOKEN }).base(process.env.AIRTABLE_BASE_ID);
 
-exports.handler = async function (event, context) {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Content-Type': 'application/json'
-  };
-
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
-  }
-
+exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
+    return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
   try {
     const { recordId, reactions } = JSON.parse(event.body);
-
-    if (!recordId || typeof reactions !== 'object') {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Missing recordId or reactions object' })
-      };
+    if (!recordId || !reactions) {
+      throw new Error('Missing recordId or reactions');
     }
 
-    const currentRecord = await base('Letters').find(recordId);
+    const record = await base('Letters').find(recordId);
+    const existing = record.fields;
+
     const updatedFields = {};
-
-    for (const [reaction, count] of Object.entries(reactions)) {
-      const current = currentRecord.fields[reaction] || 0;
-      updatedFields[reaction] = current + count;
+    for (const [key, value] of Object.entries(reactions)) {
+      const safeKey = key.trim();
+      const oldValue = parseInt(existing[safeKey] || 0);
+      updatedFields[safeKey] = oldValue + value;
     }
 
-    await base('Letters').update([
-      {
-        id: recordId,
-        fields: {
-          'View Count': updatedFields['View Count'] || 0,
-          'Prayer Count': updatedFields['Prayer Count'] || 0,
-          'Hearts Count': updatedFields['Hearts Count'] || 0,
-          'Broken Hearts Count': updatedFields['Broken Hearts Count'] || 0
-        }
-      }
-    ]);
+    await base('Letters').update(recordId, updatedFields);
 
     return {
       statusCode: 200,
-      headers,
       body: JSON.stringify({ success: true })
     };
   } catch (err) {
-    console.error('Error updating reactions:', err);
     return {
       statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: 'Failed to update reactions' })
+      body: JSON.stringify({ success: false, error: err.message })
     };
   }
 };
