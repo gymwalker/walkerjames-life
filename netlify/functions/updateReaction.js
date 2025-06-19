@@ -23,6 +23,7 @@ exports.handler = async function(event, context) {
   if (event.httpMethod === 'POST') {
     try {
       const { recordId, reactions } = JSON.parse(event.body || '{}');
+
       if (!recordId || !reactions || typeof reactions !== 'object') {
         return {
           statusCode: 400,
@@ -31,15 +32,20 @@ exports.handler = async function(event, context) {
         };
       }
 
+      // Fetch current record
       const record = await base('Letters').find(recordId);
       const currentFields = record.fields;
 
+      // Prepare updated fields by incrementing
       const updateFields = {};
       for (const [field, increment] of Object.entries(reactions)) {
-        const currentValue = parseInt(currentFields[field] || 0);
-        updateFields[field] = currentValue + increment;
+        if (typeof increment === 'number') {
+          const currentValue = parseInt(currentFields[field] || 0);
+          updateFields[field] = currentValue + increment;
+        }
       }
 
+      // Apply update to Airtable
       await base('Letters').update(recordId, updateFields);
 
       return {
@@ -70,31 +76,29 @@ exports.handler = async function(event, context) {
     await base('Letters')
       .select({
         view: 'Grid view',
-        sort: [{ field: 'Submission Date', direction: 'desc' }],
-        filterByFormula: "AND({Approval Status} = 'Approved', {Visibility} = 'Under Review')"
+        sort: [{ field: 'Created', direction: 'desc' }]
       })
-      .eachPage((fetchedRecords, fetchNextPage) => {
-        fetchedRecords.forEach(record => {
-          records.push({
-            id: record.id,
-            fields: record.fields
-          });
-        });
+      .eachPage((page, fetchNextPage) => {
+        records.push(...page);
         fetchNextPage();
       });
+
+    const formatted = records.map(record => ({
+      id: record.id,
+      fields: record.fields
+    }));
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ records })
+      body: JSON.stringify({ records: formatted })
     };
   } catch (error) {
-    console.error('Error fetching Airtable records:', error);
-
+    console.error('GET error:', error);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Failed to load letters.' })
+      body: JSON.stringify({ error: 'Failed to retrieve records' })
     };
   }
 };
