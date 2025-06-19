@@ -1,4 +1,4 @@
-
+  
 (function () {
   const css = `
     #ltg-wall-container {
@@ -40,15 +40,15 @@
       border-radius: 4px;
     }
     .table-wrapper {
-      max-width: 1400px;
-      margin: 0 auto;
+      overflow-x: auto;
+      display: block;
+      max-width: 100%;  
     }
+
     table {
-      width: 100%;
-      margin: 0 auto;
-      border-collapse: collapse;
-      table-layout: auto;
+      min-width: 900px;
     }
+
     th, td {
       border-bottom: 1px solid #ccc;
       padding: 0.5rem;
