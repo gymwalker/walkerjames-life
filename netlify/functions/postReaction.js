@@ -1,7 +1,9 @@
+// postReaction.js
+
 const Airtable = require('airtable');
 const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base('appaA8MFWiiWjXwSQ');
 
-exports.handler = async function (event, context) {
+exports.handler = async function (event) {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -32,20 +34,26 @@ exports.handler = async function (event, context) {
       };
     }
 
+    const validFields = ['View Count', 'Prayer Count', 'Hearts Count', 'Broken Hearts Count'];
     const currentRecord = await base('Letters').find(recordId);
     const updatedFields = {};
 
-    for (const [key, value] of Object.entries(reactions)) {
-      const existing = currentRecord.fields[key] || 0;
-      updatedFields[key] = existing + value;
+    for (const [reaction, count] of Object.entries(reactions)) {
+      if (validFields.includes(reaction)) {
+        const current = currentRecord.fields[reaction] || 0;
+        updatedFields[reaction] = current + count;
+      }
     }
 
-    await base('Letters').update([
-      {
-        id: recordId,
-        fields: updatedFields
-      }
-    ]);
+    if (Object.keys(updatedFields).length === 0) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'No valid reactions to update' })
+      };
+    }
+
+    await base('Letters').update([{ id: recordId, fields: updatedFields }]);
 
     return {
       statusCode: 200,
