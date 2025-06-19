@@ -1,5 +1,3 @@
-// postReaction.js
-
 const Airtable = require('airtable');
 const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base('appaA8MFWiiWjXwSQ');
 
@@ -16,7 +14,11 @@ exports.handler = async function (event, context) {
   }
 
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
+    return {
+      statusCode: 405,
+      headers,
+      body: JSON.stringify({ error: 'Method Not Allowed' })
+    };
   }
 
   try {
@@ -33,17 +35,17 @@ exports.handler = async function (event, context) {
     const currentRecord = await base('Letters').find(recordId);
     const updatedFields = {};
 
-    // Use only fields that exist in Airtable
-    const allowedFields = ['View Count', 'Prayer Count', 'Hearts Count', 'Broken Hearts Count'];
-
-    for (const [reaction, count] of Object.entries(reactions)) {
-      if (allowedFields.includes(reaction)) {
-        const current = currentRecord.fields[reaction] || 0;
-        updatedFields[reaction] = current + count;
-      }
+    for (const [key, value] of Object.entries(reactions)) {
+      const existing = currentRecord.fields[key] || 0;
+      updatedFields[key] = existing + value;
     }
 
-    await base('Letters').update([{ id: recordId, fields: updatedFields }]);
+    await base('Letters').update([
+      {
+        id: recordId,
+        fields: updatedFields
+      }
+    ]);
 
     return {
       statusCode: 200,
