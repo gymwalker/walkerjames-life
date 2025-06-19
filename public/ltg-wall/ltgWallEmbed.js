@@ -1,18 +1,40 @@
 (function () {
+  const script = document.currentScript;
+  const container = document.createElement("div");
+  container.id = "ltg-wall-container";
+  script.parentNode.insertBefore(container, script.nextSibling);
+
   const css = `
     #ltg-wall-container {
-      padding: 2rem;
       font-family: sans-serif;
+      padding: 2rem;
       overflow-x: auto;
+    }
+    #ltg-wall-container table {
+      width: max-content;
+      border-collapse: collapse;
+      min-width: 100%;
+    }
+    #ltg-wall-container th, td {
+      border-bottom: 1px solid #ccc;
+      padding: 0.5rem;
+      text-align: left;
+      white-space: nowrap;
+    }
+    #ltg-letter-row:hover {
+      background-color: #f5f5f5;
+      cursor: pointer;
     }
     #ltg-modal {
       display: none;
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       background: rgba(0,0,0,0.6);
-      align-items: center;
       justify-content: center;
+      align-items: center;
       z-index: 9999;
     }
     #ltg-modal-body {
@@ -33,169 +55,117 @@
     .scroll-box {
       max-height: 12em;
       overflow-y: auto;
-      margin-bottom: 1rem;
-      padding: 0.5rem;
-      background: #f4f4f4;
-      border-radius: 4px;
-    }
-    .table-wrapper {
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-    table {
-      width: 100%;
-      margin: 0 auto;
-      border-collapse: collapse;
-      table-layout: auto;
-    }
-    th, td {
-      border-bottom: 1px solid #ccc;
-      padding: 0.5rem;
-      text-align: left;
-      vertical-align: top;
-      font-size: 1rem;
-    }
-    th:nth-child(n+5), td:nth-child(n+5) {
-      text-align: center;
-      font-size: 1rem;
-    }
-    tr:hover {
-      background-color: #f9f9f9;
-      cursor: pointer;
-    }
-    .reaction-button {
-      margin: 0 5px;
-      cursor: pointer;
-      font-size: 1.5rem;
+      padding-right: 1em;
     }
   `;
 
-  const style = document.createElement('style');
-  style.innerHTML = css;
+  const style = document.createElement("style");
+  style.innerText = css;
   document.head.appendChild(style);
 
-  const container = document.getElementById('ltg-wall-container');
-  container.innerHTML = `
-    <div id="ltg-modal">
-      <div id="ltg-modal-body"></div>
-    </div>
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Name</th>
-            <th>Letter</th>
-            <th>Moderator Comment</th>
-            <th>❤️</th>
-            <th>🙏</th>
-            <th>💔</th>
-            <th>📖</th>
-          </tr>
-        </thead>
-        <tbody id="letters-grid"></tbody>
-      </table>
+  const modal = document.createElement("div");
+  modal.id = "ltg-modal";
+  modal.innerHTML = `
+    <div id="ltg-modal-body">
+      <div id="ltg-close">&times;</div>
+      <div id="ltg-modal-content"></div>
     </div>
   `;
+  document.body.appendChild(modal);
 
-  const grid = document.getElementById('letters-grid');
-  const modal = document.getElementById('ltg-modal');
-  const modalBody = document.getElementById('ltg-modal-body');
-  const API_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/updateReaction?list=true';
-  const REACT_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/updateReaction';
-  let currentReactionBuffer = {};
+  document.getElementById("ltg-close").onclick = function () {
+    modal.style.display = "none";
+  };
 
-  fetch(API_URL)
-    .then(res => res.json())
-    .then(({ records }) => {
-      const sorted = records.sort((a, b) => new Date(b.fields['Submission Date']) - new Date(a.fields['Submission Date']));
+  async function fetchLetters() {
+    try {
+      container.innerHTML = "<p>Loading letters...</p>";
 
-      sorted.forEach(({ id, fields }) => {
-        if (!fields || !fields['Letter Content']) return;
+      const response = await fetch("/.netlify/functions/updateReaction?list=true");
+      const data = await response.json();
 
-        const row = document.createElement('tr');
+      if (!data.records || data.records.length === 0) {
+        container.innerHTML = "<p>No public letters found.</p>";
+        return;
+      }
+
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      const tbody = document.createElement("tbody");
+
+      thead.innerHTML = `
+        <tr>
+          <th>Date</th>
+          <th>Name</th>
+          <th>Letter</th>
+          <th>❤️</th>
+          <th>🙏</th>
+          <th>💔</th>
+          <th>📖</th>
+        </tr>
+      `;
+
+      data.records.forEach((record) => {
+        const row = document.createElement("tr");
+        row.id = "ltg-letter-row";
+        const fields = record.fields;
+
         row.innerHTML = `
-          <td>${fields['Submission Date'] || ''}</td>
-          <td>${fields['Display Name'] || 'Anonymous'}</td>
-          <td>${fields['Letter Content'].substring(0, 80)}...</td>
-          <td>${fields['Moderator Comments'] || ''}</td>
-          <td>${fields['Hearts Count'] || 0}</td>
-          <td>${fields['Prayer Count'] || 0}</td>
-          <td>${fields['Broken Heart Count'] || 0}</td>
-          <td>${fields['View Count'] || 0}</td>
+          <td>${fields.Date || ""}</td>
+          <td>${fields["Display Name"] || "Anonymous"}</td>
+          <td>${(fields.Letter || "").substring(0, 50)}...</td>
+          <td><span class="reaction" data-type="Heart" data-id="${record.id}">❤️ ${fields.Heart || 0}</span></td>
+          <td><span class="reaction" data-type="Prayer" data-id="${record.id}">🙏 ${fields.Prayer || 0}</span></td>
+          <td><span class="reaction" data-type="Broken" data-id="${record.id}">💔 ${fields.Broken || 0}</span></td>
+          <td><span class="reaction" data-type="Bible" data-id="${record.id}">📖 ${fields.Bible || 0}</span></td>
         `;
 
-        row.addEventListener('click', () => {
-          currentReactionBuffer = { id, reactions: { 'View Count': 1 } };
-          const incrementedViewCount = (fields['View Count'] || 0) + 1;
+        row.onclick = function (e) {
+          if (e.target.classList.contains("reaction")) return;
 
-          modalBody.innerHTML = `
-            <span id="ltg-close">×</span>
-            <h3>${fields['Display Name'] || 'Anonymous'}</h3>
-            <div class="scroll-box" id="ltg-letter">${fields['Letter Content']}</div>
-            <p>
-              <span class="reaction-button" data-id="${id}" data-type="Hearts Count">❤️ ${fields['Hearts Count'] || 0}</span>
-              <span class="reaction-button" data-id="${id}" data-type="Prayer Count">🙏 ${fields['Prayer Count'] || 0}</span>
-              <span class="reaction-button" data-id="${id}" data-type="Broken Heart Count">💔 ${fields['Broken Heart Count'] || 0}</span>
-              <span class="reaction-button">📖 ${incrementedViewCount}</span>
-            </p>
-            <p><strong>Moderator Comment:</strong></p>
-            <div class="scroll-box">${fields['Moderator Comments'] || 'None'}</div>
-            <p><strong>Date:</strong> ${fields['Submission Date'] || ''}</p>
+          document.getElementById("ltg-modal-content").innerHTML = `
+            <h3>${fields["Display Name"] || "Anonymous"}</h3>
+            <p><strong>Date:</strong> ${fields.Date || ""}</p>
+            <div class="scroll-box">${fields.Letter || ""}</div>
           `;
+          modal.style.display = "flex";
+        };
 
-          modal.style.display = 'flex';
-
-          document.getElementById('ltg-close')?.addEventListener('click', async e => {
-            e.stopPropagation();
-            await closeModalAndSync();
-          });
-
-          modalBody.querySelectorAll('.reaction-button').forEach(btn => {
-            btn.addEventListener('click', e => {
-              e.stopPropagation();
-              const recordId = btn.getAttribute('data-id');
-              const reaction = btn.getAttribute('data-type');
-              if (!reaction || currentReactionBuffer.reactions[reaction]) return;
-              currentReactionBuffer.reactions[reaction] = 1;
-              const current = parseInt(btn.textContent.match(/\d+/)[0]);
-              btn.innerHTML = btn.innerHTML.replace(/\d+/, current + 1);
-            });
-          });
-        });
-
-        grid.appendChild(row);
+        tbody.appendChild(row);
       });
-    })
-    .catch(err => {
-      console.error(err);
-      grid.innerHTML = '<tr><td colspan="8">Failed to load letters. Please try again later.</td></tr>';
-    });
 
-  async function closeModalAndSync() {
-    if (currentReactionBuffer.id && Object.keys(currentReactionBuffer.reactions).length > 0) {
-      try {
-        console.log("🛰️ Syncing to Airtable:", JSON.stringify({
-          recordId: currentReactionBuffer.id,
-          reactions: currentReactionBuffer.reactions
-        }, null, 2));
+      table.appendChild(thead);
+      table.appendChild(tbody);
+      container.innerHTML = "";
+      container.appendChild(table);
 
-        const res = await fetch(REACT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            recordId: currentReactionBuffer.id,
-            reactions: currentReactionBuffer.reactions
-          })
+      // Attach event listeners for reactions
+      document.querySelectorAll(".reaction").forEach(el => {
+        el.addEventListener("click", async function (e) {
+          e.stopPropagation();
+          const type = this.dataset.type;
+          const id = this.dataset.id;
+
+          const countMatch = this.textContent.match(/\d+$/);
+          const currentCount = countMatch ? parseInt(countMatch[0]) : 0;
+          const newCount = currentCount + 1;
+          this.innerHTML = `${this.textContent.slice(0, 2)} ${newCount}`;
+
+          await fetch("/.netlify/functions/updateReaction", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              recordId: id,
+              reactions: { [type]: 1 }
+            })
+          });
         });
-
-        if (!res.ok) throw new Error(`Failed with status ${res.status}`);
-        else console.log('✅ Reaction successfully synced.');
-      } catch (err) {
-        console.error('Failed to sync reactions:', err);
-      }
+      });
+    } catch (err) {
+      console.error("Error fetching letters:", err);
+      container.innerHTML = "<p>Failed to load letters. Please try again later.</p>";
     }
-    currentReactionBuffer = {};
-    modal.style.display = 'none';
   }
+
+  fetchLetters();
 })();
