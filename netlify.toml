@@ -1,23 +1,18 @@
 [build]
   functions = "netlify/functions"
-  publish = "public" # ← ensures Netlify serves HTML/CSS/JS from /public
-
-[functions]
-  node_bundler = "esbuild"
-
-[[plugins]]
-  package = "@netlify/plugin-functions-install-core"
-
-[functions."updateReaction"]
-  external_node_modules = ["airtable"]
-
-[functions."LetterApproved"]
-  node_bundler = "esbuild"
-
-[build.environment]
-  AIRTABLE_TOKEN = ""
+  publish = "public"
 
 [[redirects]]
-  from = "/ltg-wall"
-  to = "/ltg-wall/index.html"
+  from = "/.netlify/functions/airtableRead"
+  to = "/.netlify/functions/airtableRead"
+  status = 200
+
+[[redirects]]
+  from = "/.netlify/functions/updateReaction"
+  to = "/.netlify/functions/updateReaction"
+  status = 200
+
+[[redirects]]
+  from = "/.netlify/functions/LetterApproved"
+  to = "/.netlify/functions/LetterApproved"
   status = 200
