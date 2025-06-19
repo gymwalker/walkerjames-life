@@ -1,53 +1,41 @@
-// getLetters.js
-
 const Airtable = require('airtable');
 
-exports.handler = async function (event, context) {
+exports.handler = async (event) => {
+  const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
+
   try {
-    const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
-    const table = base('Letters');
+    const records = await base('Letters')
+      .select({
+        view: 'Grid view',
+        fields: [
+          'Letter Content',
+          'Display Name',
+          'Moderator Comments',
+          'Approval Status',
+          'Share Publicly',
+          'Submission Date',
+          'View Count',
+          'Prayer Count',
+          'Hearts Count',
+          'Broken Hearts Count'
+        ]
+      })
+      .all();
 
-    const records = [];
-    await table.select().eachPage((pageRecords, fetchNextPage) => {
-      records.push(...pageRecords);
-      fetchNextPage();
-    });
+    const formatted = records.map((record) => ({
+      id: record.id,
+      fields: record.fields
+    }));
 
-    const listOnly = event.queryStringParameters?.list === 'true';
-
-    if (listOnly) {
-      const filtered = records
-        .filter(r => {
-          const f = r.fields;
-          return (
-            f['Approval Status'] === 'Approved' &&
-            (
-              f['Share Publicly'] === 'Yes, share publicly (first name only)' ||
-              f['Share Publicly'] === 'Yes, but anonymously'
-            )
-          );
-        })
-        .map(r => ({
-          id: r.id,
-          fields: r.fields
-        }));
-
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ records: filtered })
-      };
-    }
-
-    // Full data fallback (rare)
     return {
       statusCode: 200,
-      body: JSON.stringify({ records: records.map(r => ({ id: r.id, fields: r.fields })) })
+      body: JSON.stringify({ records: formatted })
     };
   } catch (err) {
-    console.error('[getLetters] Error:', err.message);
+    console.error('❌ Error loading letters:', err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Failed to fetch letters.' })
+      body: JSON.stringify({ error: 'Failed to load letters', detail: err.message })
     };
   }
 };
