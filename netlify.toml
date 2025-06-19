@@ -2,17 +2,10 @@
   functions = "netlify/functions"
   publish = "public"
 
-[[redirects]]
-  from = "/.netlify/functions/airtableRead"
-  to = "/.netlify/functions/airtableRead"
-  status = 200
+[functions]
+  directory = "netlify/functions"
 
 [[redirects]]
-  from = "/.netlify/functions/updateReaction"
-  to = "/.netlify/functions/updateReaction"
-  status = 200
-
-[[redirects]]
-  from = "/.netlify/functions/LetterApproved"
-  to = "/.netlify/functions/LetterApproved"
+  from = "/.netlify/functions/*"
+  to = "/.netlify/functions/:splat"
   status = 200
