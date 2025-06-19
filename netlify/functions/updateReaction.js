@@ -11,46 +11,13 @@ exports.handler = async function(event, context) {
   };
 
   if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+    return {
+      statusCode: 200,
+      headers,
+      body: ''
+    };
   }
 
-  if (event.httpMethod === 'POST') {
-    try {
-      const { recordId, reactions } = JSON.parse(event.body);
-
-      if (!recordId || !reactions) {
-        return {
-          statusCode: 400,
-          headers,
-          body: JSON.stringify({ error: 'Missing recordId or reactions' })
-        };
-      }
-
-      const fieldsToUpdate = {};
-      Object.keys(reactions).forEach(key => {
-        fieldsToUpdate[key] = Airtable.FieldValue.increment(reactions[key]);
-      });
-
-      await base('Letters').update(recordId, {
-        ...fieldsToUpdate
-      });
-
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ success: true })
-      };
-    } catch (err) {
-      console.error('POST error:', err);
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'Failed to update reactions' })
-      };
-    }
-  }
-
-  // GET request with ?list=true
   const shouldList = event.queryStringParameters?.list === 'true';
   if (!shouldList) {
     return {
@@ -70,7 +37,10 @@ exports.handler = async function(event, context) {
       })
       .eachPage((fetchedRecords, fetchNextPage) => {
         fetchedRecords.forEach(record => {
-          records.push({ id: record.id, fields: record.fields });
+          records.push({
+            id: record.id,
+            fields: record.fields
+          });
         });
         fetchNextPage();
       });
@@ -82,6 +52,7 @@ exports.handler = async function(event, context) {
     };
   } catch (error) {
     console.error('Error fetching Airtable records:', error);
+
     return {
       statusCode: 500,
       headers,
