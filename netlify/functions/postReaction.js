@@ -1,7 +1,7 @@
 // postReaction.js
 
 const Airtable = require('airtable');
-const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base('appaA8MFWiiWjXwSQ'); // ✅ CORRECT BASE ID
+const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base('appaA8MFWiiWjXwSQ');
 
 exports.handler = async function (event, context) {
   const headers = {
@@ -11,18 +11,12 @@ exports.handler = async function (event, context) {
     'Content-Type': 'application/json'
   };
 
-  // Handle preflight CORS
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers, body: '' };
   }
 
-  // Only allow POST
   if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method Not Allowed' })
-    };
+    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
   }
 
   try {
@@ -36,23 +30,20 @@ exports.handler = async function (event, context) {
       };
     }
 
-    // Fetch current record
     const currentRecord = await base('Letters').find(recordId);
     const updatedFields = {};
 
-    // Dynamically increment only the fields sent in the request
+    // Use only fields that exist in Airtable
+    const allowedFields = ['View Count', 'Prayer Count', 'Hearts Count', 'Broken Hearts Count'];
+
     for (const [reaction, count] of Object.entries(reactions)) {
-      const current = currentRecord.fields[reaction] || 0;
-      updatedFields[reaction] = current + count;
+      if (allowedFields.includes(reaction)) {
+        const current = currentRecord.fields[reaction] || 0;
+        updatedFields[reaction] = current + count;
+      }
     }
 
-    // Apply the updates to Airtable
-    await base('Letters').update([
-      {
-        id: recordId,
-        fields: updatedFields
-      }
-    ]);
+    await base('Letters').update([{ id: recordId, fields: updatedFields }]);
 
     return {
       statusCode: 200,
