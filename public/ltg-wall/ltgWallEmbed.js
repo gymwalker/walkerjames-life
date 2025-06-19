@@ -11,27 +11,43 @@ async function loadLetters() {
 
     console.log('Fetched letter data:', json);
 
-    const data = json.letters || json; // fallback if not wrapped
+    const data = json.letters || json;
     if (!Array.isArray(data)) {
       throw new Error('Unexpected response format: data is not an array');
     }
 
-    wallContainer.innerHTML = '';
+    wallContainer.innerHTML = `
+      <table class="ltg-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Letter</th>
+            <th>Moderator Comment</th>
+            <th>Reactions</th>
+          </tr>
+        </thead>
+        <tbody id="ltg-tbody"></tbody>
+      </table>
+    `;
+
+    const tbody = document.getElementById('ltg-tbody');
+
     data.forEach((letter) => {
-      const row = document.createElement('div');
+      const row = document.createElement('tr');
       row.classList.add('ltg-row');
 
       row.innerHTML = `
-        <div>${letter.date}</div>
-        <div>${letter.name}</div>
-        <div>${letter.preview}</div>
-        <div>${letter.moderatorComment || ''}</div>
-        <div class="ltg-reactions">
+        <td>${letter.date}</td>
+        <td>${letter.name}</td>
+        <td>${letter.preview}</td>
+        <td>${letter.moderatorComment || ''}</td>
+        <td class="ltg-reactions">
           <span class="ltg-icon" data-type="Hearts Count" data-id="${letter.id}">❤️ ${letter.reactions['Hearts Count'] || 0}</span>
           <span class="ltg-icon" data-type="Prayer Count" data-id="${letter.id}">🙏 ${letter.reactions['Prayer Count'] || 0}</span>
           <span class="ltg-icon" data-type="Broken Hearts Count" data-id="${letter.id}">💔 ${letter.reactions['Broken Hearts Count'] || 0}</span>
           <span class="ltg-icon" data-type="View Count" data-id="${letter.id}">📖 ${letter.reactions['View Count'] || 0}</span>
-        </div>
+        </td>
       `;
 
       row.addEventListener('click', (e) => {
@@ -40,7 +56,7 @@ async function loadLetters() {
         }
       });
 
-      wallContainer.appendChild(row);
+      tbody.appendChild(row);
     });
   } catch (err) {
     console.error('Error loading letters:', err);
