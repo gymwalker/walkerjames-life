@@ -102,8 +102,8 @@
   const grid = document.getElementById('letters-grid');
   const modal = document.getElementById('ltg-modal');
   const modalBody = document.getElementById('ltg-modal-body');
-  const API_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/updateReaction?list=true';
-  const REACT_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/updateReaction';
+  const API_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/getLetters?list=true';
+  const REACT_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/postReaction';
   let currentReactionBuffer = {};
 
   fetch(API_URL)
