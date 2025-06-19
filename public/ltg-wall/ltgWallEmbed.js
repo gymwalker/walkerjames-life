@@ -1,5 +1,3 @@
-// ltgWallEmbed.js (restored to full 201-line version with correct updates)
-
 (function () {
   const css = `
     #ltg-wall-container {
@@ -107,14 +105,8 @@
 
   fetch(API_URL)
     .then(res => res.json())
-    .then(({ records }) => {
-      const filtered = records.filter(({ fields }) =>
-        fields['Approval Status'] === 'Approved' &&
-        (fields['Share Publicly'] === 'Yes, share publicly (first name only)' ||
-         fields['Share Publicly'] === 'Yes, but anonymously')
-      );
-
-      const sorted = filtered.sort((a, b) => new Date(b.fields['Submission Date']) - new Date(a.fields['Submission Date']));
+    .then(({ letters }) => {
+      const sorted = letters.sort((a, b) => new Date(b.fields['Submission Date']) - new Date(a.fields['Submission Date']));
 
       sorted.forEach(({ id, fields }) => {
         if (!fields || !fields['Letter Content']) return;
@@ -132,8 +124,7 @@
         `;
 
         row.addEventListener('click', () => {
-          currentReactionBuffer = { id, reactions: { 'View Count': 1 } };
-          const incrementedViewCount = (fields['View Count'] || 0) + 1;
+          currentReactionBuffer = { id, reactions: { 'View Count': (fields['View Count'] || 0) + 1 } };
 
           modalBody.innerHTML = `
             <span id="ltg-close">×</span>
@@ -143,7 +134,7 @@
               <span class="reaction-button" data-id="${id}" data-type="Hearts Count">❤️ ${fields['Hearts Count'] || 0}</span>
               <span class="reaction-button" data-id="${id}" data-type="Prayer Count">🙏 ${fields['Prayer Count'] || 0}</span>
               <span class="reaction-button" data-id="${id}" data-type="Broken Hearts Count">💔 ${fields['Broken Hearts Count'] || 0}</span>
-              <span class="reaction-button">📖 ${incrementedViewCount}</span>
+              <span class="reaction-button">📖 ${fields['View Count'] + 1 || 1}</span>
             </p>
             <p><strong>Moderator Comment:</strong></p>
             <div class="scroll-box">${fields['Moderator Comments'] || 'None'}</div>
@@ -181,24 +172,18 @@
   async function closeModalAndSync() {
     if (currentReactionBuffer.id && Object.keys(currentReactionBuffer.reactions).length > 0) {
       try {
-        console.log("🛰️ Syncing to Airtable:", JSON.stringify({
-          recordId: currentReactionBuffer.id,
-          reactions: currentReactionBuffer.reactions
-        }, null, 2));
+        console.log("📡 Syncing to Airtable:", JSON.stringify(currentReactionBuffer, null, 2));
 
         const res = await fetch(REACT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            recordId: currentReactionBuffer.id,
-            reactions: currentReactionBuffer.reactions
-          })
+          body: JSON.stringify(currentReactionBuffer)
         });
 
         if (!res.ok) throw new Error(`Failed with status ${res.status}`);
         else console.log('✅ Reaction successfully synced.');
       } catch (err) {
-        console.error('Failed to sync reactions:', err);
+        console.error('❌ Failed to sync reactions:', err);
       }
     }
     currentReactionBuffer = {};
