@@ -1,39 +1,53 @@
+// getLetters.js
+
 const Airtable = require('airtable');
-const base = new Airtable({ apiKey: process.env.AIRTABLE_API_TOKEN }).base(process.env.AIRTABLE_BASE_ID);
 
-exports.handler = async (event) => {
+exports.handler = async function (event, context) {
   try {
-    const result = [];
+    const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
+    const table = base('Letters');
 
-    await base('Letters')
-      .select({
-        view: 'Grid view'
-      })
-      .eachPage((records, fetchNextPage) => {
-        records.forEach(record => {
-          const fields = record.fields;
-          if (
-            fields['Approval Status'] === 'Approved' &&
-            (fields['Share Publicly'] === 'Yes, share publicly (first name only)' ||
-             fields['Share Publicly'] === 'Yes, but anonymously')
-          ) {
-            result.push({
-              id: record.id,
-              fields
-            });
-          }
-        });
-        fetchNextPage();
-      });
+    const records = [];
+    await table.select().eachPage((pageRecords, fetchNextPage) => {
+      records.push(...pageRecords);
+      fetchNextPage();
+    });
 
+    const listOnly = event.queryStringParameters?.list === 'true';
+
+    if (listOnly) {
+      const filtered = records
+        .filter(r => {
+          const f = r.fields;
+          return (
+            f['Approval Status'] === 'Approved' &&
+            (
+              f['Share Publicly'] === 'Yes, share publicly (first name only)' ||
+              f['Share Publicly'] === 'Yes, but anonymously'
+            )
+          );
+        })
+        .map(r => ({
+          id: r.id,
+          fields: r.fields
+        }));
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ records: filtered })
+      };
+    }
+
+    // Full data fallback (rare)
     return {
       statusCode: 200,
-      body: JSON.stringify({ records: result })
+      body: JSON.stringify({ records: records.map(r => ({ id: r.id, fields: r.fields })) })
     };
   } catch (err) {
+    console.error('[getLetters] Error:', err.message);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message })
+      body: JSON.stringify({ error: 'Failed to fetch letters.' })
     };
   }
 };
