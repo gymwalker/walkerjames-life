@@ -105,21 +105,13 @@
   fetch(API_URL)
     .then(res => res.json())
     .then(({ records }) => {
-      const filtered = records.filter(({ fields }) =>
-        fields['Approval Status'] === 'Approved' &&
-        (
-          fields['Share Publicly'] === 'Yes, share publicly (first name only)' ||
-          fields['Share Publicly'] === 'Yes, but anonymously'
-        )
-      );
-
-      const sorted = filtered.sort((a, b) =>
-        new Date(b.fields['Submission Date']) - new Date(a.fields['Submission Date'])
-      );
+      const sorted = records
+        .map(r => r.fields && r.fields['Approval Status'] === 'Approved' &&
+          ['Yes, share publicly (first name only)', 'Yes, but anonymously'].includes(r.fields['Share Publicly']) ? r : null)
+        .filter(Boolean)
+        .sort((a, b) => new Date(b.fields['Submission Date']) - new Date(a.fields['Submission Date']));
 
       sorted.forEach(({ id, fields }) => {
-        if (!fields || !fields['Letter Content']) return;
-
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${fields['Submission Date'] || ''}</td>
@@ -185,7 +177,10 @@
         const res = await fetch(REACT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(currentReactionBuffer)
+          body: JSON.stringify({
+            recordId: currentReactionBuffer.id,
+            reactions: currentReactionBuffer.reactions
+          })
         });
 
         if (!res.ok) throw new Error(`Failed with status ${res.status}`);
