@@ -1,12 +1,11 @@
 const Airtable = require('airtable');
-
 const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base('patuoCbnJAetnZhcO.84d8d8a9fc4da32ca8453dc1df98291bcfbcf9820325774bd1ea44db18668f14');
 
-exports.handler = async function(event, context) {
+exports.handler = async function (event, context) {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
     'Content-Type': 'application/json'
   };
 
@@ -39,49 +38,24 @@ exports.handler = async function(event, context) {
           fetchNextPage();
         });
 
-      return { statusCode: 200, headers, body: JSON.stringify({ records }) };
-    } catch (error) {
-      console.error('Error fetching Airtable records:', error);
-      return { statusCode: 500, headers, body: JSON.stringify({ error: 'Failed to load letters.' }) };
-    }
-  }
-
-  if (event.httpMethod === 'POST') {
-    try {
-      const { recordId, reactions } = JSON.parse(event.body);
-
-      if (!recordId || typeof reactions !== 'object') {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing recordId or reactions object' }) };
-      }
-
-      const updateFields = {};
-      for (const [reactionType, increment] of Object.entries(reactions)) {
-        updateFields[reactionType] = {
-          formula: `IF({${reactionType}}, {${reactionType}} + ${increment}, ${increment})`
-        };
-      }
-
-      await base('Letters').update([
-        {
-          id: recordId,
-          fields: reactions
-        }
-      ]);
-
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify({ success: true })
+        body: JSON.stringify({ records })
       };
-    } catch (err) {
-      console.error('Error updating reactions:', err);
+    } catch (error) {
+      console.error('🔥 Airtable fetch error:', error); // This is the critical log line
       return {
         statusCode: 500,
         headers,
-        body: JSON.stringify({ error: 'Failed to update reactions' })
+        body: JSON.stringify({ error: 'Failed to load letters.', details: error.message })
       };
     }
   }
 
-  return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
+  return {
+    statusCode: 405,
+    headers,
+    body: JSON.stringify({ error: 'Method Not Allowed' })
+  };
 };
