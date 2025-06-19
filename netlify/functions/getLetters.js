@@ -14,7 +14,8 @@ exports.handler = async function (event, context) {
   }
 
   if (event.httpMethod === 'GET') {
-    const shouldList = event.queryStringParameters?.list === 'true';
+    // const shouldList = event.queryStringParameters?.list === 'true';
+    const shouldList = event.queryStringParameters && event.queryStringParameters.List === 'true';
     if (!shouldList) {
       return {
         statusCode: 400,
