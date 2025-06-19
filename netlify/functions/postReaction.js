@@ -1,49 +1,50 @@
-// postReaction.js
+// postReaction.js (validated version with correct field names)
 
-const Airtable = require('airtable');
+const Airtable = require("airtable");
 
-exports.handler = async (event) => {
+exports.handler = async function (event) {
+  if (event.httpMethod !== "POST") {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ error: "Method Not Allowed" })
+    };
+  }
+
+  const { recordId, reactions } = JSON.parse(event.body || '{}');
+
+  if (!recordId || !reactions) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Missing recordId or reactions" })
+    };
+  }
+
+  const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
+
   try {
-    const { recordId, reactions } = JSON.parse(event.body || '{}');
-    if (!recordId || !reactions) {
-      return {
-        statusCode: 400,
-        headers: { 'Access-Control-Allow-Origin': '*' },
-        body: JSON.stringify({ error: 'Missing recordId or reactions' })
-      };
+    const fieldsToUpdate = {};
+    for (const key in reactions) {
+      const count = reactions[key];
+      if (typeof count === 'number') {
+        fieldsToUpdate[key] = count;
+      }
     }
 
-    const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY })
-      .base(process.env.AIRTABLE_BASE_ID);
+    console.log("📤 Updating record", recordId, fieldsToUpdate);
 
-    const record = await base('Letters').find(recordId);
-    if (!record) {
-      return {
-        statusCode: 404,
-        headers: { 'Access-Control-Allow-Origin': '*' },
-        body: JSON.stringify({ error: 'Record not found' })
-      };
-    }
-
-    const updates = {};
-    Object.entries(reactions).forEach(([key, increment]) => {
-      const current = record.fields[key] || 0;
-      updates[key] = current + increment;
+    const updated = await base("Letters").update(recordId, {
+      ...fieldsToUpdate
     });
-
-    await base('Letters').update(recordId, updates);
 
     return {
       statusCode: 200,
-      headers: { 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ success: true })
+      body: JSON.stringify({ message: "Record updated successfully", updated })
     };
   } catch (err) {
-    console.error('Error in postReaction:', err);
+    console.error("❌ Failed to update record:", err);
     return {
       statusCode: 500,
-      headers: { 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ error: 'Failed to update reaction.' })
+      body: JSON.stringify({ error: "Failed to update record", details: err.message })
     };
   }
 };
