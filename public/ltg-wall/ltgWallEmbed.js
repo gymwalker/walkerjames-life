@@ -7,10 +7,11 @@ const modalContent = document.getElementById('ltg-modal-content');
 async function loadLetters() {
   try {
     const res = await fetch('https://walkerjames-life.netlify.app/.netlify/functions/getLetters?List=true');
-    const data = await res.json();
+    const json = await res.json();
 
-    console.log('Fetched letter data:', data);
+    console.log('Fetched letter data:', json);
 
+    const data = json.letters || json; // fallback if not wrapped
     if (!Array.isArray(data)) {
       throw new Error('Unexpected response format: data is not an array');
     }
