@@ -1,5 +1,3 @@
-// ltgWallEmbed.js
-
 (function () {
   const css = `
     #ltg-wall-container {
@@ -43,7 +41,7 @@
     .table-wrapper {
       overflow-x: auto;
       display: block;
-      max-width: 100%;  
+      max-width: 100%;
     }
     table {
       min-width: 900px;
@@ -101,47 +99,47 @@
   const grid = document.getElementById('letters-grid');
   const modal = document.getElementById('ltg-modal');
   const modalBody = document.getElementById('ltg-modal-body');
-  const API_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/getLetters?list=true';
+  const API_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/getLetters';
   const REACT_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/postReaction';
   let currentReactionBuffer = {};
 
   fetch(API_URL)
     .then(res => res.json())
-    .then(({ records }) => {
-      const sorted = records.sort((a, b) => new Date(b.fields['Submission Date']) - new Date(a.fields['Submission Date']));
+    .then(({ letters }) => {
+      const sorted = letters.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-      sorted.forEach(({ id, fields }) => {
-        if (!fields || !fields['Letter Content']) return;
+      sorted.forEach(({ id, date, name, letter, moderatorComment, reactions }) => {
+        if (!letter) return;
 
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td>${fields['Submission Date'] || ''}</td>
-          <td>${fields['Display Name'] || 'Anonymous'}</td>
-          <td>${fields['Letter Content'].substring(0, 80)}...</td>
-          <td>${fields['Moderator Comments'] || ''}</td>
-          <td>${fields['Hearts Count'] || 0}</td>
-          <td>${fields['Prayer Count'] || 0}</td>
-          <td>${fields['Broken Hearts Count'] || 0}</td>
-          <td>${fields['View Count'] || 0}</td>
+          <td>${date}</td>
+          <td>${name}</td>
+          <td>${letter.substring(0, 80)}...</td>
+          <td>${moderatorComment || ''}</td>
+          <td>${reactions['Hearts Count'] || 0}</td>
+          <td>${reactions['Prayer Count'] || 0}</td>
+          <td>${reactions['Broken Hearts Count'] || 0}</td>
+          <td>${reactions['View Count'] || 0}</td>
         `;
 
         row.addEventListener('click', () => {
           currentReactionBuffer = { id, reactions: { 'View Count': 1 } };
-          const incrementedViewCount = (fields['View Count'] || 0) + 1;
+          const incrementedViewCount = (reactions['View Count'] || 0) + 1;
 
           modalBody.innerHTML = `
             <span id="ltg-close">×</span>
-            <h3>${fields['Display Name'] || 'Anonymous'}</h3>
-            <div class="scroll-box" id="ltg-letter">${fields['Letter Content']}</div>
+            <h3>${name}</h3>
+            <div class="scroll-box" id="ltg-letter">${letter}</div>
             <p>
-              <span class="reaction-button" data-id="${id}" data-type="Hearts Count">❤️ ${fields['Hearts Count'] || 0}</span>
-              <span class="reaction-button" data-id="${id}" data-type="Prayer Count">🙏 ${fields['Prayer Count'] || 0}</span>
-              <span class="reaction-button" data-id="${id}" data-type="Broken Hearts Count">💔 ${fields['Broken Hearts Count'] || 0}</span>
+              <span class="reaction-button" data-id="${id}" data-type="Hearts Count">❤️ ${reactions['Hearts Count'] || 0}</span>
+              <span class="reaction-button" data-id="${id}" data-type="Prayer Count">🙏 ${reactions['Prayer Count'] || 0}</span>
+              <span class="reaction-button" data-id="${id}" data-type="Broken Hearts Count">💔 ${reactions['Broken Hearts Count'] || 0}</span>
               <span class="reaction-button">📖 ${incrementedViewCount}</span>
             </p>
             <p><strong>Moderator Comment:</strong></p>
-            <div class="scroll-box">${fields['Moderator Comments'] || 'None'}</div>
-            <p><strong>Date:</strong> ${fields['Submission Date'] || ''}</p>
+            <div class="scroll-box">${moderatorComment || 'None'}</div>
+            <p><strong>Date:</strong> ${date}</p>
           `;
 
           modal.style.display = 'flex';
