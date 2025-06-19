@@ -31,21 +31,17 @@ exports.handler = async function (event, context) {
     const currentRecord = await base('Letters').find(recordId);
     const updatedFields = {};
 
-    // These must match Airtable field names *exactly*
-    const fieldMap = [
-      'View Count',
-      'Prayer Count',
-      'Hearts Count',
-      'Broken Hearts Count'
-    ];
-
-    for (const field of fieldMap) {
-      const incoming = reactions[field] || 0;
-      const existing = currentRecord.fields[field] || 0;
-      updatedFields[field] = existing + incoming;
+    for (const [reaction, count] of Object.entries(reactions)) {
+      const current = currentRecord.fields[reaction] || 0;
+      updatedFields[reaction] = current + count;
     }
 
-    await base('Letters').update(recordId, updatedFields);
+    await base('Letters').update([
+      {
+        id: recordId,
+        fields: updatedFields
+      }
+    ]);
 
     return {
       statusCode: 200,
@@ -57,7 +53,7 @@ exports.handler = async function (event, context) {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Failed to update reactions', details: err.message })
+      body: JSON.stringify({ error: 'Failed to update reactions' })
     };
   }
 };
