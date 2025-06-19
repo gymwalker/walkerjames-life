@@ -1,5 +1,5 @@
 const Airtable = require('airtable');
-const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base('appaA8MFWiiWjXwSQ'); // ✅ CORRECT
+const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base('appaA8MFWiiWjXwSQ');
 
 exports.handler = async function (event, context) {
   const headers = {
@@ -28,26 +28,24 @@ exports.handler = async function (event, context) {
       };
     }
 
-    // Fetch current values to increment properly
     const currentRecord = await base('Letters').find(recordId);
     const updatedFields = {};
 
-    for (const [reaction, count] of Object.entries(reactions)) {
-      const current = currentRecord.fields[reaction] || 0;
-      updatedFields[reaction] = current + count;
+    // These must match Airtable field names *exactly*
+    const fieldMap = [
+      'View Count',
+      'Prayer Count',
+      'Hearts Count',
+      'Broken Hearts Count'
+    ];
+
+    for (const field of fieldMap) {
+      const incoming = reactions[field] || 0;
+      const existing = currentRecord.fields[field] || 0;
+      updatedFields[field] = existing + incoming;
     }
 
-    await base('Letters').update([
-      {
-        id: recordId,
-        fields: {
-          'View Count': reactions['View Count'] || 0,
-          'Prayer Count': reactions['Prayer Count'] || 0,
-          'Hearts Count': reactions['Hearts Count'] || 0,
-          'Broken Hearts Count': reactions['Broken Hearts Count'] || 0
-        }
-      }
-    ]);
+    await base('Letters').update(recordId, updatedFields);
 
     return {
       statusCode: 200,
@@ -59,7 +57,7 @@ exports.handler = async function (event, context) {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Failed to update reactions' })
+      body: JSON.stringify({ error: 'Failed to update reactions', details: err.message })
     };
   }
 };
