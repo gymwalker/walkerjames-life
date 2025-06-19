@@ -9,6 +9,12 @@ async function loadLetters() {
     const res = await fetch('https://walkerjames-life.netlify.app/.netlify/functions/getLetters?List=true');
     const data = await res.json();
 
+    console.log('Fetched letter data:', data);
+
+    if (!Array.isArray(data)) {
+      throw new Error('Unexpected response format: data is not an array');
+    }
+
     wallContainer.innerHTML = '';
     data.forEach((letter) => {
       const row = document.createElement('div');
