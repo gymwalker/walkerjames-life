@@ -1,6 +1,6 @@
 const Airtable = require('airtable');
 
-const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base('appaA8MFWiiWjXwSQ');
+const base = new Airtable({ apiKey: process.env.AIRTABLE_TOKEN }).base('appaA8MFWiiWjXwSQ/tblUV6tekHsf8VTkE/viw23lCkZoKlWUctE');
 
 exports.handler = async function(event, context) {
   const headers = {
