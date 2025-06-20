@@ -1,16 +1,17 @@
 const Airtable = require("airtable");
 
 exports.handler = async function (event, context) {
-  console.log("DEBUG: Function handler started. Event:", JSON.stringify(event));
-  console.log("DEBUG: Context:", JSON.stringify(context));
+  console.log("DEBUG: Function handler started at", new Date().toISOString());
+  console.log("DEBUG: Event received:", JSON.stringify(event, null, 2));
+  console.log("DEBUG: Context received:", JSON.stringify(context, null, 2));
 
-  console.log("DEBUG: Attempting to read environment variables...");
+  console.log("DEBUG: Checking environment variables...");
   const apiKey = process.env.AIRTABLE_API_KEY;
-  console.log("DEBUG: AIRTABLE_API_KEY read:", apiKey ? `Found (length: ${apiKey.length}, first 5 chars: ${apiKey.substring(0, 5)}...)` : "Not found");
+  console.log("DEBUG: AIRTABLE_API_KEY:", apiKey ? `Found (length: ${apiKey.length}, first 5 chars: ${apiKey.substring(0, 5)}...)` : "Not found");
   const baseId = process.env.AIRTABLE_BASE_ID;
-  console.log("DEBUG: AIRTABLE_BASE_ID read:", baseId ? `Found (length: ${baseId.length}, first 5 chars: ${baseId.substring(0, 5)}...)` : "Not found");
+  console.log("DEBUG: AIRTABLE_BASE_ID:", baseId ? `Found (length: ${baseId.length}, first 5 chars: ${baseId.substring(0, 5)}...)` : "Not found");
   const token = process.env.AIRTABLE_TOKEN;
-  console.log("DEBUG: AIRTABLE_TOKEN read:", token ? `Found (length: ${token.length}, first 5 chars: ${token.substring(0, 5)}...)` : "Not found");
+  console.log("DEBUG: AIRTABLE_TOKEN:", token ? `Found (length: ${token.length}, first 5 chars: ${token.substring(0, 5)}...)` : "Not found");
 
   if (!apiKey || !baseId) {
     console.error("DEBUG: Missing required environment variables:", {
@@ -24,16 +25,16 @@ exports.handler = async function (event, context) {
         "Access-Control-Allow-Methods": "GET, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type"
       },
-      body: JSON.stringify({ error: "Missing Airtable credentials" })
+      body: JSON.stringify({ error: "Missing Airtable credentials", timestamp: new Date().toISOString() })
     };
   }
 
-  console.log("DEBUG: All required environment variables present. Proceeding with Airtable initialization...");
-  console.log("DEBUG: Initializing Airtable base with baseId:", baseId.substring(0, 5) + "...");
+  console.log("DEBUG: All required environment variables present. Initializing Airtable...");
+  console.log("DEBUG: Airtable base ID:", baseId.substring(0, 5) + "...");
   const base = new Airtable({ apiKey }).base(baseId);
 
   try {
-    console.log("DEBUG: Attempting to fetch records from 'Letters' table...");
+    console.log("DEBUG: Fetching records from 'Letters' table...");
     const records = await base("Letters")
       .select({
         view: "Grid view",
@@ -48,7 +49,8 @@ exports.handler = async function (event, context) {
       })
       .all();
 
-    console.log("DEBUG: Successfully fetched records. Count:", records.length);
+    console.log("DEBUG: Fetch completed. Records count:", records.length);
+    console.log("DEBUG: Sample record (if any):", records.length > 0 ? JSON.stringify(records[0].fields, null, 2) : "No records");
     return {
       statusCode: 200,
       headers: { 
@@ -56,10 +58,10 @@ exports.handler = async function (event, context) {
         "Access-Control-Allow-Methods": "GET, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type"
       },
-      body: JSON.stringify({ records })
+      body: JSON.stringify({ records, timestamp: new Date().toISOString() })
     };
   } catch (err) {
-    console.error("DEBUG: Airtable error occurred:", {
+    console.error("DEBUG: Airtable error occurred at", new Date().toISOString(), ":", {
       message: err.message,
       stack: err.stack,
       code: err.code,
@@ -74,7 +76,7 @@ exports.handler = async function (event, context) {
         "Access-Control-Allow-Methods": "GET, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type"
       },
-      body: JSON.stringify({ error: "Failed to fetch letters", details: err.message })
+      body: JSON.stringify({ error: "Failed to fetch letters", details: err.message, timestamp: new Date().toISOString() })
     };
   }
 };
