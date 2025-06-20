@@ -21,7 +21,6 @@ exports.handler = async function () {
 
   try {
     console.log("Attempting to verify Airtable connection...");
-    // Test the connection by fetching the base metadata
     const baseInfo = await base.info();
     console.log("Airtable connection successful. Base info:", baseInfo);
 
