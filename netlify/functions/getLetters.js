@@ -19,7 +19,7 @@ exports.handler = async function (event, context) {
     });
     return {
       statusCode: 500,
-      headers: { "Access-Control-Allow-Origin": "https://walker-james-life.mykaijabi.com" }, // CORS fix
+      headers: { "Access-Control-Allow-Origin": "https://walker-james-life.mykaijabi.com" },
       body: JSON.stringify({ error: "Missing Airtable credentials" })
     };
   }
@@ -47,7 +47,7 @@ exports.handler = async function (event, context) {
     console.log("DEBUG: Successfully fetched records. Count:", records.length);
     return {
       statusCode: 200,
-      headers: { "Access-Control-Allow-Origin": "https://walker-james-life.mykaijabi.com" }, // CORS fix
+      headers: { "Access-Control-Allow-Origin": "https://walker-james-life.mykaijabi.com" },
       body: JSON.stringify({ records })
     };
   } catch (err) {
@@ -61,7 +61,7 @@ exports.handler = async function (event, context) {
     });
     return {
       statusCode: 500,
-      headers: { "Access-Control-Allow-Origin": "https://walker-james-life.mykaijabi.com" }, // CORS fix
+      headers: { "Access-Control-Allow-Origin": "https://walker-james-life.mykaijabi.com" },
       body: JSON.stringify({ error: "Failed to fetch letters", details: err.message })
     };
   }
