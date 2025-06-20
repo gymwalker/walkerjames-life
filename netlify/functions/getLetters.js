@@ -23,11 +23,7 @@ exports.handler = async function () {
   const base = new Airtable({ apiKey }).base(baseId);
 
   try {
-    console.log("Attempting to verify Airtable connection with baseId:", baseId.substring(0, 5) + "...");
-    const baseInfo = await base.info();
-    console.log("Airtable connection successful. Base info:", baseInfo);
-
-    console.log("Attempting to fetch records from 'Letters' table...");
+    console.log("Attempting to fetch records from 'Letters' table to verify connection...");
     const records = await base("Letters")
       .select({
         view: "Grid view",
