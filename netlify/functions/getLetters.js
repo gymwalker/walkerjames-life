@@ -1,12 +1,15 @@
 const Airtable = require("airtable");
 
-exports.handler = async function () {
-  console.log("Function started. Checking environment variables...");
+exports.handler = async function (event, context) {
+  console.log("DEBUG: Function handler started. Event:", JSON.stringify(event));
+  console.log("DEBUG: Context:", JSON.stringify(context));
+
+  console.log("DEBUG: Checking environment variables...");
   const apiKey = process.env.AIRTABLE_API_KEY;
   const baseId = process.env.AIRTABLE_BASE_ID;
 
   if (!apiKey || !baseId) {
-    console.error("Missing environment variables:", {
+    console.error("DEBUG: Missing environment variables:", {
       AIRTABLE_API_KEY: apiKey ? "Present" : "Missing",
       AIRTABLE_BASE_ID: baseId ? "Present" : "Missing"
     });
@@ -16,14 +19,16 @@ exports.handler = async function () {
     };
   }
 
-  console.log("Environment variables found:", {
+  console.log("DEBUG: Environment variables found:", {
     AIRTABLE_API_KEY: `Valid (length: ${apiKey.length}, first 5 chars: ${apiKey.substring(0, 5)}...)`,
     AIRTABLE_BASE_ID: `Valid (length: ${baseId.length}, first 5 chars: ${baseId.substring(0, 5)}...)`
   });
+
+  console.log("DEBUG: Initializing Airtable base with baseId:", baseId.substring(0, 5) + "...");
   const base = new Airtable({ apiKey }).base(baseId);
 
   try {
-    console.log("Attempting to fetch records from 'Letters' table to verify connection...");
+    console.log("DEBUG: Attempting to fetch records from 'Letters' table...");
     const records = await base("Letters")
       .select({
         view: "Grid view",
@@ -38,13 +43,13 @@ exports.handler = async function () {
       })
       .all();
 
-    console.log(`Fetched ${records.length} records from 'Letters' table`);
+    console.log("DEBUG: Successfully fetched records. Count:", records.length);
     return {
       statusCode: 200,
       body: JSON.stringify({ records })
     };
   } catch (err) {
-    console.error("Airtable error details:", {
+    console.error("DEBUG: Airtable error occurred:", {
       message: err.message,
       stack: err.stack,
       code: err.code,
