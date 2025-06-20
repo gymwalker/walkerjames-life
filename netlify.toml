@@ -1,3 +1,3 @@
 [build]
-  functions = "functions"  # Match the root-level functions directory
+  functions = "netlify/functions"  # Match the UI setting
   publish = "public"
