@@ -9,7 +9,7 @@ exports.handler = async function (event, context) {
   console.log("DEBUG: AIRTABLE_API_KEY read:", apiKey ? `Found (length: ${apiKey.length}, first 5 chars: ${apiKey.substring(0, 5)}...)` : "Not found");
   const baseId = process.env.AIRTABLE_BASE_ID;
   console.log("DEBUG: AIRTABLE_BASE_ID read:", baseId ? `Found (length: ${baseId.length}, first 5 chars: ${baseId.substring(0, 5)}...)` : "Not found");
-  const token = process.env.AIRTABLE_TOKEN; // Added for completeness, though not used yet
+  const token = process.env.AIRTABLE_TOKEN;
   console.log("DEBUG: AIRTABLE_TOKEN read:", token ? `Found (length: ${token.length}, first 5 chars: ${token.substring(0, 5)}...)` : "Not found");
 
   if (!apiKey || !baseId) {
@@ -19,6 +19,7 @@ exports.handler = async function (event, context) {
     });
     return {
       statusCode: 500,
+      headers: { "Access-Control-Allow-Origin": "https://walker-james-life.mykaijabi.com" }, // CORS fix
       body: JSON.stringify({ error: "Missing Airtable credentials" })
     };
   }
@@ -46,6 +47,7 @@ exports.handler = async function (event, context) {
     console.log("DEBUG: Successfully fetched records. Count:", records.length);
     return {
       statusCode: 200,
+      headers: { "Access-Control-Allow-Origin": "https://walker-james-life.mykaijabi.com" }, // CORS fix
       body: JSON.stringify({ records })
     };
   } catch (err) {
@@ -59,6 +61,7 @@ exports.handler = async function (event, context) {
     });
     return {
       statusCode: 500,
+      headers: { "Access-Control-Allow-Origin": "https://walker-james-life.mykaijabi.com" }, // CORS fix
       body: JSON.stringify({ error: "Failed to fetch letters", details: err.message })
     };
   }
