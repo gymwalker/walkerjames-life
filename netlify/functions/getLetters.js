@@ -4,12 +4,16 @@ exports.handler = async function (event, context) {
   console.log("DEBUG: Function handler started. Event:", JSON.stringify(event));
   console.log("DEBUG: Context:", JSON.stringify(context));
 
-  console.log("DEBUG: Checking environment variables...");
+  console.log("DEBUG: Attempting to read environment variables...");
   const apiKey = process.env.AIRTABLE_API_KEY;
+  console.log("DEBUG: AIRTABLE_API_KEY read:", apiKey ? `Found (length: ${apiKey.length}, first 5 chars: ${apiKey.substring(0, 5)}...)` : "Not found");
   const baseId = process.env.AIRTABLE_BASE_ID;
+  console.log("DEBUG: AIRTABLE_BASE_ID read:", baseId ? `Found (length: ${baseId.length}, first 5 chars: ${baseId.substring(0, 5)}...)` : "Not found");
+  const token = process.env.AIRTABLE_TOKEN; // Added for completeness, though not used yet
+  console.log("DEBUG: AIRTABLE_TOKEN read:", token ? `Found (length: ${token.length}, first 5 chars: ${token.substring(0, 5)}...)` : "Not found");
 
   if (!apiKey || !baseId) {
-    console.error("DEBUG: Missing environment variables:", {
+    console.error("DEBUG: Missing required environment variables:", {
       AIRTABLE_API_KEY: apiKey ? "Present" : "Missing",
       AIRTABLE_BASE_ID: baseId ? "Present" : "Missing"
     });
@@ -19,11 +23,7 @@ exports.handler = async function (event, context) {
     };
   }
 
-  console.log("DEBUG: Environment variables found:", {
-    AIRTABLE_API_KEY: `Valid (length: ${apiKey.length}, first 5 chars: ${apiKey.substring(0, 5)}...)`,
-    AIRTABLE_BASE_ID: `Valid (length: ${baseId.length}, first 5 chars: ${baseId.substring(0, 5)}...)`
-  });
-
+  console.log("DEBUG: All required environment variables present. Proceeding with Airtable initialization...");
   console.log("DEBUG: Initializing Airtable base with baseId:", baseId.substring(0, 5) + "...");
   const base = new Airtable({ apiKey }).base(baseId);
 
