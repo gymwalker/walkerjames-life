@@ -40,14 +40,18 @@ exports.handler = async function (event, context) {
             {Share Publicly} = "Yes, but anonymously"
           )
         )`,
-        sort: [{ field: "Submission Date", direction: "desc" }] // Updated from "Date" to "Submission Date"
+        sort: [{ field: "Submission Date", direction: "desc" }]
       })
       .all();
 
     console.log("DEBUG: Successfully fetched records. Count:", records.length);
     return {
       statusCode: 200,
-      headers: { "Access-Control-Allow-Origin": "https://walker-james-life.mykaijabi.com" },
+      headers: { 
+        "Access-Control-Allow-Origin": "https://walker-james-life.mykaijabi.com",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type"
+      },
       body: JSON.stringify({ records })
     };
   } catch (err) {
