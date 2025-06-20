@@ -16,15 +16,18 @@ exports.handler = async function () {
     };
   }
 
-  console.log("Environment variables found:", { AIRTABLE_API_KEY: "Valid (length: " + apiKey.length + ")", AIRTABLE_BASE_ID: "Valid (length: " + baseId.length + ")" });
+  console.log("Environment variables found:", {
+    AIRTABLE_API_KEY: `Valid (length: ${apiKey.length}, first 5 chars: ${apiKey.substring(0, 5)}...)`,
+    AIRTABLE_BASE_ID: `Valid (length: ${baseId.length}, first 5 chars: ${baseId.substring(0, 5)}...)`
+  });
   const base = new Airtable({ apiKey }).base(baseId);
 
   try {
-    console.log("Attempting to verify Airtable connection...");
+    console.log("Attempting to verify Airtable connection with baseId:", baseId.substring(0, 5) + "...");
     const baseInfo = await base.info();
     console.log("Airtable connection successful. Base info:", baseInfo);
 
-    console.log("Attempting to fetch records from Letters table...");
+    console.log("Attempting to fetch records from 'Letters' table...");
     const records = await base("Letters")
       .select({
         view: "Grid view",
@@ -39,17 +42,19 @@ exports.handler = async function () {
       })
       .all();
 
-    console.log(`Fetched ${records.length} records`);
+    console.log(`Fetched ${records.length} records from 'Letters' table`);
     return {
       statusCode: 200,
       body: JSON.stringify({ records })
     };
   } catch (err) {
-    console.error("Error details:", {
+    console.error("Airtable error details:", {
       message: err.message,
       stack: err.stack,
       code: err.code,
-      status: err.status
+      status: err.status,
+      isAuthError: err.message.includes("AUTHENTICATION") || err.code === "UNAUTHORIZED",
+      isBaseError: err.message.includes("NOT_FOUND") || err.code === "NOT_FOUND"
     });
     return {
       statusCode: 500,
