@@ -48,20 +48,29 @@
   const REACT_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/postReaction';
   let currentReactionBuffer = {};
 
+  console.log("Fetching data from:", API_URL);
   fetch(API_URL)
     .then(res => {
+      console.log("Fetch response status:", res.status);
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       return res.json();
     })
-    .then(({ records }) => {
-      if (!records) {
+    .then(data => {
+      console.log("Received data:", data);
+      if (!data.records || !Array.isArray(data.records)) {
+        console.error("No valid records found in response:", data);
         grid.innerHTML = '<tr><td colspan="8">No letters available.</td></tr>';
         return;
       }
-      const sorted = records
+      const sorted = data.records
         .filter(r => r.fields && r.fields['Approval Status'] === 'Approved' &&
           ['Yes, share publicly (first name only)', 'Yes, but anonymously'].includes(r.fields['Share Publicly']))
         .sort((a, b) => new Date(b.fields['Submission Date']) - new Date(a.fields['Submission Date']));
+
+      if (sorted.length === 0) {
+        grid.innerHTML = '<tr><td colspan="8">No approved letters available.</td></tr>';
+        return;
+      }
 
       sorted.forEach(({ id, fields }) => {
         const row = document.createElement('tr');
@@ -115,7 +124,7 @@
       });
     })
     .catch(err => {
-      console.error('❌ Fetch error:', err);
+      console.error("Fetch error:", err);
       grid.innerHTML = '<tr><td colspan="8">Failed to load letters. Please try again later.</td></tr>';
     });
 
