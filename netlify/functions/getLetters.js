@@ -40,7 +40,7 @@ exports.handler = async function (event, context) {
             {Share Publicly} = "Yes, but anonymously"
           )
         )`,
-        sort: [{ field: "Date", direction: "desc" }]
+        sort: [{ field: "Submission Date", direction: "desc" }] // Updated from "Date" to "Submission Date"
       })
       .all();
 
