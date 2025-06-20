@@ -46,6 +46,7 @@
   const modalBody = document.getElementById('ltg-modal-body');
   //const API_URL = '/.netlify/functions/getLetters?list=true'; // Updated to relative path
   //const REACT_URL = '/.netlify/functions/postReaction'; // Updated to relative path
+  //const API_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/getLetters?list=true';
   const API_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/getLetters?list=true';
   const REACT_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/postReaction';
   let currentReactionBuffer = {};
