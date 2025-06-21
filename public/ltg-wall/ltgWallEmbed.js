@@ -45,4 +45,5 @@
   const modal = document.getElementById('ltg-modal');
   const modalBody = document.getElementById('ltg-modal-body');
 
-  const API_URL = 'https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth'
+  const API_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/getLetters';
+
