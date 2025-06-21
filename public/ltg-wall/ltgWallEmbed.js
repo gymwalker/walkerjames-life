@@ -1,49 +1,82 @@
-(function () {
-  const css = `
-    #ltg-wall-container { padding: 2rem; font-family: sans-serif; overflow-x: auto; }
-    #ltg-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 9999; }
-    #ltg-modal-body { background: white; padding: 2rem; max-width: 600px; border-radius: 8px; overflow: hidden; position: relative; }
-    #ltg-close { position: absolute; top: 10px; right: 14px; font-size: 1.5rem; cursor: pointer; }
-    .scroll-box { max-height: 12em; overflow-y: auto; margin-bottom: 1rem; padding: 0.5rem; background: #f4f4f4; border-radius: 4px; }
-    .table-wrapper { overflow-x: auto; display: block; max-width: 100%; }
-    table { min-width: 900px; }
-    th, td { border-bottom: 1px solid #ccc; padding: 0.5rem; text-align: left; vertical-align: top; font-size: 1rem; }
-    th:nth-child(n+5), td:nth-child(n+5) { text-align: center; }
-    tr:hover { background-color: #f9f9f9; cursor: pointer; }
-    .reaction-button { margin: 0 5px; cursor: pointer; font-size: 1.5rem; }
-  `;
+// Inject styling
+const css = `
+  .reaction-button {
+    margin: 0 5px;
+    cursor: pointer;
+    font-size: 1.5rem;
+  }
+`;
+const style = document.createElement('style');
+style.innerHTML = css;
+document.head.appendChild(style);
 
-  const style = document.createElement('style');
-  style.innerHTML = css;
-  document.head.appendChild(style);
+// Create LTG Wall structure
+const container = document.getElementById('ltg-wall-container');
+container.innerHTML = `
+  <div id="ltg-modal">
+    <div id="ltg-modal-body"></div>
+  </div>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Name</th>
+          <th>Letter</th>
+          <th>Moderator Comment</th>
+          <th>❤️</th>
+          <th>🙏</th>
+          <th>💔</th>
+        </tr>
+      </thead>
+      <tbody id="letters-grid"></tbody>
+    </table>
+  </div>
+`;
 
-  const container = document.getElementById('ltg-wall-container');
-  container.innerHTML = `
-    <div id="ltg-modal">
-      <div id="ltg-modal-body"></div>
-    </div>
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Name</th>
-            <th>Letter</th>
-            <th>Moderator Comment</th>
-            <th>❤️</th>
-            <th>🙏</th>
-            <th>💔</th>
-            <th>📖</th>
-          </tr>
-        </thead>
-        <tbody id="letters-grid"></tbody>
-      </table>
-    </div>
-  `;
+const grid = document.getElementById('letters-grid');
+const modal = document.getElementById('ltg-modal');
+const modalBody = document.getElementById('ltg-modal-body');
 
-  const grid = document.getElementById('letters-grid');
-  const modal = document.getElementById('ltg-modal');
-  const modalBody = document.getElementById('ltg-modal-body');
+// Fetch letters from Netlify Function (which relays to Make → Airtable)
+fetch('/.netlify/functions/getLetters')
+  .then((res) => {
+    if (!res.ok) throw new Error('Network response was not ok');
+    return res.json();
+  })
+  .then((letters) => {
+    grid.innerHTML = '';
+    letters.forEach((letter) => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${letter['Date'] || ''}</td>
+        <td>${letter['Display Name'] || ''}</td>
+        <td><a href="#" class="view-letter" data-letter="${encodeURIComponent(letter['Letter Content'] || '')}">View</a></td>
+        <td>${letter['Moderator Comment'] || ''}</td>
+        <td><span class="reaction-button">❤️</span></td>
+        <td><span class="reaction-button">🙏</span></td>
+        <td><span class="reaction-button">💔</span></td>
+      `;
+      grid.appendChild(row);
+    });
 
-  const API_URL = 'https://walkerjames-life.netlify.app/.netlify/functions/getLetters';
+    // Modal display on letter click
+    document.querySelectorAll('.view-letter').forEach((link) => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const content = decodeURIComponent(link.dataset.letter);
+        modalBody.innerHTML = `<p>${content}</p>`;
+        modal.style.display = 'block';
+      });
+    });
 
+    // Close modal on click outside
+    modal.addEventListener('click', () => {
+      modal.style.display = 'none';
+      modalBody.innerHTML = '';
+    });
+  })
+  .catch((err) => {
+    console.error('Failed to load letters:', err);
+    grid.innerHTML = `<tr><td colspan="7">Failed to load letters. Please try again later.</td></tr>`;
+  });
