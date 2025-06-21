@@ -2,7 +2,7 @@ const axios = require("axios");
 
 exports.handler = async (event, context) => {
   try {
-    const makeResponse = await axios.get("https://hook.us2.make.com/sp9n176bkb7uzawj5uj7255w9ljznth");
+    const makeResponse = await axios.get("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth");
 
     return {
       statusCode: 200,
