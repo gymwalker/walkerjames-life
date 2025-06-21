@@ -3,7 +3,7 @@ const axios = require("axios");
 exports.handler = async (event, context) => {
   try {
     console.log("Sending request to Make webhook...");
-    const response = await axios.post("https://hook.us2.make.com/sp9n176bkb7uzawj5uj7255w9ljznth");
+    const response = await axios.post("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth");
 
     console.log("Received response:", response.data);
 
