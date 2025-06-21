@@ -3,18 +3,26 @@ const axios = require("axios");
 exports.handler = async (event, context) => {
   try {
     const response = await axios.post("https://hook.us2.make.com/sp9n176bkb7uzawj5uj7255w9ljznth");
+
     return {
       statusCode: 200,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": "*", // You can replace * with https://walkerjames.life for security
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
         "Content-Type": "application/json",
       },
       body: JSON.stringify(response.data),
     };
   } catch (error) {
     console.error("Error fetching letters:", error.message);
+
     return {
       statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ error: "Failed to fetch letters." }),
     };
   }
