@@ -39,7 +39,8 @@ const modal = document.getElementById('ltg-modal');
 const modalBody = document.getElementById('ltg-modal-body');
 
 // Fetch letters from Netlify Function (which relays to Make → Airtable)
-fetch('/.netlify/functions/getLetters')
+fetch('https://walkerjames-life.netlify.app/.netlify/functions/getLetters')
+//fetch('/.netlify/functions/getLetters')
   .then((res) => {
     if (!res.ok) throw new Error('Network response was not ok');
     return res.json();
