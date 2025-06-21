@@ -1,84 +1,67 @@
-// Inject styling
-const css = `
-  .reaction-button {
-    margin: 0 5px;
-    cursor: pointer;
-    font-size: 1.5rem;
+document.addEventListener("DOMContentLoaded", function () {
+  const tableBody = document.querySelector("#lettersTable tbody");
+  const errorContainer = document.querySelector("#errorContainer");
+
+  function displayError(message) {
+    if (errorContainer) {
+      errorContainer.textContent = message;
+      errorContainer.style.display = "block";
+    }
+    if (tableBody) {
+      tableBody.innerHTML = "";
+    }
   }
-`;
-const style = document.createElement('style');
-style.innerHTML = css;
-document.head.appendChild(style);
 
-// Create LTG Wall structure
-const container = document.getElementById('ltg-wall-container');
-container.innerHTML = `
-  <div id="ltg-modal">
-    <div id="ltg-modal-body"></div>
-  </div>
-  <div class="table-wrapper">
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Name</th>
-          <th>Letter</th>
-          <th>Moderator Comment</th>
-          <th>❤️</th>
-          <th>🙏</th>
-          <th>💔</th>
-        </tr>
-      </thead>
-      <tbody id="letters-grid"></tbody>
-    </table>
-  </div>
-`;
+  function renderLetters(letters) {
+    if (!Array.isArray(letters)) {
+      displayError("Invalid data format.");
+      return;
+    }
 
-const grid = document.getElementById('letters-grid');
-const modal = document.getElementById('ltg-modal');
-const modalBody = document.getElementById('ltg-modal-body');
+    tableBody.innerHTML = "";
+    letters.forEach((letter, index) => {
+      const row = document.createElement("tr");
 
-// Fetch letters from Netlify Function (which relays to Make → Airtable)
-fetch('https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth')
-//fetch('https://walkerjames-life.netlify.app/.netlify/functions/getLetters')
-//fetch('/.netlify/functions/getLetters')
-  .then((res) => {
-    if (!res.ok) throw new Error('Network response was not ok');
-    return res.json();
-  })
-  .then((letters) => {
-    grid.innerHTML = '';
-    letters.forEach((letter) => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${letter['Date'] || ''}</td>
-        <td>${letter['Display Name'] || ''}</td>
-        <td><a href="#" class="view-letter" data-letter="${encodeURIComponent(letter['Letter Content'] || '')}">View</a></td>
-        <td>${letter['Moderator Comment'] || ''}</td>
-        <td><span class="reaction-button">❤️</span></td>
-        <td><span class="reaction-button">🙏</span></td>
-        <td><span class="reaction-button">💔</span></td>
-      `;
-      grid.appendChild(row);
+      const dateCell = document.createElement("td");
+      dateCell.textContent = letter.date || "";
+      row.appendChild(dateCell);
+
+      const nameCell = document.createElement("td");
+      nameCell.textContent = letter.displayName || "Anonymous";
+      row.appendChild(nameCell);
+
+      const contentCell = document.createElement("td");
+      contentCell.textContent = letter.letterContent || "";
+      row.appendChild(contentCell);
+
+      const commentCell = document.createElement("td");
+      commentCell.textContent = letter.moderatorComment || "";
+      row.appendChild(commentCell);
+
+      tableBody.appendChild(row);
     });
+  }
 
-    // Modal display on letter click
-    document.querySelectorAll('.view-letter').forEach((link) => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const content = decodeURIComponent(link.dataset.letter);
-        modalBody.innerHTML = `<p>${content}</p>`;
-        modal.style.display = 'block';
-      });
-    });
+  fetch("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth")
+    .then(async (response) => {
+      const contentType = response.headers.get("content-type");
 
-    // Close modal on click outside
-    modal.addEventListener('click', () => {
-      modal.style.display = 'none';
-      modalBody.innerHTML = '';
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        if (data && Array.isArray(data.letters)) {
+          renderLetters(data.letters);
+        } else {
+          console.error("Unexpected JSON structure:", data);
+          displayError("Invalid data format received.");
+        }
+      } else {
+        const text = await response.text();
+        console.error("Expected JSON but received non-JSON:", text.slice(0, 500));
+        displayError("Server error: Unexpected response received.");
+      }
+    })
+    .catch((error) => {
+      console.error("Fetch failed:", error);
+      displayError("Failed to load letters. Please try again later.");
     });
-  })
-  .catch((err) => {
-    console.error('Failed to load letters:', err);
-    grid.innerHTML = `<tr><td colspan="7">Failed to load letters. Please try again later.</td></tr>`;
-  });
+});
