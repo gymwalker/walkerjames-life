@@ -2,13 +2,7 @@ const axios = require("axios");
 
 exports.handler = async (event, context) => {
   try {
-    const response = await axios.post("https://hook.us2.make.com/sp9n176bkb7uzawj5uj7255w9ljznth");
-
-    // Ensure the response contains letters
-    const letters = response.data?.letters;
-    if (!Array.isArray(letters)) {
-      throw new Error("Invalid data format: 'letters' is not an array.");
-    }
+    const makeResponse = await axios.get("https://hook.us2.make.com/sp9n176bkb7uzawj5uj7255w9ljznth");
 
     return {
       statusCode: 200,
@@ -16,15 +10,12 @@ exports.handler = async (event, context) => {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ letters }),
+      body: JSON.stringify(makeResponse.data),
     };
   } catch (error) {
     console.error("Error fetching letters:", error.message);
     return {
-      statusCode: 500,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-      },
+      statusCode: error.response?.status || 500,
       body: JSON.stringify({ error: "Failed to fetch letters." }),
     };
   }
