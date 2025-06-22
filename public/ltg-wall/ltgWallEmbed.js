@@ -1,73 +1,97 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const wallContainer = document.createElement("div");
-  wallContainer.id = "ltg-wall-container";
-  wallContainer.style.overflowX = "auto";
-  wallContainer.style.width = "100%";
-  wallContainer.style.marginTop = "40px";
+// WalkerJames.Life LTG Wall Embed Script
+// Updated to: remove JSON dependency, fix full table display, restore icons, and use open book icon for read counter
 
-  const table = document.createElement("table");
-  table.style.width = "100%";
-  table.style.borderCollapse = "collapse";
-  table.style.fontFamily = "Arial, sans-serif";
-  table.style.fontSize = "16px";
+(function () {
+  const container = document.getElementById("ltg-wall-container");
+  if (!container) return;
 
-  const headerRow = document.createElement("tr");
-  const headers = ["Date", "Name", "Letter", "Moderator Comment", "Hearts ❤️", "Prayers 🙏", "Broken 💔", "Views 👁️"];
-
-  headers.forEach((text, i) => {
-    const th = document.createElement("th");
-    th.innerText = text;
-    th.style.border = "1px solid #ccc";
-    th.style.padding = "12px";
-    th.style.backgroundColor = "#f8f8f8";
-    th.style.textAlign = "left";
-    th.style.position = "sticky";
-    th.style.top = "0";
-    th.style.background = "#fff";
-    th.style.zIndex = "2";
-    if (i < 3) th.style.left = `${i * 150}px`; // lock first 3 columns
-    headerRow.appendChild(th);
-  });
-
-  table.appendChild(headerRow);
+  container.innerHTML = "<p>Loading letters…</p>";
 
   fetch("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth")
     .then(response => response.text())
     .then(text => {
-      const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
-      lines.forEach(line => {
-        const match = line.match(/^(\d{4}-\d{2}-\d{2})(Anonymous|[A-Za-z ]+)(.*?)(Lovely drawing.*|Uplifting news.*|Heartwarming message.*)?$/);
-        if (match) {
-          const row = document.createElement("tr");
-          const [_, date, name, letter, comment] = match;
-          const cells = [date, name, letter.trim(), comment || "", "", "", "", ""];
+      const lines = text.trim().split(/\r?\n/);
+      const lettersArray = lines.map(line => line.trim()).filter(Boolean);
 
-          cells.forEach((cellText, i) => {
-            const td = document.createElement("td");
-            td.innerText = cellText;
-            td.style.border = "1px solid #ccc";
-            td.style.padding = "10px";
-            td.style.whiteSpace = i >= 2 ? "normal" : "nowrap";
-            td.style.maxWidth = i === 2 ? "400px" : "150px";
-            td.style.overflow = "hidden";
-            td.style.textOverflow = "ellipsis";
-            if (i < 3) {
-              td.style.position = "sticky";
-              td.style.left = `${i * 150}px`;
-              td.style.background = "#fff";
-              td.style.zIndex = "1";
-            }
-            row.appendChild(td);
-          });
+      if (lettersArray.length === 0) {
+        container.innerHTML = "<p>No letters found.</p>";
+        return;
+      }
 
-          table.appendChild(row);
-        }
+      const table = document.createElement("table");
+      table.className = "ltg-wall-table";
+
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th>Date</th>
+          <th>Display Name</th>
+          <th>Letter</th>
+          <th>Moderator Comments</th>
+          <th><span title='Prayers'>🙏</span></th>
+          <th><span title='Hearts'>❤️</span></th>
+          <th><span title='Broken Hearts'>💔</span></th>
+          <th><span title='Views'>📖</span></th>
+        </tr>
+      `;
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      lettersArray.forEach(entry => {
+        const td = document.createElement("td");
+        td.colSpan = 8;
+
+        const fields = entry.split(/(?=\d{4}-\d{2}-\d{2})/)[0]
+          .split(/(?<=\d{4}-\d{2}-\d{2}.*?)(?=Anonymous|\d{4}-\d{2}-\d{2})/);
+
+        const [date, name, ...rest] = entry.split(/(?=\d{4}-\d{2}-\d{2})/)[0]
+          .trim().split(/(?=Anonymous|\d{4}-\d{2}-\d{2})/);
+
+        const letterContent = rest.join(" ").split("Moderator Comments:")[0].trim();
+        const moderator = (entry.match(/Moderator Comments:(.*)/) || ["", ""])[1].trim();
+
+        const views = (entry.match(/View Count:\s*(\d+)/) || ["", "0"])[1];
+        const prayers = (entry.match(/Prayer Count:\s*(\d+)/) || ["", "0"])[1];
+        const hearts = (entry.match(/Hearts Count:\s*(\d+)/) || ["", "0"])[1];
+        const broken = (entry.match(/Broken Hearts Count:\s*(\d+)/) || ["", "0"])[1];
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${date.trim()}</td>
+          <td>${name.trim()}</td>
+          <td class="truncate" title="Click to read full letter">${letterContent.slice(0, 120)}…</td>
+          <td class="truncate">${moderator.slice(0, 120)}…</td>
+          <td>🙏 ${prayers}</td>
+          <td>❤️ ${hearts}</td>
+          <td>💔 ${broken}</td>
+          <td>📖 ${views}</td>
+        `;
+        tr.onclick = () => showPopup(name.trim(), date.trim(), letterContent, moderator);
+        tbody.appendChild(tr);
       });
 
-      wallContainer.appendChild(table);
-      document.body.appendChild(wallContainer);
+      table.appendChild(tbody);
+      container.innerHTML = "";
+      container.appendChild(table);
     })
     .catch(err => {
-      console.error("Failed to load Letters to God data:", err);
+      container.innerHTML = `<p>Error loading letters: ${err.message}</p>`;
     });
-});
+
+  function showPopup(name, date, content, moderator) {
+    const popup = document.createElement("div");
+    popup.className = "ltg-popup";
+    popup.innerHTML = `
+      <div class="ltg-popup-inner">
+        <button class="ltg-popup-close">&times;</button>
+        <h3>${name}</h3>
+        <p><strong>${date}</strong></p>
+        <div class="ltg-popup-letter">${content}</div>
+        <p><em>${moderator}</em></p>
+      </div>
+    `;
+
+    popup.querySelector(".ltg-popup-close").onclick = () => popup.remove();
+    document.body.appendChild(popup);
+  }
+})();
