@@ -1,5 +1,5 @@
 // WalkerJames.Life LTG Wall Embed Script
-// Updated to: use pipe-delimited CSV, parse properly, include all columns, enforce scroll, truncate long fields, and restore popup
+// Updated to: use pipe-delimited CSV, parse properly, include all columns, enforce scroll, truncate long fields, and restore popup — no icons in counts row
 
 (function () {
   const container = document.getElementById("ltg-wall-container");
@@ -33,10 +33,10 @@
           <th>Display Name</th>
           <th style="max-width: 50ch;">Letter</th>
           <th style="max-width: 50ch;">Moderator Comments</th>
-          <th><span title='Prayers'>🙏</span></th>
-          <th><span title='Hearts'>❤️</span></th>
-          <th><span title='Broken Hearts'>💔</span></th>
-          <th><span title='Views'>📖</span></th>
+          <th title='Prayers'>🙏</th>
+          <th title='Hearts'>❤️</th>
+          <th title='Broken Hearts'>💔</th>
+          <th title='Views'>📖</th>
         </tr>
       `;
       table.appendChild(thead);
@@ -51,10 +51,10 @@
           <td>${name}</td>
           <td class="truncate" style="max-width: 50ch; white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; cursor: pointer;" title="Click to read full letter">${letterContent}</td>
           <td class="truncate" style="max-width: 50ch; white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${moderator}</td>
-          <td>🙏 ${prayers}</td>
-          <td>❤️ ${hearts}</td>
-          <td>💔 ${broken}</td>
-          <td>📖 ${views}</td>
+          <td>${prayers}</td>
+          <td>${hearts}</td>
+          <td>${broken}</td>
+          <td>${views}</td>
         `;
         tr.onclick = () => showPopup(name, date, letterContent, moderator);
         tbody.appendChild(tr);
