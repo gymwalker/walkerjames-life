@@ -1,5 +1,5 @@
 // WalkerJames.Life LTG Wall Embed Script
-// Updated: Fix layout, restore clickable icon columns, avoid JSON entirely, and show all fields properly
+// Updated: Fix layout, correct popup order, clickable 📖, add table lines
 
 (function () {
   const container = document.getElementById("ltg-wall-container");
@@ -25,18 +25,20 @@
       const table = document.createElement("table");
       table.className = "ltg-wall-table";
       table.style.minWidth = "1000px";
+      table.style.borderCollapse = "collapse";
+      table.style.width = "100%";
 
       const thead = document.createElement("thead");
       thead.innerHTML = `
         <tr>
-          <th>Date</th>
-          <th>Display Name</th>
-          <th style="max-width: 50ch;">Letter</th>
-          <th style="max-width: 50ch;">Moderator Comments</th>
-          <th title='Prayers'>🙏</th>
-          <th title='Hearts'>❤️</th>
-          <th title='Broken Hearts'>💔</th>
-          <th title='Views'>📖</th>
+          <th style="border: 1px solid #ccc; padding: 8px;">Date</th>
+          <th style="border: 1px solid #ccc; padding: 8px;">Display Name</th>
+          <th style="border: 1px solid #ccc; padding: 8px; max-width: 50ch;">Letter</th>
+          <th style="border: 1px solid #ccc; padding: 8px; max-width: 50ch;">Moderator Comments</th>
+          <th style="border: 1px solid #ccc; padding: 8px;" title='Hearts'>❤️</th>
+          <th style="border: 1px solid #ccc; padding: 8px;" title='Prayers'>🙏</th>
+          <th style="border: 1px solid #ccc; padding: 8px;" title='Broken Hearts'>💔</th>
+          <th style="border: 1px solid #ccc; padding: 8px;" title='Views'>📖</th>
         </tr>
       `;
       table.appendChild(thead);
@@ -47,14 +49,14 @@
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${date}</td>
-          <td>${name}</td>
-          <td class="truncate" style="max-width: 50ch; white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; cursor: pointer;" title="Click to read full letter">${letterContent}</td>
-          <td class="truncate" style="max-width: 50ch; white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${moderator}</td>
-          <td><span class="icon-btn" data-type="pray" data-index="${index}">🙏</span><br>${prayers}</td>
-          <td><span class="icon-btn" data-type="love" data-index="${index}">❤️</span><br>${hearts}</td>
-          <td><span class="icon-btn" data-type="break" data-index="${index}">💔</span><br>${broken}</td>
-          <td><span class="icon-btn" data-type="read" data-index="${index}">📖</span><br>${views}</td>
+          <td style="border: 1px solid #ccc; padding: 8px;">${date}</td>
+          <td style="border: 1px solid #ccc; padding: 8px;">${name}</td>
+          <td class="truncate" style="border: 1px solid #ccc; padding: 8px; max-width: 50ch; white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; cursor: pointer;" title="Click to read full letter">${letterContent}</td>
+          <td class="truncate" style="border: 1px solid #ccc; padding: 8px; max-width: 50ch; white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${moderator}</td>
+          <td style="border: 1px solid #ccc; padding: 8px;"><span class="icon-btn" data-type="love" data-index="${index}">❤️</span><br>${hearts}</td>
+          <td style="border: 1px solid #ccc; padding: 8px;"><span class="icon-btn" data-type="pray" data-index="${index}">🙏</span><br>${prayers}</td>
+          <td style="border: 1px solid #ccc; padding: 8px;"><span class="icon-btn" data-type="break" data-index="${index}">💔</span><br>${broken}</td>
+          <td style="border: 1px solid #ccc; padding: 8px;"><span class="icon-btn" data-type="read" data-index="${index}">📖</span><br>${views}</td>
         `;
         tr.querySelector("td:nth-child(3)").onclick = () => showPopup(name, date, letterContent, moderator, prayers, hearts, broken, views, index);
         tbody.appendChild(tr);
@@ -90,8 +92,8 @@
         <div class="ltg-popup-letter">${content}</div>
         <p><em>${moderator}</em></p>
         <div class="ltg-popup-reactions" style="margin-top: 1em; font-size: 1.5em; display: flex; justify-content: space-around;">
-          <div title="Prayers" class="reaction" data-type="pray" data-index="${index}">🙏 <span>${prayers}</span></div>
           <div title="Hearts" class="reaction" data-type="love" data-index="${index}">❤️ <span>${hearts}</span></div>
+          <div title="Prayers" class="reaction" data-type="pray" data-index="${index}">🙏 <span>${prayers}</span></div>
           <div title="Broken Hearts" class="reaction" data-type="break" data-index="${index}">💔 <span>${broken}</span></div>
           <div title="Views" class="reaction" data-type="read" data-index="${index}">📖 <span>${views}</span></div>
         </div>
