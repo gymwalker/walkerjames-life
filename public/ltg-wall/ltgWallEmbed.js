@@ -1,186 +1,73 @@
-// ltgWallEmbed.js (full fix: formatting, popup, parsing, widths)
+document.addEventListener("DOMContentLoaded", function () {
+  const wallContainer = document.createElement("div");
+  wallContainer.id = "ltg-wall-container";
+  wallContainer.style.overflowX = "auto";
+  wallContainer.style.width = "100%";
+  wallContainer.style.marginTop = "40px";
 
-const endpoint = "https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth";
+  const table = document.createElement("table");
+  table.style.width = "100%";
+  table.style.borderCollapse = "collapse";
+  table.style.fontFamily = "Arial, sans-serif";
+  table.style.fontSize = "16px";
 
-const style = document.createElement('style');
-style.innerHTML = `
-  #ltg-wall-container {
-    padding: 2rem;
-    font-family: sans-serif;
-    overflow-x: auto;
-  }
-  #ltg-modal {
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6);
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-  }
-  #ltg-modal-body {
-    background: white;
-    padding: 2rem;
-    max-width: 600px;
-    width: 90%;
-    border-radius: 8px;
-    overflow: hidden;
-    position: relative;
-    font-family: sans-serif;
-    font-size: 1rem;
-  }
-  #ltg-close {
-    position: absolute;
-    top: 10px;
-    right: 14px;
-    font-size: 1.5rem;
-    cursor: pointer;
-  }
-  .scroll-box {
-    max-height: 10em;
-    overflow-y: auto;
-    margin-bottom: 1rem;
-    padding: 0.75rem;
-    background: #f4f4f4;
-    border-radius: 4px;
-    white-space: pre-wrap;
-    font-family: sans-serif;
-    font-size: 1rem;
-  }
-  .table-wrapper {
-    overflow-x: auto;
-  }
-  table {
-    border-collapse: collapse;
-    table-layout: auto;
-    min-width: 900px;
-    width: 100%;
-  }
-  th, td {
-    border-bottom: 1px solid #ccc;
-    padding: 0.5rem;
-    text-align: left;
-    vertical-align: top;
-    font-size: 1rem;
-    word-wrap: break-word;
-  }
-  td.letter, td.moderator {
-    max-width: 300px;
-    min-width: 300px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  tr:hover {
-    background-color: #f9f9f9;
-    cursor: pointer;
-  }
-`;
-document.head.appendChild(style);
+  const headerRow = document.createElement("tr");
+  const headers = ["Date", "Name", "Letter", "Moderator Comment", "Hearts ❤️", "Prayers 🙏", "Broken 💔", "Views 👁️"];
 
-const container = document.getElementById('ltg-wall-container') || document.body;
-container.innerHTML = `
-  <div id="ltg-modal">
-    <div id="ltg-modal-body"></div>
-  </div>
-  <div class="table-wrapper">
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Name</th>
-          <th>Letter</th>
-          <th>Moderator Comment</th>
-          <th>❤️</th>
-          <th>🙏</th>
-          <th>💔</th>
-          <th>📖</th>
-        </tr>
-      </thead>
-      <tbody id="letters-grid"></tbody>
-    </table>
-  </div>
-`;
+  headers.forEach((text, i) => {
+    const th = document.createElement("th");
+    th.innerText = text;
+    th.style.border = "1px solid #ccc";
+    th.style.padding = "12px";
+    th.style.backgroundColor = "#f8f8f8";
+    th.style.textAlign = "left";
+    th.style.position = "sticky";
+    th.style.top = "0";
+    th.style.background = "#fff";
+    th.style.zIndex = "2";
+    if (i < 3) th.style.left = `${i * 150}px`; // lock first 3 columns
+    headerRow.appendChild(th);
+  });
 
-const grid = document.getElementById('letters-grid');
-const modal = document.getElementById('ltg-modal');
-const modalBody = document.getElementById('ltg-modal-body');
+  table.appendChild(headerRow);
 
-fetch(endpoint)
-  .then(response => response.text())
-  .then(text => {
-    const lines = text.split(/\n|(?=\d{4}-\d{2}-\d{2})/g);
-    const lettersArray = [];
+  fetch("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth")
+    .then(response => response.text())
+    .then(text => {
+      const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
+      lines.forEach(line => {
+        const match = line.match(/^(\d{4}-\d{2}-\d{2})(Anonymous|[A-Za-z ]+)(.*?)(Lovely drawing.*|Uplifting news.*|Heartwarming message.*)?$/);
+        if (match) {
+          const row = document.createElement("tr");
+          const [_, date, name, letter, comment] = match;
+          const cells = [date, name, letter.trim(), comment || "", "", "", "", ""];
 
-    lines.forEach(line => {
-      const match = line.match(/(\d{4}-\d{2}-\d{2})\s+(.*?)\s+([^!]+)!?(.*)/);
-      if (match) {
-        lettersArray.push({
-          date: match[1].trim(),
-          from: match[2].trim(),
-          letter: match[3].trim(),
-          moderatorNote: match[4].trim(),
-          hearts: 0,
-          prayers: 0,
-          broken: 0,
-          views: 0
-        });
-      }
-    });
-
-    lettersArray.forEach((l, index) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${l.date}</td>
-        <td>${l.from || "Anonymous"}</td>
-        <td class="letter">${l.letter}</td>
-        <td class="moderator">${l.moderatorNote || 'None'}</td>
-        <td>${l.hearts}</td>
-        <td>${l.prayers}</td>
-        <td>${l.broken}</td>
-        <td>${l.views}</td>
-      `;
-
-      row.addEventListener('click', () => {
-        const newView = l.views + 1;
-        const clicked = {};
-        modalBody.innerHTML = `
-          <span id="ltg-close">×</span>
-          <h3 style="margin-bottom: 0.5rem; font-weight: 600;">${l.from}</h3>
-          <div class="scroll-box">${l.letter}</div>
-          <p>
-            <span class="reaction-button" data-type="hearts">❤️ ${l.hearts}</span>
-            <span class="reaction-button" data-type="prayers">🙏 ${l.prayers}</span>
-            <span class="reaction-button" data-type="broken">💔 ${l.broken}</span>
-            <span class="reaction-button">📖 ${newView}</span>
-          </p>
-          <p><strong>Moderator Comment:</strong></p>
-          <div class="scroll-box">${l.moderatorNote || 'None'}</div>
-          <p><strong>Date:</strong> ${l.date}</p>
-        `;
-        modal.style.display = 'flex';
-
-        document.getElementById('ltg-close').addEventListener('click', () => modal.style.display = 'none');
-
-        modalBody.querySelectorAll('.reaction-button').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            const type = e.target.dataset.type;
-            if (!type || clicked[type]) return;
-            clicked[type] = true;
-            l[type] = (l[type] || 0) + 1;
-            e.target.textContent = e.target.textContent.split(' ')[0] + ' ' + l[type];
-            console.log(`Reaction '${type}' +1 for letter ${index}`);
+          cells.forEach((cellText, i) => {
+            const td = document.createElement("td");
+            td.innerText = cellText;
+            td.style.border = "1px solid #ccc";
+            td.style.padding = "10px";
+            td.style.whiteSpace = i >= 2 ? "normal" : "nowrap";
+            td.style.maxWidth = i === 2 ? "400px" : "150px";
+            td.style.overflow = "hidden";
+            td.style.textOverflow = "ellipsis";
+            if (i < 3) {
+              td.style.position = "sticky";
+              td.style.left = `${i * 150}px`;
+              td.style.background = "#fff";
+              td.style.zIndex = "1";
+            }
+            row.appendChild(td);
           });
-        });
+
+          table.appendChild(row);
+        }
       });
 
-      grid.appendChild(row);
+      wallContainer.appendChild(table);
+      document.body.appendChild(wallContainer);
+    })
+    .catch(err => {
+      console.error("Failed to load Letters to God data:", err);
     });
-  })
-  .catch(err => {
-    console.error("Failed to fetch letters:", err);
-    grid.innerHTML = '<tr><td colspan="8">Failed to load letters. Please try again later.</td></tr>';
-  });
+});
