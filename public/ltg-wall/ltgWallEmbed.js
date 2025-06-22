@@ -1,4 +1,4 @@
-// ltgWallEmbed.js (final cleanup with Walker's specs — minimal columns, fixed popup, horizontal scroll)
+// ltgWallEmbed.js (fully aligned to Walker's specs — clean scroll, fixed modal, click-once reactions)
 
 const endpoint = "https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth";
 
@@ -63,13 +63,14 @@ style.innerHTML = `
     font-size: 1rem;
     word-wrap: break-word;
   }
-  td:nth-child(3) {
-    max-height: 3em;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  td:nth-child(2), td:nth-child(3) {
+    width: 250px;
+    max-width: 250px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   tr:hover {
     background-color: #f9f9f9;
@@ -108,7 +109,7 @@ fetch(endpoint)
     const lettersArray = [];
 
     lines.forEach(line => {
-      const match = line.match(/(\d{4}-\d{2}-\d{2})([^@]*)@?([^,]*),?(.*)/);
+      const match = line.match(/(\d{4}-\d{2}-\d{2})\s+(.*?)\s+([^!]+)!?(.*)/);
       if (match) {
         lettersArray.push({
           date: match[1].trim(),
@@ -133,6 +134,7 @@ fetch(endpoint)
 
       row.addEventListener('click', () => {
         const newView = l.views + 1;
+        const clicked = {};
         modalBody.innerHTML = `
           <span id="ltg-close">×</span>
           <h3 style="font-family: sans-serif; font-size: 1.2rem;">${l.from}</h3>
@@ -141,7 +143,7 @@ fetch(endpoint)
             <span class="reaction-button" data-type="hearts">❤️ ${l.hearts}</span>
             <span class="reaction-button" data-type="prayers">🙏 ${l.prayers}</span>
             <span class="reaction-button" data-type="broken">💔 ${l.broken}</span>
-            <span class="reaction-button" data-type="views">📖 ${newView}</span>
+            <span class="reaction-button">📖 ${newView}</span>
           </p>
           <p><strong>Moderator Comment:</strong></p>
           <div class="scroll-box">${l.moderatorNote || 'None'}</div>
@@ -154,12 +156,11 @@ fetch(endpoint)
         modalBody.querySelectorAll('.reaction-button').forEach(btn => {
           btn.addEventListener('click', (e) => {
             const type = e.target.dataset.type;
-            if (!type || type === 'views') return;
-
+            if (!type || clicked[type]) return;
+            clicked[type] = true;
             l[type] = (l[type] || 0) + 1;
             e.target.textContent = e.target.textContent.split(' ')[0] + ' ' + l[type];
             console.log(`Reaction '${type}' +1 for letter ${index}`);
-            // You can POST to Make webhook here if needed
           });
         });
       });
