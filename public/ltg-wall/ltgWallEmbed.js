@@ -1,4 +1,4 @@
-// ltgWallEmbed.js (corrected layout, restored full table, improved modal)
+// ltgWallEmbed.js (full fix: formatting, popup, parsing, widths)
 
 const endpoint = "https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth";
 
@@ -66,7 +66,8 @@ style.innerHTML = `
     word-wrap: break-word;
   }
   td.letter, td.moderator {
-    max-width: 250px;
+    max-width: 300px;
+    min-width: 300px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
