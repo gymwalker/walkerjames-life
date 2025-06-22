@@ -1,4 +1,4 @@
-// ltgWallEmbed.js (updated with styling, reaction logic, modal fixes)
+// ltgWallEmbed.js (cleaned for Make response, formatted popup/table, no JSON parsing)
 
 const endpoint = "https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth";
 
@@ -44,14 +44,14 @@ style.innerHTML = `
     background: #f4f4f4;
     border-radius: 4px;
     white-space: pre-wrap;
+    font-family: sans-serif;
   }
   .table-wrapper {
-    min-width: 1200px; width: max-content;
-    margin: 0 auto;
+    width: 100%;
+    overflow-x: auto;
   }
   table {
     width: 100%;
-    margin: 0 auto;
     border-collapse: collapse;
     table-layout: fixed;
   }
@@ -66,6 +66,14 @@ style.innerHTML = `
   th:nth-child(n+5), td:nth-child(n+5) {
     text-align: center;
     font-size: 1rem;
+  }
+  td:nth-child(3), td:nth-child(4) {
+    max-height: 3em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
   tr:hover {
     background-color: #f9f9f9;
@@ -110,41 +118,32 @@ const modalBody = document.getElementById('ltg-modal-body');
 fetch(endpoint)
   .then(response => response.text())
   .then(text => {
-    let lettersArray = [];
-    try {
-      const json = JSON.parse(text);
-      if (Array.isArray(json.letters)) {
-        lettersArray = json.letters;
-      } else {
-        throw new Error("letters not array");
+    const lines = text.split(/\n|(?=\d{4}-\d{2}-\d{2})/g);
+    const lettersArray = [];
+
+    lines.forEach(line => {
+      const match = line.match(/(\d{4}-\d{2}-\d{2})([^@]*)@?([^,]*),?(.*)/);
+      if (match) {
+        lettersArray.push({
+          date: match[1].trim(),
+          from: match[2].trim(),
+          letter: match[3].trim(),
+          moderatorNote: match[4].trim(),
+          hearts: 0,
+          prayers: 0,
+          broken: 0,
+          views: 0
+        });
       }
-    } catch (e) {
-      console.warn("Fallback to manual parsing due to non-JSON response");
-      const lines = text.split(/\n|(?=\d{4}-\d{2}-\d{2})/g);
-      lines.forEach(line => {
-        const match = line.match(/(\d{4}-\d{2}-\d{2})([^@]*)@?([^,]*),?(.*)/);
-        if (match) {
-          lettersArray.push({
-            date: match[1].trim(),
-            from: match[2].trim(),
-            letter: match[3].trim(),
-            moderatorNote: match[4].trim(),
-            hearts: 0,
-            prayers: 0,
-            broken: 0,
-            views: 0
-          });
-        }
-      });
-    }
+    });
 
     lettersArray.forEach((l, index) => {
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${l.date}</td>
         <td>${l.from || "Anonymous"}</td>
-        <td style="max-width: 250px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${l.letter}</td>
-        <td style="max-width: 250px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${l.moderatorNote || ''}</td>
+        <td>${l.letter}</td>
+        <td>${l.moderatorNote || ''}</td>
         <td>${l.hearts}</td>
         <td>${l.prayers}</td>
         <td>${l.broken}</td>
@@ -155,8 +154,8 @@ fetch(endpoint)
         const newView = l.views + 1;
         modalBody.innerHTML = `
           <span id="ltg-close">×</span>
-          <h3>${l.from}</h3>
-          <div class="scroll-box" id="ltg-letter">${l.letter}</div>
+          <h3 style="font-family: sans-serif;">${l.from}</h3>
+          <div class="scroll-box">${l.letter}</div>
           <p>
             <span class="reaction-button" data-type="hearts">❤️ ${l.hearts}</span>
             <span class="reaction-button" data-type="prayers">🙏 ${l.prayers}</span>
@@ -169,10 +168,8 @@ fetch(endpoint)
         `;
         modal.style.display = 'flex';
 
-        // Close button
         document.getElementById('ltg-close').addEventListener('click', () => modal.style.display = 'none');
 
-        // Handle reactions
         modalBody.querySelectorAll('.reaction-button').forEach(btn => {
           btn.addEventListener('click', (e) => {
             const type = e.target.dataset.type;
@@ -181,8 +178,7 @@ fetch(endpoint)
             l[type] = (l[type] || 0) + 1;
             e.target.textContent = e.target.textContent.split(' ')[0] + ' ' + l[type];
             console.log(`Reaction '${type}' +1 for letter ${index}`);
-            // Simulated post - replace with actual POST to updateReaction.js
-            // postReaction(index, type)
+            // This should eventually trigger a Make webhook POST if needed
           });
         });
       });
