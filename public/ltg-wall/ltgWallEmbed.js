@@ -1,8 +1,8 @@
-// ltgWallEmbed.js (merged: working formatting + new Make endpoint logic)
+// ltgWallEmbed.js (updated with styling, reaction logic, modal fixes)
 
 const endpoint = "https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth";
 
-// Styling
+// Apply styling
 const style = document.createElement('style');
 style.innerHTML = `
   #ltg-wall-container {
@@ -27,6 +27,7 @@ style.innerHTML = `
     border-radius: 8px;
     overflow: hidden;
     position: relative;
+    font-family: sans-serif;
   }
   #ltg-close {
     position: absolute;
@@ -42,6 +43,7 @@ style.innerHTML = `
     padding: 0.5rem;
     background: #f4f4f4;
     border-radius: 4px;
+    white-space: pre-wrap;
   }
   .table-wrapper {
     min-width: 1200px; width: max-content;
@@ -51,7 +53,7 @@ style.innerHTML = `
     width: 100%;
     margin: 0 auto;
     border-collapse: collapse;
-    table-layout: auto;
+    table-layout: fixed;
   }
   th, td {
     border-bottom: 1px solid #ccc;
@@ -59,9 +61,11 @@ style.innerHTML = `
     text-align: left;
     vertical-align: top;
     font-size: 1rem;
+    word-wrap: break-word;
   }
   th:nth-child(n+5), td:nth-child(n+5) {
     text-align: center;
+    font-size: 1rem;
   }
   tr:hover {
     background-color: #f9f9f9;
@@ -75,7 +79,6 @@ style.innerHTML = `
 `;
 document.head.appendChild(style);
 
-// HTML container
 const container = document.getElementById('ltg-wall-container') || document.body;
 container.innerHTML = `
   <div id="ltg-modal">
@@ -103,20 +106,17 @@ container.innerHTML = `
 const grid = document.getElementById('letters-grid');
 const modal = document.getElementById('ltg-modal');
 const modalBody = document.getElementById('ltg-modal-body');
-let currentReactionBuffer = {};
 
-// Fetch and parse letters
 fetch(endpoint)
   .then(response => response.text())
   .then(text => {
     let lettersArray = [];
-
     try {
       const json = JSON.parse(text);
       if (Array.isArray(json.letters)) {
         lettersArray = json.letters;
       } else {
-        throw new Error("Expected 'letters' to be an array");
+        throw new Error("letters not array");
       }
     } catch (e) {
       console.warn("Fallback to manual parsing due to non-JSON response");
@@ -143,41 +143,54 @@ fetch(endpoint)
       row.innerHTML = `
         <td>${l.date}</td>
         <td>${l.from || "Anonymous"}</td>
-        <td>${l.letter.substring(0, 80)}...</td>
-        <td>${l.moderatorNote || ''}</td>
-        <td>${l.hearts || 0}</td>
-        <td>${l.prayers || 0}</td>
-        <td>${l.broken || 0}</td>
-        <td>${l.views || 0}</td>
+        <td style="max-width: 250px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${l.letter}</td>
+        <td style="max-width: 250px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${l.moderatorNote || ''}</td>
+        <td>${l.hearts}</td>
+        <td>${l.prayers}</td>
+        <td>${l.broken}</td>
+        <td>${l.views}</td>
       `;
 
       row.addEventListener('click', () => {
-        currentReactionBuffer = { id: index, reactions: { views: 1 } };
-        const incrementedViewCount = (l.views || 0) + 1;
-
+        const newView = l.views + 1;
         modalBody.innerHTML = `
           <span id="ltg-close">×</span>
           <h3>${l.from}</h3>
           <div class="scroll-box" id="ltg-letter">${l.letter}</div>
           <p>
-            <span class="reaction-button" data-id="${index}" data-type="hearts">❤️ ${l.hearts}</span>
-            <span class="reaction-button" data-id="${index}" data-type="prayers">🙏 ${l.prayers}</span>
-            <span class="reaction-button" data-id="${index}" data-type="broken">💔 ${l.broken}</span>
-            <span class="reaction-button">📖 ${incrementedViewCount}</span>
+            <span class="reaction-button" data-type="hearts">❤️ ${l.hearts}</span>
+            <span class="reaction-button" data-type="prayers">🙏 ${l.prayers}</span>
+            <span class="reaction-button" data-type="broken">💔 ${l.broken}</span>
+            <span class="reaction-button" data-type="views">📖 ${newView}</span>
           </p>
           <p><strong>Moderator Comment:</strong></p>
           <div class="scroll-box">${l.moderatorNote || 'None'}</div>
           <p><strong>Date:</strong> ${l.date}</p>
         `;
-
         modal.style.display = 'flex';
+
+        // Close button
         document.getElementById('ltg-close').addEventListener('click', () => modal.style.display = 'none');
+
+        // Handle reactions
+        modalBody.querySelectorAll('.reaction-button').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const type = e.target.dataset.type;
+            if (!type || type === 'views') return;
+
+            l[type] = (l[type] || 0) + 1;
+            e.target.textContent = e.target.textContent.split(' ')[0] + ' ' + l[type];
+            console.log(`Reaction '${type}' +1 for letter ${index}`);
+            // Simulated post - replace with actual POST to updateReaction.js
+            // postReaction(index, type)
+          });
+        });
       });
 
       grid.appendChild(row);
     });
   })
   .catch(err => {
-    console.error("Fetch error:", err);
+    console.error("Failed to fetch letters:", err);
     grid.innerHTML = '<tr><td colspan="8">Failed to load letters. Please try again later.</td></tr>';
   });
