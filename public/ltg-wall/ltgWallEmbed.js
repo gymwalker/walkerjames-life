@@ -1,8 +1,7 @@
-// ltgWallEmbed.js (cleaned for Make response, formatted popup/table, no JSON parsing)
+// ltgWallEmbed.js (final cleanup with Walker's specs — minimal columns, fixed popup, horizontal scroll)
 
 const endpoint = "https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth";
 
-// Apply styling
 const style = document.createElement('style');
 style.innerHTML = `
   #ltg-wall-container {
@@ -45,15 +44,16 @@ style.innerHTML = `
     border-radius: 4px;
     white-space: pre-wrap;
     font-family: sans-serif;
+    font-size: 1rem;
   }
   .table-wrapper {
-    width: 100%;
     overflow-x: auto;
   }
   table {
-    width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
+    min-width: 600px;
+    width: 100%;
   }
   th, td {
     border-bottom: 1px solid #ccc;
@@ -63,11 +63,7 @@ style.innerHTML = `
     font-size: 1rem;
     word-wrap: break-word;
   }
-  th:nth-child(n+5), td:nth-child(n+5) {
-    text-align: center;
-    font-size: 1rem;
-  }
-  td:nth-child(3), td:nth-child(4) {
+  td:nth-child(3) {
     max-height: 3em;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -78,11 +74,6 @@ style.innerHTML = `
   tr:hover {
     background-color: #f9f9f9;
     cursor: pointer;
-  }
-  .reaction-button {
-    margin: 0 5px;
-    cursor: pointer;
-    font-size: 1.5rem;
   }
 `;
 document.head.appendChild(style);
@@ -99,11 +90,6 @@ container.innerHTML = `
           <th>Date</th>
           <th>Name</th>
           <th>Letter</th>
-          <th>Moderator Comment</th>
-          <th>❤️</th>
-          <th>🙏</th>
-          <th>💔</th>
-          <th>📖</th>
         </tr>
       </thead>
       <tbody id="letters-grid"></tbody>
@@ -143,18 +129,13 @@ fetch(endpoint)
         <td>${l.date}</td>
         <td>${l.from || "Anonymous"}</td>
         <td>${l.letter}</td>
-        <td>${l.moderatorNote || ''}</td>
-        <td>${l.hearts}</td>
-        <td>${l.prayers}</td>
-        <td>${l.broken}</td>
-        <td>${l.views}</td>
       `;
 
       row.addEventListener('click', () => {
         const newView = l.views + 1;
         modalBody.innerHTML = `
           <span id="ltg-close">×</span>
-          <h3 style="font-family: sans-serif;">${l.from}</h3>
+          <h3 style="font-family: sans-serif; font-size: 1.2rem;">${l.from}</h3>
           <div class="scroll-box">${l.letter}</div>
           <p>
             <span class="reaction-button" data-type="hearts">❤️ ${l.hearts}</span>
@@ -178,7 +159,7 @@ fetch(endpoint)
             l[type] = (l[type] || 0) + 1;
             e.target.textContent = e.target.textContent.split(' ')[0] + ' ' + l[type];
             console.log(`Reaction '${type}' +1 for letter ${index}`);
-            // This should eventually trigger a Make webhook POST if needed
+            // You can POST to Make webhook here if needed
           });
         });
       });
@@ -188,5 +169,5 @@ fetch(endpoint)
   })
   .catch(err => {
     console.error("Failed to fetch letters:", err);
-    grid.innerHTML = '<tr><td colspan="8">Failed to load letters. Please try again later.</td></tr>';
+    grid.innerHTML = '<tr><td colspan="3">Failed to load letters. Please try again later.</td></tr>';
   });
