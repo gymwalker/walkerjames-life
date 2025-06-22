@@ -1,5 +1,5 @@
 // WalkerJames.Life LTG Wall Embed Script
-// Updated to: use pipe-delimited CSV, parse properly, include all columns, enforce scroll, truncate long fields, and restore popup — no icons in counts row
+// Updated: Fix layout, restore clickable icon columns, avoid JSON entirely, and show all fields properly
 
 (function () {
   const container = document.getElementById("ltg-wall-container");
@@ -42,7 +42,7 @@
       table.appendChild(thead);
 
       const tbody = document.createElement("tbody");
-      lettersArray.forEach(line => {
+      lettersArray.forEach((line, index) => {
         const [date, name, letterContent, moderator, prayers, hearts, broken, views] = line.split("|").map(val => val.trim());
 
         const tr = document.createElement("tr");
@@ -51,12 +51,12 @@
           <td>${name}</td>
           <td class="truncate" style="max-width: 50ch; white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; cursor: pointer;" title="Click to read full letter">${letterContent}</td>
           <td class="truncate" style="max-width: 50ch; white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${moderator}</td>
-          <td>${prayers}</td>
-          <td>${hearts}</td>
-          <td>${broken}</td>
-          <td>${views}</td>
+          <td><span class="icon-btn" data-type="pray" data-index="${index}">🙏</span><br>${prayers}</td>
+          <td><span class="icon-btn" data-type="love" data-index="${index}">❤️</span><br>${hearts}</td>
+          <td><span class="icon-btn" data-type="break" data-index="${index}">💔</span><br>${broken}</td>
+          <td><span class="icon-btn" data-type="read" data-index="${index}">📖</span><br>${views}</td>
         `;
-        tr.onclick = () => showPopup(name, date, letterContent, moderator);
+        tr.querySelector("td:nth-child(3)").onclick = () => showPopup(name, date, letterContent, moderator, prayers, hearts, broken, views);
         tbody.appendChild(tr);
       });
 
@@ -69,7 +69,7 @@
       container.innerHTML = `<p>Error loading letters: ${err.message}</p>`;
     });
 
-  function showPopup(name, date, content, moderator) {
+  function showPopup(name, date, content, moderator, prayers, hearts, broken, views) {
     const popup = document.createElement("div");
     popup.className = "ltg-popup";
     popup.style.position = "fixed";
@@ -89,6 +89,12 @@
         <p><strong>${date}</strong></p>
         <div class="ltg-popup-letter">${content}</div>
         <p><em>${moderator}</em></p>
+        <div class="ltg-popup-reactions" style="margin-top: 1em; font-size: 1.5em; display: flex; justify-content: space-around;">
+          <div title="Prayers">🙏 ${prayers}</div>
+          <div title="Hearts">❤️ ${hearts}</div>
+          <div title="Broken Hearts">💔 ${broken}</div>
+          <div title="Views">📖 ${views}</div>
+        </div>
       </div>
     `;
 
