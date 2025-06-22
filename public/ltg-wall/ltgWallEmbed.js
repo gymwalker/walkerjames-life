@@ -1,4 +1,4 @@
-// ltgWallEmbed.js (fully aligned to Walker's specs — clean scroll, fixed modal, click-once reactions)
+// ltgWallEmbed.js (corrected layout, restored full table, improved modal)
 
 const endpoint = "https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth";
 
@@ -23,10 +23,12 @@ style.innerHTML = `
     background: white;
     padding: 2rem;
     max-width: 600px;
+    width: 90%;
     border-radius: 8px;
     overflow: hidden;
     position: relative;
     font-family: sans-serif;
+    font-size: 1rem;
   }
   #ltg-close {
     position: absolute;
@@ -36,10 +38,10 @@ style.innerHTML = `
     cursor: pointer;
   }
   .scroll-box {
-    max-height: 12em;
+    max-height: 10em;
     overflow-y: auto;
     margin-bottom: 1rem;
-    padding: 0.5rem;
+    padding: 0.75rem;
     background: #f4f4f4;
     border-radius: 4px;
     white-space: pre-wrap;
@@ -51,8 +53,8 @@ style.innerHTML = `
   }
   table {
     border-collapse: collapse;
-    table-layout: fixed;
-    min-width: 600px;
+    table-layout: auto;
+    min-width: 900px;
     width: 100%;
   }
   th, td {
@@ -63,8 +65,7 @@ style.innerHTML = `
     font-size: 1rem;
     word-wrap: break-word;
   }
-  td:nth-child(2), td:nth-child(3) {
-    width: 250px;
+  td.letter, td.moderator {
     max-width: 250px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -91,6 +92,11 @@ container.innerHTML = `
           <th>Date</th>
           <th>Name</th>
           <th>Letter</th>
+          <th>Moderator Comment</th>
+          <th>❤️</th>
+          <th>🙏</th>
+          <th>💔</th>
+          <th>📖</th>
         </tr>
       </thead>
       <tbody id="letters-grid"></tbody>
@@ -129,7 +135,12 @@ fetch(endpoint)
       row.innerHTML = `
         <td>${l.date}</td>
         <td>${l.from || "Anonymous"}</td>
-        <td>${l.letter}</td>
+        <td class="letter">${l.letter}</td>
+        <td class="moderator">${l.moderatorNote || 'None'}</td>
+        <td>${l.hearts}</td>
+        <td>${l.prayers}</td>
+        <td>${l.broken}</td>
+        <td>${l.views}</td>
       `;
 
       row.addEventListener('click', () => {
@@ -137,7 +148,7 @@ fetch(endpoint)
         const clicked = {};
         modalBody.innerHTML = `
           <span id="ltg-close">×</span>
-          <h3 style="font-family: sans-serif; font-size: 1.2rem;">${l.from}</h3>
+          <h3 style="margin-bottom: 0.5rem; font-weight: 600;">${l.from}</h3>
           <div class="scroll-box">${l.letter}</div>
           <p>
             <span class="reaction-button" data-type="hearts">❤️ ${l.hearts}</span>
@@ -170,5 +181,5 @@ fetch(endpoint)
   })
   .catch(err => {
     console.error("Failed to fetch letters:", err);
-    grid.innerHTML = '<tr><td colspan="3">Failed to load letters. Please try again later.</td></tr>';
+    grid.innerHTML = '<tr><td colspan="8">Failed to load letters. Please try again later.</td></tr>';
   });
