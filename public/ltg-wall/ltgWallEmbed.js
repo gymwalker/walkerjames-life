@@ -12,20 +12,25 @@ fetch("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth")
 
     console.log("Raw webhook response:", text);
 
-    let lettersArray = [];
+    const lettersArray = [];
 
-    // Break response into lines (handles single or multi-line)
+    // Assume response is plain text, one letter per line
     const lines = text.split(/\r?\n/).filter(Boolean);
 
     lines.forEach(line => {
-      // Match format: YYYY-MM-DD[DisplayName][Message]
+      // Match pattern: YYYY-MM-DD + Name + Content + Moderator (optional, comma-separated)
       const match = line.match(/^(\d{4}-\d{2}-\d{2})([A-Za-z\s]+)(.+)$/);
       if (match) {
         const [, date, name, content] = match;
+
+        // Try to split moderator comment from letter using a delimiter (like ! or last period)
+        const [letter, moderatorComment] = content.split("!").map(p => p.trim());
+
         lettersArray.push({
           date: date.trim(),
           name: name.trim(),
-          content: content.trim()
+          content: letter,
+          moderator: moderatorComment || ""
         });
       } else {
         console.warn("Line format did not match:", line);
@@ -37,15 +42,18 @@ fetch("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth")
       return;
     }
 
-    // Clear loading text
+    // Clear previous or loading text
     wallContainer.innerHTML = "";
 
     lettersArray.forEach(letter => {
       const letterDiv = document.createElement("div");
       letterDiv.className = "ltg-letter";
+      letterDiv.style.marginBottom = "2rem";
       letterDiv.innerHTML = `
-        <p><strong>${letter.name}</strong> on ${letter.date}</p>
-        <p>${letter.content}</p>
+        <p><strong>From:</strong> ${letter.name}</p>
+        <p><strong>Date:</strong> ${letter.date}</p>
+        <p><strong>Letter:</strong><br>${letter.content}</p>
+        ${letter.moderator ? `<p><strong>Moderator:</strong> ${letter.moderator}</p>` : ""}
       `;
       wallContainer.appendChild(letterDiv);
     });
