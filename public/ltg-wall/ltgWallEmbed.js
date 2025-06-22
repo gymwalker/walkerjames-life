@@ -1,5 +1,5 @@
 // WalkerJames.Life LTG Wall Embed Script
-// Updated to: remove JSON dependency, fix full table display, restore icons, and use open book icon for read counter
+// Updated to: use pipe-delimited CSV, parse properly, include all columns, and use open book icon for views
 
 (function () {
   const container = document.getElementById("ltg-wall-container");
@@ -37,28 +37,13 @@
       table.appendChild(thead);
 
       const tbody = document.createElement("tbody");
-      lettersArray.forEach(entry => {
-        const td = document.createElement("td");
-        td.colSpan = 8;
-
-        const fields = entry.split(/(?=\d{4}-\d{2}-\d{2})/)[0]
-          .split(/(?<=\d{4}-\d{2}-\d{2}.*?)(?=Anonymous|\d{4}-\d{2}-\d{2})/);
-
-        const [date, name, ...rest] = entry.split(/(?=\d{4}-\d{2}-\d{2})/)[0]
-          .trim().split(/(?=Anonymous|\d{4}-\d{2}-\d{2})/);
-
-        const letterContent = rest.join(" ").split("Moderator Comments:")[0].trim();
-        const moderator = (entry.match(/Moderator Comments:(.*)/) || ["", ""])[1].trim();
-
-        const views = (entry.match(/View Count:\s*(\d+)/) || ["", "0"])[1];
-        const prayers = (entry.match(/Prayer Count:\s*(\d+)/) || ["", "0"])[1];
-        const hearts = (entry.match(/Hearts Count:\s*(\d+)/) || ["", "0"])[1];
-        const broken = (entry.match(/Broken Hearts Count:\s*(\d+)/) || ["", "0"])[1];
+      lettersArray.forEach(line => {
+        const [date, name, letterContent, moderator, prayers, hearts, broken, views] = line.split("|").map(val => val.trim());
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${date.trim()}</td>
-          <td>${name.trim()}</td>
+          <td>${date}</td>
+          <td>${name}</td>
           <td class="truncate" title="Click to read full letter">${letterContent.slice(0, 120)}…</td>
           <td class="truncate">${moderator.slice(0, 120)}…</td>
           <td>🙏 ${prayers}</td>
@@ -66,7 +51,7 @@
           <td>💔 ${broken}</td>
           <td>📖 ${views}</td>
         `;
-        tr.onclick = () => showPopup(name.trim(), date.trim(), letterContent, moderator);
+        tr.onclick = () => showPopup(name, date, letterContent, moderator);
         tbody.appendChild(tr);
       });
 
