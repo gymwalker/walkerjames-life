@@ -1,8 +1,8 @@
-// ltgWallEmbed.js (restored formatting and structure from last working version)
+// ltgWallEmbed.js (merged: working formatting + new Make endpoint logic)
 
 const endpoint = "https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth";
 
-// Apply styling
+// Styling
 const style = document.createElement('style');
 style.innerHTML = `
   #ltg-wall-container {
@@ -62,7 +62,6 @@ style.innerHTML = `
   }
   th:nth-child(n+5), td:nth-child(n+5) {
     text-align: center;
-    font-size: 1rem;
   }
   tr:hover {
     background-color: #f9f9f9;
@@ -76,6 +75,7 @@ style.innerHTML = `
 `;
 document.head.appendChild(style);
 
+// HTML container
 const container = document.getElementById('ltg-wall-container') || document.body;
 container.innerHTML = `
   <div id="ltg-modal">
@@ -105,16 +105,18 @@ const modal = document.getElementById('ltg-modal');
 const modalBody = document.getElementById('ltg-modal-body');
 let currentReactionBuffer = {};
 
+// Fetch and parse letters
 fetch(endpoint)
   .then(response => response.text())
   .then(text => {
     let lettersArray = [];
+
     try {
       const json = JSON.parse(text);
       if (Array.isArray(json.letters)) {
         lettersArray = json.letters;
       } else {
-        throw new Error("letters not array");
+        throw new Error("Expected 'letters' to be an array");
       }
     } catch (e) {
       console.warn("Fallback to manual parsing due to non-JSON response");
@@ -143,15 +145,15 @@ fetch(endpoint)
         <td>${l.from || "Anonymous"}</td>
         <td>${l.letter.substring(0, 80)}...</td>
         <td>${l.moderatorNote || ''}</td>
-        <td>${l.hearts}</td>
-        <td>${l.prayers}</td>
-        <td>${l.broken}</td>
-        <td>${l.views}</td>
+        <td>${l.hearts || 0}</td>
+        <td>${l.prayers || 0}</td>
+        <td>${l.broken || 0}</td>
+        <td>${l.views || 0}</td>
       `;
 
       row.addEventListener('click', () => {
         currentReactionBuffer = { id: index, reactions: { views: 1 } };
-        const incrementedViewCount = l.views + 1;
+        const incrementedViewCount = (l.views || 0) + 1;
 
         modalBody.innerHTML = `
           <span id="ltg-close">×</span>
@@ -176,6 +178,6 @@ fetch(endpoint)
     });
   })
   .catch(err => {
-    console.error("Failed to fetch letters:", err);
+    console.error("Fetch error:", err);
     grid.innerHTML = '<tr><td colspan="8">Failed to load letters. Please try again later.</td></tr>';
   });
