@@ -44,8 +44,8 @@
         tr.innerHTML = `
           <td>${date}</td>
           <td>${name}</td>
-          <td class="truncate" title="Click to read full letter">${letterContent.slice(0, 120)}…</td>
-          <td class="truncate">${moderator.slice(0, 120)}…</td>
+          <td class="truncate" style="max-width: 350px; white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;" title="Click to read full letter">${letterContent}</td>
+          <td class="truncate" style="max-width: 350px; white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${moderator}</td>
           <td>🙏 ${prayers}</td>
           <td>❤️ ${hearts}</td>
           <td>💔 ${broken}</td>
@@ -58,6 +58,8 @@
       table.appendChild(tbody);
       container.innerHTML = "";
       container.appendChild(table);
+
+      container.style.overflowX = "auto";
     })
     .catch(err => {
       container.innerHTML = `<p>Error loading letters: ${err.message}</p>`;
