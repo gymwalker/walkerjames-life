@@ -56,7 +56,7 @@
           <td><span class="icon-btn" data-type="break" data-index="${index}">💔</span><br>${broken}</td>
           <td><span class="icon-btn" data-type="read" data-index="${index}">📖</span><br>${views}</td>
         `;
-        tr.querySelector("td:nth-child(3)").onclick = () => showPopup(name, date, letterContent, moderator, prayers, hearts, broken, views);
+        tr.querySelector("td:nth-child(3)").onclick = () => showPopup(name, date, letterContent, moderator, prayers, hearts, broken, views, index);
         tbody.appendChild(tr);
       });
 
@@ -69,7 +69,7 @@
       container.innerHTML = `<p>Error loading letters: ${err.message}</p>`;
     });
 
-  function showPopup(name, date, content, moderator, prayers, hearts, broken, views) {
+  function showPopup(name, date, content, moderator, prayers, hearts, broken, views, index) {
     const popup = document.createElement("div");
     popup.className = "ltg-popup";
     popup.style.position = "fixed";
@@ -90,10 +90,10 @@
         <div class="ltg-popup-letter">${content}</div>
         <p><em>${moderator}</em></p>
         <div class="ltg-popup-reactions" style="margin-top: 1em; font-size: 1.5em; display: flex; justify-content: space-around;">
-          <div title="Prayers">🙏 ${prayers}</div>
-          <div title="Hearts">❤️ ${hearts}</div>
-          <div title="Broken Hearts">💔 ${broken}</div>
-          <div title="Views">📖 ${views}</div>
+          <div title="Prayers" class="reaction" data-type="pray" data-index="${index}">🙏 <span>${prayers}</span></div>
+          <div title="Hearts" class="reaction" data-type="love" data-index="${index}">❤️ <span>${hearts}</span></div>
+          <div title="Broken Hearts" class="reaction" data-type="break" data-index="${index}">💔 <span>${broken}</span></div>
+          <div title="Views" class="reaction" data-type="read" data-index="${index}">📖 <span>${views}</span></div>
         </div>
       </div>
     `;
@@ -101,5 +101,23 @@
     popup.querySelector(".ltg-popup-close").onclick = () => popup.remove();
     popup.onclick = e => { if (e.target === popup) popup.remove(); };
     document.body.appendChild(popup);
+
+    popup.querySelectorAll(".reaction").forEach(icon => {
+      icon.addEventListener("click", () => {
+        const type = icon.getAttribute("data-type");
+        const index = icon.getAttribute("data-index");
+        const countSpan = icon.querySelector("span");
+        const newCount = parseInt(countSpan.textContent || "0") + 1;
+        countSpan.textContent = newCount;
+
+        fetch("/functions/updateReaction", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type, index })
+        }).catch(err => console.warn("Failed to update reaction:", err));
+
+        icon.style.pointerEvents = "none";
+      });
+    });
   }
 })();
