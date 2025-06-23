@@ -52,11 +52,11 @@
           <td style="border: 1px solid #ccc; padding: 8px;">${date}</td>
           <td style="border: 1px solid #ccc; padding: 8px;">${name}</td>
           <td class="truncate" style="border: 1px solid #ccc; padding: 8px; max-width: 50ch; white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; cursor: pointer;" title="Click to read full letter">${letterContent}</td>
-          <td class="truncate" style="border: 1px solid #ccc; padding: 8px; max-width: 50ch; white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${moderator}</td>
-          <td style="border: 1px solid #ccc; padding: 8px;"><span class="icon-btn" data-type="love" data-index="${index}">❤️</span><br>${hearts}</td>
-          <td style="border: 1px solid #ccc; padding: 8px;"><span class="icon-btn" data-type="pray" data-index="${index}">🙏</span><br>${prayers}</td>
-          <td style="border: 1px solid #ccc; padding: 8px;"><span class="icon-btn" data-type="break" data-index="${index}">💔</span><br>${broken}</td>
-          <td style="border: 1px solid #ccc; padding: 8px;"><span class="icon-btn" data-type="read" data-index="${index}">📖</span><br>${views}</td>
+          <td class="truncate" style="border: 1px solid #ccc; padding: 8px; max-width: 50ch; white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${moderator.replace(/\n/g, ' ')}</td>
+          <td style="border: 1px solid #ccc; padding: 8px;">${hearts}</td>
+          <td style="border: 1px solid #ccc; padding: 8px;">${prayers}</td>
+          <td style="border: 1px solid #ccc; padding: 8px;">${broken}</td>
+          <td style="border: 1px solid #ccc; padding: 8px;">${views}</td>
         `;
         tr.querySelector("td:nth-child(3)").onclick = () => showPopup(name, date, letterContent, moderator, prayers, hearts, broken, views, index);
         tbody.appendChild(tr);
