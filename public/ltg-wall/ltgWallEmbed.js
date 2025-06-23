@@ -1,4 +1,3 @@
-
 // WalkerJames.Life LTG Wall Embed Script (FINAL - FIXED FIELD ORDER & DISPLAY)
 // Correct column order: Date, Display Name, Letter, Moderator, ❤️, 🙏, 💔, 📖
 // Uses Letter ID internally for reaction updates
@@ -27,7 +26,7 @@
       table.style.borderCollapse = "collapse";
       table.style.width = "100%";
 
-      table.innerHTML = \`
+      table.innerHTML = `
         <thead>
           <tr>
             <th style="border:1px solid #ccc;padding:8px;">Date</th>
@@ -41,7 +40,7 @@
           </tr>
         </thead>
         <tbody></tbody>
-      \`;
+      `;
 
       const tbody = table.querySelector("tbody");
 
@@ -49,16 +48,16 @@
         const [date, name, letter, moderator, hearts, prayers, broken, views, id] = line.split("|").map(x => x.trim());
 
         const row = document.createElement("tr");
-        row.innerHTML = \`
-          <td style="border:1px solid #ccc;padding:8px;">\${date}</td>
-          <td style="border:1px solid #ccc;padding:8px;">\${name}</td>
-          <td class="truncate" style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;cursor:pointer;" title="Click to read full letter">\${letter}</td>
-          <td class="truncate" style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">\${moderator}</td>
-          <td style="border:1px solid #ccc;padding:8px;">\${hearts}</td>
-          <td style="border:1px solid #ccc;padding:8px;">\${prayers}</td>
-          <td style="border:1px solid #ccc;padding:8px;">\${broken}</td>
-          <td style="border:1px solid #ccc;padding:8px;">\${views}</td>
-        \`;
+        row.innerHTML = `
+          <td style="border:1px solid #ccc;padding:8px;">${date}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${name}</td>
+          <td class="truncate" style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;cursor:pointer;" title="Click to read full letter">${letter}</td>
+          <td class="truncate" style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${moderator}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${hearts}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${prayers}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${broken}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${views}</td>
+        `;
         tbody.appendChild(row);
 
         const popupTrigger = row.querySelector("td:nth-child(3)");
@@ -73,7 +72,7 @@
       container.appendChild(wrapper);
     })
     .catch(err => {
-      container.innerHTML = \`<p>Error loading letters: \${err.message}</p>\`;
+      container.innerHTML = `<p>Error loading letters: ${err.message}</p>`;
     });
 
   function showPopup(name, date, content, moderator, hearts, prayers, broken, views, id) {
@@ -89,21 +88,21 @@
     popup.style.justifyContent = "center";
     popup.style.alignItems = "center";
 
-    popup.innerHTML = \`
+    popup.innerHTML = `
       <div style="background:white;padding:2em;max-width:600px;border-radius:10px;position:relative;">
         <button style="position:absolute;top:10px;right:15px;font-size:24px;background:none;border:none;cursor:pointer;">&times;</button>
-        <h3>\${name}</h3>
-        <p><strong>\${date}</strong></p>
-        <div>\${content}</div>
-        <p><em>\${moderator}</em></p>
+        <h3>${name}</h3>
+        <p><strong>${date}</strong></p>
+        <div>${content}</div>
+        <p><em>${moderator}</em></p>
         <div style="margin-top:1em;font-size:1.5em;display:flex;justify-content:space-around;">
-          <div class="reaction" data-type="love" data-id="\${id}">❤️ <span>\${hearts}</span></div>
-          <div class="reaction" data-type="pray" data-id="\${id}">🙏 <span>\${prayers}</span></div>
-          <div class="reaction" data-type="break" data-id="\${id}">💔 <span>\${broken}</span></div>
-          <div class="reaction" data-type="read" data-id="\${id}">📖 <span>\${views}</span></div>
+          <div class="reaction" data-type="love" data-id="${id}">❤️ <span>${hearts}</span></div>
+          <div class="reaction" data-type="pray" data-id="${id}">🙏 <span>${prayers}</span></div>
+          <div class="reaction" data-type="break" data-id="${id}">💔 <span>${broken}</span></div>
+          <div class="reaction" data-type="read" data-id="${id}">📖 <span>${views}</span></div>
         </div>
       </div>
-    \`;
+    `;
 
     popup.querySelector("button").onclick = () => popup.remove();
     popup.onclick = e => { if (e.target === popup) popup.remove(); };
