@@ -1,5 +1,5 @@
 // WalkerJames.Life LTG Wall Embed Script
-// Updated: Format parsing from bar-delimited string, retain all behavior
+// Updated: Field mapping, correct table display, use letter ID for reaction updates
 
 (function () {
   const container = document.getElementById("ltg-wall-container");
@@ -10,7 +10,6 @@
   fetch("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth")
     .then(response => response.text())
     .then(text => {
-      console.log("RAW FETCHED TEXT FROM MAKE:\n", text); // <-- Debug message
       const lines = text.trim().split(/\r?\n/);
       const lettersArray = lines.map(line => line.trim()).filter(Boolean);
 
@@ -46,7 +45,7 @@
 
       const tbody = document.createElement("tbody");
       lettersArray.forEach((line, index) => {
-        const [date, name, letterContent, moderator, prayers, hearts, broken, views] = line.split("|").map(val => val.trim());
+        const [date, name, letterContent, moderator, hearts, prayers, broken, views, letterId] = line.split("|").map(val => val.trim());
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -59,7 +58,7 @@
           <td style="border: 1px solid #ccc; padding: 8px;">${broken}</td>
           <td style="border: 1px solid #ccc; padding: 8px;">${views}</td>
         `;
-        tr.querySelector("td:nth-child(3)").onclick = () => showPopup(name, date, letterContent, moderator, prayers, hearts, broken, views, index);
+        tr.querySelector("td:nth-child(3)").onclick = () => showPopup(name, date, letterContent, moderator, prayers, hearts, broken, views, letterId);
         tbody.appendChild(tr);
       });
 
@@ -72,7 +71,7 @@
       container.innerHTML = `<p>Error loading letters: ${err.message}</p>`;
     });
 
-  function showPopup(name, date, content, moderator, prayers, hearts, broken, views, index) {
+  function showPopup(name, date, content, moderator, prayers, hearts, broken, views, letterId) {
     const popup = document.createElement("div");
     popup.className = "ltg-popup";
     popup.style.position = "fixed";
@@ -93,10 +92,10 @@
         <div class="ltg-popup-letter">${content}</div>
         <p><em>${moderator}</em></p>
         <div class="ltg-popup-reactions" style="margin-top: 1em; font-size: 1.5em; display: flex; justify-content: space-around;">
-          <div title="Hearts" class="reaction" data-type="love" data-index="${index}">❤️ <span>${hearts}</span></div>
-          <div title="Prayers" class="reaction" data-type="pray" data-index="${index}">🙏 <span>${prayers}</span></div>
-          <div title="Broken Hearts" class="reaction" data-type="break" data-index="${index}">💔 <span>${broken}</span></div>
-          <div title="Views" class="reaction" data-type="read" data-index="${index}">📖 <span>${views}</span></div>
+          <div title="Hearts" class="reaction" data-type="love" data-id="${letterId}">❤️ <span>${hearts}</span></div>
+          <div title="Prayers" class="reaction" data-type="pray" data-id="${letterId}">🙏 <span>${prayers}</span></div>
+          <div title="Broken Hearts" class="reaction" data-type="break" data-id="${letterId}">💔 <span>${broken}</span></div>
+          <div title="Views" class="reaction" data-type="read" data-id="${letterId}">📖 <span>${views}</span></div>
         </div>
       </div>
     `;
@@ -108,7 +107,7 @@
     popup.querySelectorAll(".reaction").forEach(icon => {
       icon.addEventListener("click", () => {
         const type = icon.getAttribute("data-type");
-        const index = icon.getAttribute("data-index");
+        const id = icon.getAttribute("data-id");
         const countSpan = icon.querySelector("span");
         const newCount = parseInt(countSpan.textContent || "0") + 1;
         countSpan.textContent = newCount;
@@ -116,7 +115,7 @@
         fetch("/functions/updateReaction", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type, index })
+          body: JSON.stringify({ type, letterId: id })
         }).catch(err => console.warn("Failed to update reaction:", err));
 
         icon.style.pointerEvents = "none";
