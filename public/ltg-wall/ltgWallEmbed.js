@@ -1,5 +1,5 @@
-// WalkerJames.Life LTG Wall Embed Script (FINAL - CORRECTED FIELD MAPPING + DISPLAY)
-// Proper mapping based on actual Make/Airtable data field order
+// WalkerJames.Life LTG Wall Embed Script (FINAL - CORRECTED FIELD MAPPING)
+// Field order returned: Letter, Name, ❤️, 💔, Date, 📖, Moderator
 
 (function () {
   const container = document.getElementById("ltg-wall-container");
@@ -45,16 +45,16 @@
 
       lettersArray.forEach((line) => {
         const [
-          heartsCount,
-          brokenHeartsCount,
-          displayName,
-          letterContent,
-          moderatorComments,
-          submissionDate,
-          prayerCount,
-          readCount,
-          letterID
+          letterContent,        // 0
+          displayName,          // 1
+          heartsCount,          // 2
+          brokenHeartsCount,    // 3
+          submissionDate,       // 4
+          readCount,            // 5
+          moderatorComments     // 6
         ] = line.split("|").map(x => x.trim());
+
+        const prayerCount = ""; // Not returned — leave blank
 
         const row = document.createElement("tr");
         row.innerHTML = `
@@ -72,7 +72,7 @@
         const popupTrigger = row.querySelector("td:nth-child(3)");
         if (popupTrigger) {
           popupTrigger.onclick = () =>
-            showPopup(displayName, submissionDate, letterContent, moderatorComments, heartsCount, prayerCount, brokenHeartsCount, readCount, letterID);
+            showPopup(displayName, submissionDate, letterContent, moderatorComments, heartsCount, prayerCount, brokenHeartsCount, readCount);
         }
       });
 
@@ -84,7 +84,7 @@
       container.innerHTML = `<p>Error loading letters: ${err.message}</p>`;
     });
 
-  function showPopup(name, date, content, moderator, hearts, prayers, broken, views, id) {
+  function showPopup(name, date, content, moderator, hearts, prayers, broken, views) {
     const popup = document.createElement("div");
     popup.style.position = "fixed";
     popup.style.top = 0;
@@ -105,10 +105,10 @@
         <div>${content}</div>
         <p><em>${moderator}</em></p>
         <div style="margin-top:1em;font-size:1.5em;display:flex;justify-content:space-around;">
-          <div class="reaction" data-type="love" data-id="${id}">❤️ <span>${hearts}</span></div>
-          <div class="reaction" data-type="pray" data-id="${id}">🙏 <span>${prayers}</span></div>
-          <div class="reaction" data-type="break" data-id="${id}">💔 <span>${broken}</span></div>
-          <div class="reaction" data-type="read" data-id="${id}">📖 <span>${views}</span></div>
+          <div class="reaction">❤️ <span>${hearts}</span></div>
+          <div class="reaction">🙏 <span>${prayers}</span></div>
+          <div class="reaction">💔 <span>${broken}</span></div>
+          <div class="reaction">📖 <span>${views}</span></div>
         </div>
       </div>
     `;
@@ -116,22 +116,5 @@
     popup.querySelector("button").onclick = () => popup.remove();
     popup.onclick = e => { if (e.target === popup) popup.remove(); };
     document.body.appendChild(popup);
-
-    popup.querySelectorAll(".reaction").forEach(el => {
-      el.onclick = () => {
-        const type = el.dataset.type;
-        const id = el.dataset.id;
-        const count = el.querySelector("span");
-        count.textContent = parseInt(count.textContent || "0") + 1;
-
-        fetch("/functions/updateReaction", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type, id })
-        }).catch(err => console.warn("Update failed:", err));
-
-        el.style.pointerEvents = "none";
-      };
-    });
   }
 })();
