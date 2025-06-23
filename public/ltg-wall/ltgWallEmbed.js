@@ -1,6 +1,5 @@
-// WalkerJames.Life LTG Wall Embed Script (FINAL - FIXED FIELD ORDER & DISPLAY)
-// Correct column order: Date, Display Name, Letter, Moderator, ❤️, 🙏, 💔, 📖
-// Uses Letter ID internally for reaction updates
+// WalkerJames.Life LTG Wall Embed Script (FINAL - CORRECTED FIELD MAPPING + DISPLAY)
+// Proper mapping based on actual Make/Airtable data field order
 
 (function () {
   const container = document.getElementById("ltg-wall-container");
@@ -45,16 +44,15 @@
       const tbody = table.querySelector("tbody");
 
       lettersArray.forEach((line) => {
-        // Mapping based on correct order: Date, Display Name, Letter, Moderator, ❤️, 🙏, 💔, 📖, Letter ID
         const [
-          submissionDate,
+          heartsCount,
+          brokenHeartsCount,
           displayName,
           letterContent,
           moderatorComments,
-          heartsCount,
+          submissionDate,
           prayerCount,
-          brokenHeartsCount,
-          viewCount,
+          readCount,
           letterID
         ] = line.split("|").map(x => x.trim());
 
@@ -67,14 +65,14 @@
           <td style="border:1px solid #ccc;padding:8px;">${heartsCount}</td>
           <td style="border:1px solid #ccc;padding:8px;">${prayerCount}</td>
           <td style="border:1px solid #ccc;padding:8px;">${brokenHeartsCount}</td>
-          <td style="border:1px solid #ccc;padding:8px;">${viewCount}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${readCount}</td>
         `;
         tbody.appendChild(row);
 
         const popupTrigger = row.querySelector("td:nth-child(3)");
         if (popupTrigger) {
           popupTrigger.onclick = () =>
-            showPopup(displayName, submissionDate, letterContent, moderatorComments, heartsCount, prayerCount, brokenHeartsCount, viewCount, letterID);
+            showPopup(displayName, submissionDate, letterContent, moderatorComments, heartsCount, prayerCount, brokenHeartsCount, readCount, letterID);
         }
       });
 
