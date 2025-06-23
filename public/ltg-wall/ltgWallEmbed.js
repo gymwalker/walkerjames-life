@@ -7,9 +7,14 @@
 
   container.innerHTML = "<p>Loading letters…</p>";
 
+  //fetch("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth")
+  //  .then(response => response.text())
+  //  .then(text => {
   fetch("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth")
     .then(response => response.text())
     .then(text => {
+      console.log("⚠️ RAW FETCHED TEXT FROM MAKE:");
+      console.log(text);
       const lines = text.trim().split(/\r?\n/);
       const lettersArray = lines.map(line => line.trim()).filter(Boolean);
 
