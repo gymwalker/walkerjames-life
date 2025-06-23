@@ -1,5 +1,5 @@
 // WalkerJames.Life LTG Wall Embed Script
-// Updated: Fix layout, correct popup order, clickable 📖, add table lines
+// Updated: Fix layout, correct popup order, clickable 📖, add table lines, debug output added
 
 (function () {
   const container = document.getElementById("ltg-wall-container");
@@ -10,6 +10,8 @@
   fetch("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth")
     .then(response => response.text())
     .then(text => {
+      console.log("RAW FETCHED TEXT FROM MAKE:\n", text); // Debug log
+
       const lines = text.trim().split(/\r?\n/);
       const lettersArray = lines.map(line => line.trim()).filter(Boolean);
 
