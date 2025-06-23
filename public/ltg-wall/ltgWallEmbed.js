@@ -44,26 +44,37 @@
 
       const tbody = table.querySelector("tbody");
 
-      lettersArray.forEach((line, index) => {
-        const [date, name, letter, moderator, hearts, prayers, broken, views, id] = line.split("|").map(x => x.trim());
+      lettersArray.forEach((line) => {
+        // Mapping based on correct order: Date, Display Name, Letter, Moderator, ❤️, 🙏, 💔, 📖, Letter ID
+        const [
+          submissionDate,
+          displayName,
+          letterContent,
+          moderatorComments,
+          heartsCount,
+          prayerCount,
+          brokenHeartsCount,
+          viewCount,
+          letterID
+        ] = line.split("|").map(x => x.trim());
 
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td style="border:1px solid #ccc;padding:8px;">${date}</td>
-          <td style="border:1px solid #ccc;padding:8px;">${name}</td>
-          <td class="truncate" style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;cursor:pointer;" title="Click to read full letter">${letter}</td>
-          <td class="truncate" style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${moderator}</td>
-          <td style="border:1px solid #ccc;padding:8px;">${hearts}</td>
-          <td style="border:1px solid #ccc;padding:8px;">${prayers}</td>
-          <td style="border:1px solid #ccc;padding:8px;">${broken}</td>
-          <td style="border:1px solid #ccc;padding:8px;">${views}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${submissionDate}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${displayName}</td>
+          <td class="truncate" style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;cursor:pointer;" title="Click to read full letter">${letterContent}</td>
+          <td class="truncate" style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${moderatorComments}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${heartsCount}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${prayerCount}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${brokenHeartsCount}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${viewCount}</td>
         `;
         tbody.appendChild(row);
 
         const popupTrigger = row.querySelector("td:nth-child(3)");
         if (popupTrigger) {
           popupTrigger.onclick = () =>
-            showPopup(name, date, letter, moderator, hearts, prayers, broken, views, id);
+            showPopup(displayName, submissionDate, letterContent, moderatorComments, heartsCount, prayerCount, brokenHeartsCount, viewCount, letterID);
         }
       });
 
