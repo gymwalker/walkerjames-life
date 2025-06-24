@@ -188,54 +188,60 @@
       container.innerHTML = `<p>Error loading letters: ${err.message}</p>`;
     });
 
-  function showPopup(name, date, content, moderator, hearts, prayers, broken, views, id) {
-    const popup = document.createElement("div");
-    popup.style.position = "fixed";
-    popup.style.top = 0;
-    popup.style.left = 0;
-    popup.style.width = "100vw";
-    popup.style.height = "100vh";
-    popup.style.background = "rgba(0,0,0,0.75)";
-    popup.style.zIndex = 9999;
-    popup.style.display = "flex";
-    popup.style.justifyContent = "center";
-    popup.style.alignItems = "center";
+function showPopup(name, date, content, moderator, hearts, prayers, broken, views, id) {
+  // Convert date to mm/dd/yyyy
+  const formattedDate = (() => {
+    const parts = date.split("-");
+    return parts.length === 3 ? `${parts[1]}/${parts[2]}/${parts[0]}` : date;
+  })();
 
-    popup.innerHTML = `
-      <div style="background:white;padding:2em;max-width:600px;border-radius:10px;position:relative;">
-        <button style="position:absolute;top:10px;right:15px;font-size:24px;background:none;border:none;cursor:pointer;">&times;</button>
-        <h3>${name}</h3>
-        <p><strong>${date}</strong></p>
-        <div>${content}</div>
-        <p><em>${moderator}</em></p>
-        <div style="margin-top:1em;font-size:1.5em;display:flex;justify-content:space-around;">
-          <div class="reaction" data-type="love" data-id="${id}">❤️ <span>${hearts}</span></div>
-          <div class="reaction" data-type="pray" data-id="${id}">🙏 <span>${prayers}</span></div>
-          <div class="reaction" data-type="break" data-id="${id}">💔 <span>${broken}</span></div>
-          <div class="reaction" data-type="read" data-id="${id}">📖 <span>${views}</span></div>
-        </div>
+  const popup = document.createElement("div");
+  popup.style.position = "fixed";
+  popup.style.top = 0;
+  popup.style.left = 0;
+  popup.style.width = "100vw";
+  popup.style.height = "100vh";
+  popup.style.background = "rgba(0,0,0,0.75)";
+  popup.style.zIndex = 9999;
+  popup.style.display = "flex";
+  popup.style.justifyContent = "center";
+  popup.style.alignItems = "center";
+
+  popup.innerHTML = `
+    <div style="background:white;padding:2em;max-width:600px;border-radius:10px;position:relative;">
+      <button style="position:absolute;top:10px;right:15px;font-size:24px;background:none;border:none;cursor:pointer;">&times;</button>
+      <h3>${name}</h3>
+      <p><strong>${formattedDate}</strong></p>
+      <div class="scroll-box">${content}</div>
+      <div class="scroll-box"><em>${moderator}</em></div>
+      <div style="margin-top:1em;font-size:1.5em;display:flex;justify-content:space-around;">
+        <div class="reaction" data-type="love" data-id="${id}">❤️ <span>${hearts}</span></div>
+        <div class="reaction" data-type="pray" data-id="${id}">🙏 <span>${prayers}</span></div>
+        <div class="reaction" data-type="break" data-id="${id}">💔 <span>${broken}</span></div>
+        <div class="reaction" data-type="read" data-id="${id}">📖 <span>${views}</span></div>
       </div>
-    `;
+    </div>
+  `;
 
-    popup.querySelector("button").onclick = () => popup.remove();
-    popup.onclick = e => { if (e.target === popup) popup.remove(); };
-    document.body.appendChild(popup);
+  popup.querySelector("button").onclick = () => popup.remove();
+  popup.onclick = e => { if (e.target === popup) popup.remove(); };
+  document.body.appendChild(popup);
 
-    popup.querySelectorAll(".reaction").forEach(el => {
-      el.onclick = () => {
-        const type = el.dataset.type;
-        const id = el.dataset.id;
-        const count = el.querySelector("span");
-        count.textContent = parseInt(count.textContent || "0") + 1;
+  popup.querySelectorAll(".reaction").forEach(el => {
+    el.onclick = () => {
+      const type = el.dataset.type;
+      const id = el.dataset.id;
+      const count = el.querySelector("span");
+      count.textContent = parseInt(count.textContent || "0") + 1;
 
-        fetch("/functions/updateReaction", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type, id })
-        }).catch(err => console.warn("Update failed:", err));
+      fetch("/functions/updateReaction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, id })
+      }).catch(err => console.warn("Update failed:", err));
 
-        el.style.pointerEvents = "none";
-      };
-    });
-  }
+      el.style.pointerEvents = "none";
+    };
+  });
+}
 })();
