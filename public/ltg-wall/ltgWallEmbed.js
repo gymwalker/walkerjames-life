@@ -1,3 +1,15 @@
+// WalkerJames.Life LTG Wall Embed Script (FINAL - LOCKED VERIFIED FIELD ORDER)
+// Field Order (confirmed):
+// 0: Letter Content
+// 1: Hearts Count
+// 2: Prayer Count
+// 3: Display Name
+// 4: Submission Date
+// 5: Moderator Comments
+// 6: Broken Hearts Count
+// 7: Read Count
+// 8: Letter ID
+
 (function () {
   const css = `
     #ltg-wall-container {
@@ -88,6 +100,7 @@
       lines.forEach(line => {
         buffer += line.trim() + " ";
         const parts = buffer.split("|");
+
         if (parts.length < 9) return;
 
         const [
@@ -123,20 +136,23 @@
       }
 
       const wrapper = document.createElement("div");
-      wrapper.className = "table-wrapper";
+      wrapper.style.overflowX = "auto";
 
       const table = document.createElement("table");
+      table.style.borderCollapse = "collapse";
+      table.style.width = "100%";
+
       table.innerHTML = `
         <thead>
           <tr>
-            <th>Date</th>
-            <th>Name</th>
-            <th>Letter</th>
-            <th>Moderator Comments</th>
-            <th title="Hearts">❤️</th>
-            <th title="Prayers">🙏</th>
-            <th title="Broken Hearts">💔</th>
-            <th title="Views">📖</th>
+            <th style="border:1px solid #ccc;padding:8px;">Date</th>
+            <th style="border:1px solid #ccc;padding:8px;">Display Name</th>
+            <th style="border:1px solid #ccc;padding:8px;max-width:50ch;">Letter</th>
+            <th style="border:1px solid #ccc;padding:8px;max-width:50ch;">Moderator Comments</th>
+            <th style="border:1px solid #ccc;padding:8px;" title="Hearts">❤️</th>
+            <th style="border:1px solid #ccc;padding:8px;" title="Prayers">🙏</th>
+            <th style="border:1px solid #ccc;padding:8px;" title="Broken Hearts">💔</th>
+            <th style="border:1px solid #ccc;padding:8px;" title="Views">📖</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -147,14 +163,14 @@
       lettersArray.forEach(letter => {
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td>${letter.submissionDate}</td>
-          <td>${letter.displayName}</td>
-          <td style="max-width: 40ch; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${letter.letterContent}</td>
-          <td style="max-width: 40ch; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${letter.moderatorComments}</td>
-          <td style="min-width: 3ch;">${letter.heartsCount}</td>
-          <td style="min-width: 3ch;">${letter.prayerCount}</td>
-          <td style="min-width: 3ch;">${letter.brokenHeartsCount}</td>
-          <td style="min-width: 3ch;">${letter.readCount}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${letter.submissionDate}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${letter.displayName}</td>
+          <td style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${letter.letterContent}</td>
+          <td style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${letter.moderatorComments}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${letter.heartsCount}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${letter.prayerCount}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${letter.brokenHeartsCount}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${letter.readCount}</td>
         `;
         tbody.appendChild(row);
 
