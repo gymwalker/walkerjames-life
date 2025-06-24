@@ -54,15 +54,15 @@
 
       lettersArray.forEach((line) => {
         const [
-          letterID,              // 1
-          letterContent,        // 2
-          submissionDate,       // 3
-          displayName,          // 4
-          moderatorComments,    // 5
-          readCount,            // 6
-          heartsCount,          // 7
-          prayerCount,          // 8
-          brokenHeartsCount     // 9
+          letterID,             // 1
+          heartsCount,          // 2
+          displayName,          // 3
+          brokenHeartsCount,    // 4
+          prayerCount,          // 5
+          letterContent,        // 6
+          submissionDate,       // 7
+          moderatorComments,    // 8
+          readCount             // 9
         ] = line.split("|").map(x => x.trim());
 
         const row = document.createElement("tr");
