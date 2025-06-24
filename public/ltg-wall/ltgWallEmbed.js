@@ -11,81 +11,6 @@
 // 8: Letter ID
 
 (function () {
-  const css = `
-    #ltg-wall-container {
-      padding: 2rem;
-      font-family: sans-serif;
-      overflow-x: auto;
-    }
-    #ltg-modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6);
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
-    #ltg-modal-body {
-      background: white;
-      padding: 2rem;
-      max-width: 600px;
-      border-radius: 8px;
-      overflow: hidden;
-      position: relative;
-    }
-    #ltg-close {
-      position: absolute;
-      top: 10px;
-      right: 14px;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-    .scroll-box {
-      max-height: 12em;
-      overflow-y: auto;
-      margin-bottom: 1rem;
-      padding: 0.5rem;
-      background: #f4f4f4;
-      border-radius: 4px;
-    }
-    .table-wrapper {
-      min-width: 1200px; width: max-content;
-      margin: 0 auto;
-    }
-    table {
-      width: 100%;
-      margin: 0 auto;
-      border-collapse: collapse;
-      table-layout: auto;
-    }
-    th, td {
-      border-bottom: 1px solid #ccc;
-      padding: 0.5rem;
-      text-align: left;
-      vertical-align: top;
-      font-size: 1rem;
-    }
-    th:nth-child(n+5), td:nth-child(n+5) {
-      text-align: center;
-      font-size: 1rem;
-    }
-    tr:hover {
-      background-color: #f9f9f9;
-      cursor: pointer;
-    }
-    .reaction-button {
-      margin: 0 5px;
-      cursor: pointer;
-      font-size: 1.5rem;
-    }
-  `;
-
-  const style = document.createElement('style');
-  style.innerHTML = css;
-  document.head.appendChild(style);
-
   const container = document.getElementById("ltg-wall-container");
   if (!container) return;
 
@@ -112,14 +37,14 @@
       table.innerHTML = `
         <thead>
           <tr>
-            <th style="border:1px solid #ccc;padding:8px;width:110px;">Date</th>
-            <th style="border:1px solid #ccc;padding:8px;width:160px;">Name</th>
-            <th style="border:1px solid #ccc;padding:8px;width:320px;">Letter</th>
-            <th style="border:1px solid #ccc;padding:8px;width:320px;">Moderator Comments</th>
-            <th style="border:1px solid #ccc;padding:8px;width:60px;" title="Hearts">❤️</th>
-            <th style="border:1px solid #ccc;padding:8px;width:60px;" title="Prayers">🙏</th>
-            <th style="border:1px solid #ccc;padding:8px;width:60px;" title="Broken Hearts">💔</th>
-            <th style="border:1px solid #ccc;padding:8px;width:60px;" title="Views">📖</th>
+            <th style="border:1px solid #ccc;padding:8px;">Date</th>
+            <th style="border:1px solid #ccc;padding:8px;">Display Name</th>
+            <th style="border:1px solid #ccc;padding:8px;max-width:50ch;">Letter</th>
+            <th style="border:1px solid #ccc;padding:8px;max-width:50ch;">Moderator Comments</th>
+            <th style="border:1px solid #ccc;padding:8px;" title="Hearts">❤️</th>
+            <th style="border:1px solid #ccc;padding:8px;" title="Prayers">🙏</th>
+            <th style="border:1px solid #ccc;padding:8px;" title="Broken Hearts">💔</th>
+            <th style="border:1px solid #ccc;padding:8px;" title="Views">📖</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -129,36 +54,34 @@
 
       lettersArray.forEach((line) => {
         const [
-          letterID,
-          heartsCount,
-          displayName,
-          brokenHeartsCount,
-          prayerCount,
-          letterContent,
-          submissionDate,
-          moderatorComments,
-          readCount
+          letterID,             // 1
+          heartsCount,          // 2
+          displayName,          // 3
+          brokenHeartsCount,    // 4
+          prayerCount,          // 5
+          letterContent,        // 6
+          submissionDate,       // 7
+          moderatorComments,    // 8
+          readCount             // 9
         ] = line.split("|").map(x => x.trim());
-
-        const formattedDate = new Date(submissionDate).toLocaleDateString("en-US");
 
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td style="border:1px solid #ccc;padding:8px;">${formattedDate}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${submissionDate}</td>
           <td style="border:1px solid #ccc;padding:8px;">${displayName}</td>
-          <td style="border:1px solid #ccc;padding:8px;max-width:40ch;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;cursor:pointer;">${letterContent}</td>
-          <td style="border:1px solid #ccc;padding:8px;max-width:40ch;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;">${moderatorComments}</td>
-          <td style="border:1px solid #ccc;padding:8px;text-align:center;">${heartsCount}</td>
-          <td style="border:1px solid #ccc;padding:8px;text-align:center;">${prayerCount}</td>
-          <td style="border:1px solid #ccc;padding:8px;text-align:center;">${brokenHeartsCount}</td>
-          <td style="border:1px solid #ccc;padding:8px;text-align:center;">${readCount}</td>
+          <td style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${letterContent}</td>
+          <td style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${moderatorComments}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${heartsCount}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${prayerCount}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${brokenHeartsCount}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${readCount}</td>
         `;
         tbody.appendChild(row);
 
         const popupTrigger = row.querySelector("td:nth-child(3)");
         if (popupTrigger) {
           popupTrigger.onclick = () =>
-            showPopup(displayName, formattedDate, letterContent, moderatorComments, heartsCount, prayerCount, brokenHeartsCount, readCount, letterID);
+            showPopup(displayName, submissionDate, letterContent, moderatorComments, heartsCount, prayerCount, brokenHeartsCount, readCount, letterID);
         }
       });
 
