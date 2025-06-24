@@ -1,5 +1,5 @@
-// WalkerJames.Life LTG Wall Embed Script (FINAL - VERIFIED FIELD MAPPING)
-// Incoming Field Order:
+// WalkerJames.Life LTG Wall Embed Script (FINAL - LOCKED VERIFIED FIELD ORDER)
+// Field Order (confirmed):
 // 0: Letter Content
 // 1: Hearts Count
 // 2: Prayer Count
