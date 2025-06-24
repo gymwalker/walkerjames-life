@@ -105,26 +105,26 @@
 
         const [
           letterID,
-          heartsCount,
+          readCount,
           displayName,
-          brokenHeartsCount,
+          heartsCount,
           prayerCount,
           letterContent,
           submissionDate,
           moderatorComments,
-          readCount
+          brokenHeartsCount
         ] = parts.map(x => x.trim());
 
         lettersArray.push({
           letterID,
-          heartsCount,
+          readCount,
           displayName,
-          brokenHeartsCount,
+          heartsCount,
           prayerCount,
           letterContent,
           submissionDate,
           moderatorComments,
-          readCount
+          brokenHeartsCount
         });
 
         buffer = "";
