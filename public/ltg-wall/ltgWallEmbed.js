@@ -69,8 +69,10 @@
         row.innerHTML = `
           <td style="border:1px solid #ccc;padding:8px;">${submissionDate}</td>
           <td style="border:1px solid #ccc;padding:8px;">${displayName}</td>
-          <td class="truncate" style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;cursor:pointer;" title="Click to read full letter">${letterContent}</td>
-          <td class="truncate" style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${moderatorComments}</td>
+          //<td class="truncate" style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;cursor:pointer;" title="Click to read full letter">${letterContent}</td>
+          //<td class="truncate" style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${moderatorComments}</td>
+          <td class="truncate" style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;cursor:pointer;" title="Click to read full letter">${letterContent}&ZeroWidthSpace;</td>
+          <td class="truncate" style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${moderatorComments}&ZeroWidthSpace;</td>
           <td style="border:1px solid #ccc;padding:8px;">${heartsCount}</td>
           <td style="border:1px solid #ccc;padding:8px;">${prayerCount}</td>
           <td style="border:1px solid #ccc;padding:8px;">${brokenHeartsCount}</td>
