@@ -1,16 +1,90 @@
 // WalkerJames.Life LTG Wall Embed Script (FINAL - LOCKED VERIFIED FIELD ORDER)
 // Field Order (confirmed):
-// 0: Letter Content
-// 1: Hearts Count
-// 2: Prayer Count
-// 3: Display Name
-// 4: Submission Date
-// 5: Moderator Comments
-// 6: Broken Hearts Count
-// 7: Read Count
-// 8: Letter ID
+// 0: Letter ID
+// 1: Read Count
+// 2: Display Name
+// 3: Hearts Count
+// 4: Prayer Count
+// 5: Letter Content
+// 6: Submission Date
+// 7: Moderator Comments
+// 8: Broken Hearts Count
 
 (function () {
+  const css = `
+    #ltg-wall-container {
+      padding: 2rem;
+      font-family: sans-serif;
+      overflow-x: auto;
+    }
+    #ltg-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    #ltg-modal-body {
+      background: white;
+      padding: 2rem;
+      max-width: 600px;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+    #ltg-close {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .scroll-box {
+      max-height: 12em;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      background: #f4f4f4;
+      border-radius: 4px;
+    }
+    .table-wrapper {
+      min-width: 1200px; width: max-content;
+      margin: 0 auto;
+    }
+    table {
+      width: 100%;
+      margin: 0 auto;
+      border-collapse: collapse;
+      table-layout: auto;
+    }
+    th, td {
+      border-bottom: 1px solid #ccc;
+      padding: 0.5rem;
+      text-align: left;
+      vertical-align: top;
+      font-size: 1rem;
+    }
+    th:nth-child(n+5), td:nth-child(n+5) {
+      text-align: center;
+      font-size: 1rem;
+    }
+    tr:hover {
+      background-color: #f9f9f9;
+      cursor: pointer;
+    }
+    .reaction-button {
+      margin: 0 5px;
+      cursor: pointer;
+      font-size: 1.5rem;
+    }
+  `;
+  const style = document.createElement("style");
+  style.innerHTML = css;
+  document.head.appendChild(style);
+
   const container = document.getElementById("ltg-wall-container");
   if (!container) return;
 
@@ -31,26 +105,26 @@
 
         const [
           letterID,
-          heartsCount,
+          readCount,
           displayName,
-          brokenHeartsCount,
+          heartsCount,
           prayerCount,
           letterContent,
           submissionDate,
           moderatorComments,
-          readCount
+          brokenHeartsCount
         ] = parts.map(x => x.trim());
 
         lettersArray.push({
           letterID,
-          heartsCount,
+          readCount,
           displayName,
-          brokenHeartsCount,
+          heartsCount,
           prayerCount,
           letterContent,
           submissionDate,
           moderatorComments,
-          readCount
+          brokenHeartsCount
         });
 
         buffer = "";
@@ -62,12 +136,9 @@
       }
 
       const wrapper = document.createElement("div");
-      wrapper.style.overflowX = "auto";
+      wrapper.className = "table-wrapper";
 
       const table = document.createElement("table");
-      table.style.borderCollapse = "collapse";
-      table.style.width = "100%";
-
       table.innerHTML = `
         <thead>
           <tr>
@@ -88,16 +159,18 @@
 
       lettersArray.forEach(letter => {
         const row = document.createElement("tr");
+
         row.innerHTML = `
           <td style="border:1px solid #ccc;padding:8px;">${letter.submissionDate}</td>
           <td style="border:1px solid #ccc;padding:8px;">${letter.displayName}</td>
-          <td style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${letter.letterContent}</td>
-          <td style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${letter.moderatorComments}</td>
+          <td style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${letter.letterContent.substring(0, 80)}...</td>
+          <td style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${letter.moderatorComments.substring(0, 80)}...</td>
           <td style="border:1px solid #ccc;padding:8px;">${letter.heartsCount}</td>
           <td style="border:1px solid #ccc;padding:8px;">${letter.prayerCount}</td>
           <td style="border:1px solid #ccc;padding:8px;">${letter.brokenHeartsCount}</td>
           <td style="border:1px solid #ccc;padding:8px;">${letter.readCount}</td>
         `;
+
         tbody.appendChild(row);
 
         const popupTrigger = row.querySelector("td:nth-child(3)");
