@@ -136,12 +136,9 @@
       }
 
       const wrapper = document.createElement("div");
-      wrapper.style.overflowX = "auto";
+      wrapper.className = "table-wrapper";
 
       const table = document.createElement("table");
-      table.style.borderCollapse = "collapse";
-      table.style.width = "100%";
-
       table.innerHTML = `
         <thead>
           <tr>
