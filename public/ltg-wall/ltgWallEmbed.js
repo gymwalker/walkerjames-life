@@ -143,7 +143,7 @@
         <thead>
           <tr>
             <th style="border:1px solid #ccc;padding:8px;">Date</th>
-            <th style="border:1px solid #ccc;padding:8px;">Display Name</th>
+            <th style="border:1px solid #ccc;padding:8px;">Name</th>
             <th style="border:1px solid #ccc;padding:8px;max-width:50ch;">Letter</th>
             <th style="border:1px solid #ccc;padding:8px;max-width:50ch;">Moderator Comments</th>
             <th style="border:1px solid #ccc;padding:8px;" title="Hearts">❤️</th>
