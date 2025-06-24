@@ -175,6 +175,7 @@
 
         const popupTrigger = row.querySelector("td:nth-child(3)");
         if (popupTrigger) {
+          popupTrigger.style.cursor = "pointer";
           popupTrigger.onclick = () =>
             showPopup(letter.displayName, letter.submissionDate, letter.letterContent, letter.moderatorComments, letter.heartsCount, letter.prayerCount, letter.brokenHeartsCount, letter.readCount, letter.letterID);
         }
@@ -230,6 +231,10 @@ function showPopup(name, date, content, moderator, hearts, prayers, broken, view
   // ✅ Correct place to add the code
   document.body.appendChild(popup);
   
+  // Increment view count visually
+  const viewEl = popup.querySelector(".read-view span");
+  if (viewEl) viewEl.textContent = parseInt(viewEl.textContent || "0") + 1;
+
   // ✅ Auto-increment read count
   fetch("/functions/updateReaction", {
     method: "POST",
