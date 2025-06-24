@@ -162,8 +162,8 @@
         row.innerHTML = `
           <td style="border:1px solid #ccc;padding:8px;">${letter.submissionDate}</td>
           <td style="border:1px solid #ccc;padding:8px;">${letter.displayName}</td>
-          <td style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${letter.letterContent}</td>
-          <td style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${letter.moderatorComments}</td>
+          <td style="border:1px solid #ccc;padding:8px;max-width:50ch;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${letter.letterContent}</td>
+          <td style="border:1px solid #ccc;padding:8px;max-width:50ch;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${letter.moderatorComments}</td>
           <td style="border:1px solid #ccc;padding:8px;">${letter.heartsCount}</td>
           <td style="border:1px solid #ccc;padding:8px;">${letter.prayerCount}</td>
           <td style="border:1px solid #ccc;padding:8px;">${letter.brokenHeartsCount}</td>
