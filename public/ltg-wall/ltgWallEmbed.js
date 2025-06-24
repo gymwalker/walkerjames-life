@@ -212,8 +212,13 @@ function showPopup(name, date, content, moderator, hearts, prayers, broken, view
       <button style="position:absolute;top:10px;right:15px;font-size:24px;background:none;border:none;cursor:pointer;">&times;</button>
       <h3>${name}</h3>
       <p><strong>${formattedDate}</strong></p>
+  
+      <p style="margin-bottom:0.25em;font-weight:bold;">Letter:</p>
       <div class="scroll-box">${content}</div>
-      <div class="scroll-box"><em>${moderator}</em></div>
+  
+      <p style="margin-bottom:0.25em;font-weight:bold;">Moderator Comment:</p>
+      <div class="scroll-box" style="min-height:4em;">${moderator || "<em>No moderator comments.</em>"}</div>
+  
       <div style="margin-top:1em;font-size:1.5em;display:flex;justify-content:space-around;">
         <div class="reaction" data-type="love" data-id="${id}">❤️ <span>${hearts}</span></div>
         <div class="reaction" data-type="pray" data-id="${id}">🙏 <span>${prayers}</span></div>
