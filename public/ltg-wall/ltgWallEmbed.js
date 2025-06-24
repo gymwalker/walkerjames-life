@@ -236,10 +236,10 @@ function showPopup(name, date, content, moderator, hearts, prayers, broken, view
   const viewEl = popup.querySelector(".read-view span");
   if (viewEl) viewEl.textContent = parseInt(viewEl.textContent || "0") + 1;
 
-  fetch("/functions/updateReaction", {
+  fetch("https://hook.us2.make.com/llyd2p9njx4s7pqb3krotsvb7wbaso4f", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ type: "read", id })
+    body: JSON.stringify({ type: "read", letterId: id })
   }).catch(err => console.warn("Read increment failed:", err));
 
   popup.querySelector("button").onclick = () => popup.remove();
@@ -252,10 +252,10 @@ function showPopup(name, date, content, moderator, hearts, prayers, broken, view
       const count = el.querySelector("span");
       count.textContent = parseInt(count.textContent || "0") + 1;
 
-      fetch("/functions/updateReaction", {
+      fetch("https://hook.us2.make.com/llyd2p9njx4s7pqb3krotsvb7wbaso4f", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, id })
+        body: JSON.stringify({ type, letterId: id })
       }).catch(err => console.warn("Update failed:", err));
 
       el.style.pointerEvents = "none";
