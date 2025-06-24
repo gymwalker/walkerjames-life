@@ -80,6 +80,9 @@
       cursor: pointer;
       font-size: 1.5rem;
     }
+    td.clickable {
+      cursor: pointer !important;
+    }
   `;
   const style = document.createElement("style");
   style.innerHTML = css;
@@ -163,7 +166,7 @@
         row.innerHTML = `
           <td style="border:1px solid #ccc;padding:8px;">${letter.submissionDate}</td>
           <td style="border:1px solid #ccc;padding:8px;">${letter.displayName}</td>
-          <td style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${letter.letterContent.substring(0, 80)}...</td>
+          <td class="clickable" style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${letter.letterContent.substring(0, 80)}...</td>
           <td style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${letter.moderatorComments.substring(0, 80)}...</td>
           <td style="border:1px solid #ccc;padding:8px;">${letter.heartsCount}</td>
           <td style="border:1px solid #ccc;padding:8px;">${letter.prayerCount}</td>
@@ -175,7 +178,7 @@
 
         const popupTrigger = row.querySelector("td:nth-child(3)");
         if (popupTrigger) {
-          popupTrigger.style.cursor = "pointer";
+          popupTrigger.classList.add("clickable");
           popupTrigger.onclick = () =>
             showPopup(letter.displayName, letter.submissionDate, letter.letterContent, letter.moderatorComments, letter.heartsCount, letter.prayerCount, letter.brokenHeartsCount, letter.readCount, letter.letterID);
         }
@@ -190,7 +193,6 @@
     });
 
 function showPopup(name, date, content, moderator, hearts, prayers, broken, views, id) {
-  // Convert date to mm/dd/yyyy
   const formattedDate = (() => {
     const parts = date.split("-");
     return parts.length === 3 ? `${parts[1]}/${parts[2]}/${parts[0]}` : date;
@@ -224,27 +226,24 @@ function showPopup(name, date, content, moderator, hearts, prayers, broken, view
         <div class="reaction" data-type="love" data-id="${id}">❤️ <span>${hearts}</span></div>
         <div class="reaction" data-type="pray" data-id="${id}">🙏 <span>${prayers}</span></div>
         <div class="reaction" data-type="break" data-id="${id}">💔 <span>${broken}</span></div>
-        <div class="reaction" style="pointer-events: none; opacity: 0.6;">📖 <span>${views}</span></div>
-    </div>
+        <div class="reaction read-view" style="pointer-events: none; opacity: 0.6;">📖 <span>${views}</span></div>
+      </div>
     </div>
   `;
-  // ✅ Correct place to add the code
+
   document.body.appendChild(popup);
-  
-  // Increment view count visually
+
   const viewEl = popup.querySelector(".read-view span");
   if (viewEl) viewEl.textContent = parseInt(viewEl.textContent || "0") + 1;
 
-  // ✅ Auto-increment read count
   fetch("/functions/updateReaction", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ type: "read", id })
   }).catch(err => console.warn("Read increment failed:", err));
- 
+
   popup.querySelector("button").onclick = () => popup.remove();
   popup.onclick = e => { if (e.target === popup) popup.remove(); };
-  document.body.appendChild(popup);
 
   popup.querySelectorAll(".reaction").forEach(el => {
     el.onclick = () => {
