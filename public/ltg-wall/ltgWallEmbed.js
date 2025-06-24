@@ -224,17 +224,19 @@ function showPopup(name, date, content, moderator, hearts, prayers, broken, view
         <div class="reaction" data-type="pray" data-id="${id}">🙏 <span>${prayers}</span></div>
         <div class="reaction" data-type="break" data-id="${id}">💔 <span>${broken}</span></div>
         <div class="reaction" style="pointer-events: none; opacity: 0.6;">📖 <span>${views}</span></div>
-        document.body.appendChild(popup);
-        // Increment read count automatically
-        fetch("/functions/updateReaction", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: "read", id })
-        }).catch(err => console.warn("Read increment failed:", err));
     </div>
     </div>
   `;
-
+  // ✅ Correct place to add the code
+  document.body.appendChild(popup);
+  
+  // ✅ Auto-increment read count
+  fetch("/functions/updateReaction", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type: "read", id })
+  }).catch(err => console.warn("Read increment failed:", err));
+ 
   popup.querySelector("button").onclick = () => popup.remove();
   popup.onclick = e => { if (e.target === popup) popup.remove(); };
   document.body.appendChild(popup);
