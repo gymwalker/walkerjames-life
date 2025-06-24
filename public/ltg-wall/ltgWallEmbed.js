@@ -73,14 +73,13 @@
     }
     tr:hover {
       background-color: #f9f9f9;
-      cursor: pointer;
     }
     .reaction-button {
       margin: 0 5px;
       cursor: pointer;
       font-size: 1.5rem;
     }
-    td.clickable {
+    td.clickable:hover {
       cursor: pointer !important;
     }
   `;
