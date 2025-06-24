@@ -180,7 +180,17 @@
         if (popupTrigger) {
           popupTrigger.classList.add("clickable");
           popupTrigger.onclick = () =>
-            showPopup(letter.displayName, letter.submissionDate, letter.letterContent, letter.moderatorComments, letter.heartsCount, letter.prayerCount, letter.brokenHeartsCount, letter.readCount, letter.letterID);
+            showPopup(
+              letter.displayName,
+              letter.submissionDate,
+              letter.letterContent,
+              letter.moderatorComments,
+              parseInt(letter.heartsCount),
+              parseInt(letter.prayerCount),
+              parseInt(letter.brokenHeartsCount),
+              parseInt(letter.readCount),
+              letter.letterID
+            );
         }
       });
 
@@ -215,32 +225,31 @@ function showPopup(name, date, content, moderator, hearts, prayers, broken, view
       <button style="position:absolute;top:10px;right:15px;font-size:24px;background:none;border:none;cursor:pointer;">&times;</button>
       <h3>${name}</h3>
       <p><strong>${formattedDate}</strong></p>
-  
+
       <p style="margin-bottom:0.25em;font-weight:bold;">Letter:</p>
       <div class="scroll-box">${content}</div>
-  
+
       <p style="margin-bottom:0.25em;font-weight:bold;">Moderator Comment:</p>
       <div class="scroll-box" style="min-height:4em;">${moderator || "<em>No moderator comments.</em>"}</div>
-  
+
       <div style="margin-top:1em;font-size:1.5em;display:flex;justify-content:space-around;">
-        <div class="reaction" data-type="love" data-id="${id}">❤️ <span>${hearts}</span></div>
+        <div class="reaction" data-type="heart" data-id="${id}">❤️ <span>${hearts}</span></div>
         <div class="reaction" data-type="pray" data-id="${id}">🙏 <span>${prayers}</span></div>
         <div class="reaction" data-type="break" data-id="${id}">💔 <span>${broken}</span></div>
-        <div class="reaction read-view" style="pointer-events: none; opacity: 0.6;">📖 <span>${views}</span></div>
+        <div class="reaction read-view" style="pointer-events: none; opacity: 0.6;">📖 <span>${views + 1}</span></div>
       </div>
     </div>
   `;
 
   document.body.appendChild(popup);
 
-  const viewEl = popup.querySelector(".read-view span");
-  if (viewEl) viewEl.textContent = parseInt(viewEl.textContent || "0") + 1;
-
-  fetch("https://hook.us2.make.com/llyd2p9njx4s7pqb3krotsvb7wbaso4f", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ type: "read", letterId: id })
-  }).catch(err => console.warn("Read increment failed:", err));
+  postReaction({ 
+    letterID: id, 
+    heartsCount: hearts, 
+    prayerCount: prayers, 
+    brokenHeartsCount: broken, 
+    readCount: views + 1 
+  }, "read");
 
   popup.querySelector("button").onclick = () => popup.remove();
   popup.onclick = e => { if (e.target === popup) popup.remove(); };
@@ -249,17 +258,52 @@ function showPopup(name, date, content, moderator, hearts, prayers, broken, view
     el.onclick = () => {
       const type = el.dataset.type;
       const id = el.dataset.id;
-      const count = el.querySelector("span");
-      count.textContent = parseInt(count.textContent || "0") + 1;
+      const countEl = el.querySelector("span");
+      const count = parseInt(countEl.textContent || "0") + 1;
+      countEl.textContent = count;
 
-      fetch("https://hook.us2.make.com/llyd2p9njx4s7pqb3krotsvb7wbaso4f", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, letterId: id })
-      }).catch(err => console.warn("Update failed:", err));
+      postReaction({ 
+        letterID: id, 
+        heartsCount: type === "heart" ? count : hearts, 
+        prayerCount: type === "pray" ? count : prayers, 
+        brokenHeartsCount: type === "break" ? count : broken, 
+        readCount: views + 1 
+      }, type);
 
       el.style.pointerEvents = "none";
     };
   });
+}
+
+function postReaction(row, iconType) {
+  switch (iconType) {
+    case "heart":
+      row.heartsCount++;
+      break;
+    case "pray":
+      row.prayerCount++;
+      break;
+    case "break":
+      row.brokenHeartsCount++;
+      break;
+    case "read":
+      row.readCount++;
+      break;
+  }
+
+  fetch("https://hook.us2.make.com/llyd2p9njx4s7pqb3krotsvb7wbaso4f", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      letterId: row.letterID,
+      hearts: row.heartsCount,
+      prayers: row.prayerCount,
+      brokenHearts: row.brokenHeartsCount,
+      views: row.readCount
+    })
+  })
+  .then(res => res.text())
+  .then(data => console.log("Reaction sync OK:", data))
+  .catch(err => console.warn("Reaction sync FAILED:", err));
 }
 })();
