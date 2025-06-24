@@ -20,7 +20,41 @@
     .then(response => response.text())
     .then(text => {
       const lines = text.trim().split(/\r?\n/);
-      const lettersArray = lines.map(line => line.trim()).filter(Boolean);
+      const lettersArray = [];
+      let buffer = "";
+
+      lines.forEach(line => {
+        buffer += line.trim() + " ";
+        const parts = buffer.split("|");
+
+        if (parts.length < 9) return;
+
+        const [
+          letterID,
+          heartsCount,
+          displayName,
+          brokenHeartsCount,
+          prayerCount,
+          letterContent,
+          submissionDate,
+          moderatorComments,
+          readCount
+        ] = parts.map(x => x.trim());
+
+        lettersArray.push({
+          letterID,
+          heartsCount,
+          displayName,
+          brokenHeartsCount,
+          prayerCount,
+          letterContent,
+          submissionDate,
+          moderatorComments,
+          readCount
+        });
+
+        buffer = "";
+      });
 
       if (lettersArray.length === 0) {
         container.innerHTML = "<p>No letters found.</p>";
@@ -52,36 +86,24 @@
 
       const tbody = table.querySelector("tbody");
 
-      lettersArray.forEach((line) => {
-        const [
-          letterID,             // 1
-          heartsCount,          // 2
-          displayName,          // 3
-          brokenHeartsCount,    // 4
-          prayerCount,          // 5
-          letterContent,        // 6
-          submissionDate,       // 7
-          moderatorComments,    // 8
-          readCount             // 9
-        ] = line.split("|").map(x => x.trim());
-
+      lettersArray.forEach(letter => {
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td style="border:1px solid #ccc;padding:8px;">${submissionDate}</td>
-          <td style="border:1px solid #ccc;padding:8px;">${displayName}</td>
-          <td style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${letterContent}</td>
-          <td style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${moderatorComments}</td>
-          <td style="border:1px solid #ccc;padding:8px;">${heartsCount}</td>
-          <td style="border:1px solid #ccc;padding:8px;">${prayerCount}</td>
-          <td style="border:1px solid #ccc;padding:8px;">${brokenHeartsCount}</td>
-          <td style="border:1px solid #ccc;padding:8px;">${readCount}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${letter.submissionDate}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${letter.displayName}</td>
+          <td style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${letter.letterContent}</td>
+          <td style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${letter.moderatorComments}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${letter.heartsCount}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${letter.prayerCount}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${letter.brokenHeartsCount}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${letter.readCount}</td>
         `;
         tbody.appendChild(row);
 
         const popupTrigger = row.querySelector("td:nth-child(3)");
         if (popupTrigger) {
           popupTrigger.onclick = () =>
-            showPopup(displayName, submissionDate, letterContent, moderatorComments, heartsCount, prayerCount, brokenHeartsCount, readCount, letterID);
+            showPopup(letter.displayName, letter.submissionDate, letter.letterContent, letter.moderatorComments, letter.heartsCount, letter.prayerCount, letter.brokenHeartsCount, letter.readCount, letter.letterID);
         }
       });
 
