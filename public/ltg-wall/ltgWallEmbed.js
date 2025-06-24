@@ -1,14 +1,14 @@
 // WalkerJames.Life LTG Wall Embed Script (FINAL - LOCKED VERIFIED FIELD ORDER)
 // Field Order (confirmed):
-// 0: Letter Content
-// 1: Hearts Count
-// 2: Prayer Count
-// 3: Display Name
-// 4: Submission Date
-// 5: Moderator Comments
-// 6: Broken Hearts Count
-// 7: Read Count
-// 8: Letter ID
+// 0: Letter ID
+// 1: Read Count
+// 2: Display Name
+// 3: Hearts Count
+// 4: Prayer Count
+// 5: Letter Content
+// 6: Submission Date
+// 7: Moderator Comments
+// 8: Broken Hearts Count
 
 (function () {
   const css = `
