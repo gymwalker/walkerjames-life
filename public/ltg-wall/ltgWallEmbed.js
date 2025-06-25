@@ -208,6 +208,12 @@ function showPopup(name, date, content, moderator, hearts, prayers, broken, view
     return parts.length === 3 ? `${parts[1]}/${parts[2]}/${parts[0]}` : date;
   })();
 
+  // Track deltas for Make
+  let heartDelta = 0;
+  let prayerDelta = 0;
+  let brokenDelta = 0;
+  let viewDelta = 1;
+
   const popup = document.createElement("div");
   popup.style.position = "fixed";
   popup.style.top = 0;
@@ -243,53 +249,84 @@ function showPopup(name, date, content, moderator, hearts, prayers, broken, view
 
   document.body.appendChild(popup);
 
-  postReaction({ 
-    letterID: id, 
-    heartsCount: hearts, 
-    prayerCount: prayers, 
-    brokenHeartsCount: broken, 
-    readCount: views + 1 
-  }, "read");
-
-  popup.querySelector("button").onclick = () => popup.remove();
-  popup.onclick = e => { if (e.target === popup) popup.remove(); };
+  // disable double-clicks
+  const clicked = { heart: false, pray: false, break: false };
 
   popup.querySelectorAll(".reaction").forEach(el => {
     el.onclick = () => {
       const type = el.dataset.type;
-      const id = el.dataset.id;
+      if (clicked[type]) return;
+      clicked[type] = true;
+
       const countEl = el.querySelector("span");
       const count = parseInt(countEl.textContent || "0") + 1;
       countEl.textContent = count;
 
-      postReaction({ 
-        letterID: id, 
-        heartsCount: type === "heart" ? count : hearts, 
-        prayerCount: type === "pray" ? count : prayers, 
-        brokenHeartsCount: type === "break" ? count : broken, 
-        readCount: views + 1 
-      }, type);
+      if (type === "heart") heartDelta = 1;
+      if (type === "pray") prayerDelta = 1;
+      if (type === "break") brokenDelta = 1;
 
       el.style.pointerEvents = "none";
     };
   });
+
+  const sendReactionUpdate = () => {
+    postReaction(
+      {
+        letterID: id,
+        heartsCount: hearts + heartDelta,
+        prayerCount: prayers + prayerDelta,
+        brokenHeartsCount: broken + brokenDelta,
+        readCount: views + viewDelta
+      },
+      {
+        letterId: id,
+        hearts: heartDelta,
+        prayers: prayerDelta,
+        brokenHearts: brokenDelta,
+        views: viewDelta
+      }
+    );
+  };
+
+  popup.querySelector("button").onclick = () => {
+    sendReactionUpdate();
+    popup.remove();
+  };
+
+  popup.onclick = e => {
+    if (e.target === popup) {
+      sendReactionUpdate();
+      popup.remove();
+    }
+  };
 }
 
-function postReaction(row, iconType) {
-  switch (iconType) {
-    case "heart":
-      row.heartsCount++;
-      break;
-    case "pray":
-      row.prayerCount++;
-      break;
-    case "break":
-      row.brokenHeartsCount++;
-      break;
-    case "read":
-      row.readCount++;
-      break;
-  }
+function postReaction(updatedCounts, deltas) {
+  // Send only deltas to Make (safe for concurrency)
+  fetch("https://hook.us2.make.com/llyd2p9njx4s7pqb3krotsvb7wbaso4f", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(deltas)
+  })
+  .then(res => res.text())
+  .then(data => console.log("Delta update sent:", data))
+  .catch(err => console.warn("Delta update failed:", err));
+
+  // Also update the visual table row
+  const rows = document.querySelectorAll("tbody tr");
+  rows.forEach(row => {
+    const viewID = row.querySelector("td:nth-child(3)");
+    if (!viewID || !viewID.onclick) return;
+    const onclickStr = viewID.onclick.toString();
+    if (onclickStr.includes(`'${updatedCounts.letterID}'`)) {
+      row.children[4].textContent = updatedCounts.heartsCount;
+      row.children[5].textContent = updatedCounts.prayerCount;
+      row.children[6].textContent = updatedCounts.brokenHeartsCount;
+      row.children[7].textContent = updatedCounts.readCount;
+    }
+  });
+}
 
   fetch("https://hook.us2.make.com/llyd2p9njx4s7pqb3krotsvb7wbaso4f", {
     method: "POST",
