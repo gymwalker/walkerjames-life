@@ -232,7 +232,7 @@ function showPopup(name, date, content, moderator, hearts, prayers, broken, view
       <div class="scroll-box">${content}</div>
 
       <p style="margin-bottom:0.25em;font-weight:bold;">Moderator Comment:</p>
-      <div class="scroll-box" style="min-height:4em;">${moderator || "<em>No moderator comments.</em>"}</div>
+      <div class="scroll-box" style="min-height:4em;">${moderator || '<em>No moderator comments.</em>'}</div>
 
       <div style="margin-top:1em;font-size:1.5em;display:flex;justify-content:space-around;">
         <div class="reaction" data-type="heart" data-id="${id}">❤️ <span>${hearts}</span></div>
