@@ -93,114 +93,131 @@
 
   container.innerHTML = "<p>Loading letters…</p>";
 
-  fetch("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth")
-    .then(response => response.text())
-    .then(text => {
-      const lines = text.trim().split(/\r?\n/);
-      const lettersArray = [];
-      let buffer = "";
+fetch("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth")
+  .then(response => {
+    console.log("Fetch succeeded, status:", response.status);
+    return response.text();
+  })
+  .then(text => {
+    console.log("Raw text received:", text.slice(0, 300)); // Only show the first 300 characters
+    const lines = text.trim().split(/\r?\n/);
+    console.log("Total lines:", lines.length);
+    
+    const lettersArray = [];
+    let buffer = "";
 
-      lines.forEach(line => {
-        buffer += line.trim() + " ";
-        const parts = buffer.split("|");
+    lines.forEach((line, index) => {
+      buffer += line.trim() + " ";
+      const parts = buffer.split("|");
 
-        if (parts.length < 9) return;
-
-        const [
-          letterID,
-          readCount,
-          displayName,
-          heartsCount,
-          prayerCount,
-          letterContent,
-          submissionDate,
-          moderatorComments,
-          brokenHeartsCount
-        ] = parts.map(x => x.trim());
-
-        lettersArray.push({
-          letterID,
-          readCount,
-          displayName,
-          heartsCount,
-          prayerCount,
-          letterContent,
-          submissionDate,
-          moderatorComments,
-          brokenHeartsCount
-        });
-
-        buffer = "";
-      });
-
-      if (lettersArray.length === 0) {
-        container.innerHTML = "<p>No letters found.</p>";
+      if (parts.length < 9) {
+        console.log(`Line ${index + 1}: Incomplete, waiting for more...`);
         return;
       }
 
-      const wrapper = document.createElement("div");
-      wrapper.className = "table-wrapper";
+      const [
+        letterID,
+        readCount,
+        displayName,
+        heartsCount,
+        prayerCount,
+        letterContent,
+        submissionDate,
+        moderatorComments,
+        brokenHeartsCount
+      ] = parts.map(x => x.trim());
 
-      const table = document.createElement("table");
-      table.innerHTML = `
-        <thead>
-          <tr>
-            <th style="border:1px solid #ccc;padding:8px;">Date</th>
-            <th style="border:1px solid #ccc;padding:8px;">Name</th>
-            <th style="border:1px solid #ccc;padding:8px;max-width:50ch;">Letter</th>
-            <th style="border:1px solid #ccc;padding:8px;max-width:50ch;">Moderator Comments</th>
-            <th style="border:1px solid #ccc;padding:8px;" title="Hearts">❤️</th>
-            <th style="border:1px solid #ccc;padding:8px;" title="Prayers">🙏</th>
-            <th style="border:1px solid #ccc;padding:8px;" title="Broken Hearts">💔</th>
-            <th style="border:1px solid #ccc;padding:8px;" title="Views">📖</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      `;
-
-      const tbody = table.querySelector("tbody");
-
-      lettersArray.forEach(letter => {
-        const row = document.createElement("tr");
-
-        row.innerHTML = `
-          <td style="border:1px solid #ccc;padding:8px;">${letter.submissionDate}</td>
-          <td style="border:1px solid #ccc;padding:8px;">${letter.displayName}</td>
-          <td class="clickable" style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${letter.letterContent.substring(0, 80)}...</td>
-          <td style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${letter.moderatorComments.substring(0, 80)}...</td>
-          <td style="border:1px solid #ccc;padding:8px;">${letter.heartsCount}</td>
-          <td style="border:1px solid #ccc;padding:8px;">${letter.prayerCount}</td>
-          <td style="border:1px solid #ccc;padding:8px;">${letter.brokenHeartsCount}</td>
-          <td style="border:1px solid #ccc;padding:8px;">${letter.readCount}</td>
-        `;
-
-        tbody.appendChild(row);
-
-        const popupTrigger = row.querySelector("td:nth-child(3)");
-        if (popupTrigger) {
-          popupTrigger.classList.add("clickable");
-          popupTrigger.onclick = () =>
-            showPopup(
-              letter.displayName,
-              letter.submissionDate,
-              letter.letterContent,
-              letter.moderatorComments,
-              parseInt(letter.heartsCount),
-              parseInt(letter.prayerCount),
-              parseInt(letter.brokenHeartsCount),
-              parseInt(letter.readCount),
-              letter.letterID
-            );
-        }
+      lettersArray.push({
+        letterID,
+        readCount,
+        displayName,
+        heartsCount,
+        prayerCount,
+        letterContent,
+        submissionDate,
+        moderatorComments,
+        brokenHeartsCount
       });
 
-      wrapper.appendChild(table);
-      container.innerHTML = "";
-      container.appendChild(wrapper);
-    })
-    .catch(err => {
-      container.innerHTML = `<p>Error loading letters: ${err.message}</p>`;
+      console.log(`Letter ${letterID} parsed and added.`);
+      buffer = "";
     });
+
+    if (lettersArray.length === 0) {
+      console.warn("No valid letters parsed — empty lettersArray.");
+      container.innerHTML = "<p>No letters found.</p>";
+      return;
+    }
+
+    console.log(`Total letters parsed: ${lettersArray.length}`);
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "table-wrapper";
+
+    const table = document.createElement("table");
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th style="border:1px solid #ccc;padding:8px;">Date</th>
+          <th style="border:1px solid #ccc;padding:8px;">Name</th>
+          <th style="border:1px solid #ccc;padding:8px;max-width:50ch;">Letter</th>
+          <th style="border:1px solid #ccc;padding:8px;max-width:50ch;">Moderator Comments</th>
+          <th style="border:1px solid #ccc;padding:8px;" title="Hearts">❤️</th>
+          <th style="border:1px solid #ccc;padding:8px;" title="Prayers">🙏</th>
+          <th style="border:1px solid #ccc;padding:8px;" title="Broken Hearts">💔</th>
+          <th style="border:1px solid #ccc;padding:8px;" title="Views">📖</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    `;
+
+    const tbody = table.querySelector("tbody");
+
+    lettersArray.forEach((letter, idx) => {
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td style="border:1px solid #ccc;padding:8px;">${letter.submissionDate}</td>
+        <td style="border:1px solid #ccc;padding:8px;">${letter.displayName}</td>
+        <td class="clickable" style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${letter.letterContent.substring(0, 80)}...</td>
+        <td style="border:1px solid #ccc;padding:8px;max-width:50ch;white-space:normal;">${letter.moderatorComments.substring(0, 80)}...</td>
+        <td style="border:1px solid #ccc;padding:8px;">${letter.heartsCount}</td>
+        <td style="border:1px solid #ccc;padding:8px;">${letter.prayerCount}</td>
+        <td style="border:1px solid #ccc;padding:8px;">${letter.brokenHeartsCount}</td>
+        <td style="border:1px solid #ccc;padding:8px;">${letter.readCount}</td>
+      `;
+
+      tbody.appendChild(row);
+
+      const popupTrigger = row.querySelector("td:nth-child(3)");
+      if (popupTrigger) {
+        popupTrigger.classList.add("clickable");
+        popupTrigger.onclick = () =>
+          showPopup(
+            letter.displayName,
+            letter.submissionDate,
+            letter.letterContent,
+            letter.moderatorComments,
+            parseInt(letter.heartsCount),
+            parseInt(letter.prayerCount),
+            parseInt(letter.brokenHeartsCount),
+            parseInt(letter.readCount),
+            letter.letterID
+          );
+      }
+
+      console.log(`Row for letter ${letter.letterID} added to table.`);
+    });
+
+    wrapper.appendChild(table);
+    container.innerHTML = "";
+    container.appendChild(wrapper);
+    console.log("Table fully rendered.");
+  })
+  .catch(err => {
+    console.error("Error during fetch or processing:", err);
+    container.innerHTML = `<p>Error loading letters: ${err.message}</p>`;
+  });
 
 function showPopup(name, date, content, moderator, hearts, prayers, broken, views, id) {
   const formattedDate = (() => {
