@@ -97,8 +97,6 @@
     .then(response => response.text())
     .then(text => {
       const lines = text.trim().split(/\r?\n/);
-?
-/);
       const lettersArray = [];
       let buffer = "";
 
@@ -232,7 +230,7 @@ function showPopup(name, date, content, moderator, hearts, prayers, broken, view
       <div class="scroll-box">${content}</div>
 
       <p style="margin-bottom:0.25em;font-weight:bold;">Moderator Comment:</p>
-      <div class="scroll-box" style="min-height:4em;">${moderator || '<em>No moderator comments.</em>'}</div>
+      <div class="scroll-box" style="min-height:4em;">${moderator || "<em>No moderator comments.</em>"}</div>
 
       <div style="margin-top:1em;font-size:1.5em;display:flex;justify-content:space-around;">
         <div class="reaction" data-type="heart" data-id="${id}">❤️ <span>${hearts}</span></div>
@@ -278,20 +276,20 @@ function showPopup(name, date, content, moderator, hearts, prayers, broken, view
 }
 
 function postReaction(row, iconType) {
-  const delta = {
-    letterId: row.letterID,
-    hearts: iconType === "heart" ? 1 : 0, prayers: iconType === "pray" ? 1 : 0,
-    brokenHearts: iconType === "break" ? 1 : 0, views: iconType === "read" ? 1 : 0
-  };
-  fetch("https://hook.us2.make.com/llyd2p9njx4s7pqb3krotsvb7wbaso4f", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(delta)
-  })
-  .then(res => res.text())
-  .then(data => console.log("Reaction sync OK:", data))
-  .catch(err => console.warn("Reaction sync FAILED:", err));
-}
+  switch (iconType) {
+    case "heart":
+      row.heartsCount++;
+      break;
+    case "pray":
+      row.prayerCount++;
+      break;
+    case "break":
+      row.brokenHeartsCount++;
+      break;
+    case "read":
+      row.readCount++;
+      break;
+  }
 
   fetch("https://hook.us2.make.com/llyd2p9njx4s7pqb3krotsvb7wbaso4f", {
     method: "POST",
