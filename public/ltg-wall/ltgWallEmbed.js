@@ -96,7 +96,7 @@
   fetch("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth")
     .then(response => response.text())
     .then(text => {
-      const lines = text.trim().split(/
+      const lines = text.trim().split(/\r?\n/);
 ?
 /);
       const lettersArray = [];
