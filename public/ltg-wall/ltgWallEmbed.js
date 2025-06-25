@@ -96,7 +96,9 @@
   fetch("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth")
     .then(response => response.text())
     .then(text => {
-      const lines = text.trim().split(/\r?\n/);
+      const lines = text.trim().split(/
+?
+/);
       const lettersArray = [];
       let buffer = "";
 
@@ -276,20 +278,20 @@ function showPopup(name, date, content, moderator, hearts, prayers, broken, view
 }
 
 function postReaction(row, iconType) {
-  switch (iconType) {
-    case "heart":
-      row.heartsCount++;
-      break;
-    case "pray":
-      row.prayerCount++;
-      break;
-    case "break":
-      row.brokenHeartsCount++;
-      break;
-    case "read":
-      row.readCount++;
-      break;
-  }
+  const delta = {
+    letterId: row.letterID,
+    hearts: iconType === "heart" ? 1 : 0, prayers: iconType === "pray" ? 1 : 0,
+    brokenHearts: iconType === "break" ? 1 : 0, views: iconType === "read" ? 1 : 0
+  };
+  fetch("https://hook.us2.make.com/llyd2p9njx4s7pqb3krotsvb7wbaso4f", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(delta)
+  })
+  .then(res => res.text())
+  .then(data => console.log("Reaction sync OK:", data))
+  .catch(err => console.warn("Reaction sync FAILED:", err));
+}
 
   fetch("https://hook.us2.make.com/llyd2p9njx4s7pqb3krotsvb7wbaso4f", {
     method: "POST",
