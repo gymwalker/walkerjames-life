@@ -344,20 +344,3 @@ function postReaction(updatedCounts, deltas) {
     }
   });
 }
-
-  fetch("https://hook.us2.make.com/llyd2p9njx4s7pqb3krotsvb7wbaso4f", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      letterId: row.letterID,
-      hearts: row.heartsCount,
-      prayers: row.prayerCount,
-      brokenHearts: row.brokenHeartsCount,
-      views: row.readCount
-    })
-  })
-  .then(res => res.text())
-  .then(data => console.log("Reaction sync OK:", data))
-  .catch(err => console.warn("Reaction sync FAILED:", err));
-}
-})();
