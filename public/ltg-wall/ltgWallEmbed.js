@@ -344,3 +344,5 @@ function postReaction(updatedCounts, deltas) {
     }
   });
 }
+// ✅ CLOSE OUTER WRAPPER
+})();
