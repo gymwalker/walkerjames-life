@@ -18,7 +18,7 @@ exports.handler = async function(event) {
     }
 
     // Step 1: Find the record using Letter ID (search by {Letter ID} field)
-    const filterFormula = `AND({Letter ID} = "${letterId}")`;
+    const filterFormula = `{Letter ID}="${letterId}"`;
     const searchURL = `${airtableURL}?filterByFormula=${encodeURIComponent(filterFormula)}`;
 
     console.log("🔍 Searching Airtable with formula:", filterFormula);
