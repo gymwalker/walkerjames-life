@@ -320,15 +320,15 @@ function showPopup(name, date, content, moderator, hearts, prayers, broken, view
 }
 
 function postReaction(updatedCounts, deltas) {
-  // Send only deltas to Make (safe for concurrency)
-  fetch("https://hook.us2.make.com/llyd2p9njx4s7pqb3krotsvb7wbaso4f", {
+  // Send only deltas to Netlify function (custom JavaScript)
+  fetch("/.netlify/functions/updateReaction", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(deltas)
   })
   .then(res => res.text())
-  .then(data => console.log("Delta update sent:", data))
-  .catch(err => console.warn("Delta update failed:", err));
+  .then(data => console.log("✅ Delta update sent:", data))
+  .catch(err => console.warn("❌ Delta update failed:", err));
 
   // Also update the visual table row
   const rows = document.querySelectorAll("tbody tr");
@@ -344,5 +344,6 @@ function postReaction(updatedCounts, deltas) {
     }
   });
 }
+
 // ✅ CLOSE OUTER WRAPPER
 })();
