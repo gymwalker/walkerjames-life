@@ -64,6 +64,8 @@ exports.handler = async function(event) {
     };
 
     console.log("🛠 New values to update:", updatedFields);
+    console.log("PATCHing to:", airtableURL + "/" + recordId);
+    console.log("Payload:", JSON.stringify(updatePayload, null, 2));
 
     const updateRes = await fetch(`${airtableURL}/${recordId}`, {
       method: "PATCH",
@@ -73,6 +75,8 @@ exports.handler = async function(event) {
       },
       body: JSON.stringify({ fields: updatedFields })
     });
+    const data = await response.json();
+    console.log("PATCH response body:", JSON.stringify(data, null, 2));
 
     const updateJson = await updateRes.json();
 
