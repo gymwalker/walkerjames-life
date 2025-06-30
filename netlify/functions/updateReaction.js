@@ -6,6 +6,11 @@ exports.handler = async function(event, context) {
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
+      headers: {
+        "Access-Control-Allow-Origin": "https://walkerjames.life",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "POST",
+      },      
       body: JSON.stringify({ error: "Method Not Allowed" }),
     };
   }
@@ -18,6 +23,11 @@ exports.handler = async function(event, context) {
     console.error("❌ Failed to parse request body:", err);
     return {
       statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "https://walkerjames.life",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "POST",
+      },      
       body: JSON.stringify({ error: "Invalid JSON" }),
     };
   }
@@ -28,6 +38,11 @@ exports.handler = async function(event, context) {
     console.error("❌ Missing letterID in request");
     return {
       statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "https://walkerjames.life",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "POST",
+      },      
       body: JSON.stringify({ error: "Missing letterID" }),
     };
   }
@@ -53,6 +68,11 @@ exports.handler = async function(event, context) {
     console.error("❌ No matching record found in Airtable");
     return {
       statusCode: 404,
+      headers: {
+        "Access-Control-Allow-Origin": "https://walkerjames.life",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "POST",
+      },      
       body: JSON.stringify({ error: "Record not found" }),
     };
   }
@@ -98,6 +118,11 @@ exports.handler = async function(event, context) {
     console.error("❌ Airtable update failed:", updateJson);
     return {
       statusCode: updateRes.status,
+      headers: {
+        "Access-Control-Allow-Origin": "https://walkerjames.life",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "POST",
+      },      
       body: JSON.stringify({ error: "Airtable update failed", details: updateJson })
     };
   }
@@ -105,6 +130,11 @@ exports.handler = async function(event, context) {
   console.log("✅ Airtable update successful!");
   return {
     statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "https://walkerjames.life",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "POST",
+      },      
     body: JSON.stringify({ success: true, recordId, updatedFields }),
   };
 };
