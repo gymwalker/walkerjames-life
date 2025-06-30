@@ -9,7 +9,7 @@ exports.handler = async function(event, context) {
       headers: {
         "Access-Control-Allow-Origin": "https://walkerjames.life",
         "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Methods": "POST",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
       },      
       body: JSON.stringify({ error: "Method Not Allowed" }),
     };
