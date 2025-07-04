@@ -2,12 +2,11 @@
 <!-- Modal Overlay -->
 <div id="popup-modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:9998;"></div>
 
-<div style="position:absolute; top:10px; right:15px;">
-  <button onclick="closePopupModal()" style="font-size:18px; background:none; border:none; cursor:pointer;">&times;</button>
-</div>
-
 <!-- Modal Container -->
 <div id="popup-modal" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); width:90%; max-width:700px; background:#fff; padding:30px; z-index:9999; border-radius:12px; box-shadow:0 0 30px rgba(0,0,0,0.3); max-height:80vh; overflow-y:auto;">
+  <div style="position:absolute; top:10px; right:15px;">
+    <button onclick="closePopupModal()" style="font-size:18px; background:none; border:none; cursor:pointer;">&times;</button>
+  </div>
   <div id="popup-modal-content" style="line-height:1.8; font-size:1rem;">
     <p>Loading content...</p>
   </div>
