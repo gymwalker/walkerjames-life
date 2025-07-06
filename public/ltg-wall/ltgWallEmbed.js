@@ -321,8 +321,9 @@ function showPopup(name, date, content, moderator, hearts, prayers, broken, view
 
 function postReaction(updatedCounts, deltas) {
   // Send only deltas to Netlify function (custom JavaScript)
-  const endpoint = "https://walkerjames-life.netlify.app/.netlify/functions/updateReaction"; // ✅ CORRECT
+  //const endpoint = "https://walkerjames-life.netlify.app/.netlify/functions/updateReaction"; // ✅ CORRECT
   //const endpoint = "/.netlify/functions/updateReaction"; // ✅ USE THIS
+  const endpoint = "https://hook.us2.make.com/llyd2p9njx4s7pqb3krotsvb7wbaso4f";
 
   fetch(endpoint, {
     method: "POST",
