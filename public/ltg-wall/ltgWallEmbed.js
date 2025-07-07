@@ -180,6 +180,7 @@ fetch("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth")
 
     lettersArray.forEach((letter, idx) => {
       const row = document.createElement("tr");
+      row.dataset.letterId = letter.letterID;
 
       row.innerHTML = `
         <td style="border:1px solid #ccc;padding:8px;">${letter.submissionDate}</td>
@@ -340,19 +341,13 @@ function postReaction(updatedCounts, deltas) {
   .catch(err => console.warn("❌ Delta update failed:", err));
 
   // Also update the visual table row
-  const rows = document.querySelectorAll("tbody tr");
-  rows.forEach(row => {
-    const viewID = row.querySelector("td:nth-child(3)");
-    if (!viewID || !viewID.onclick) return;
-    const onclickStr = viewID.onclick.toString();
-    if (onclickStr.includes(`'${updatedCounts.letterID}'`)) {
-      row.children[4].textContent = updatedCounts.heartsCount;
-      row.children[5].textContent = updatedCounts.prayerCount;
-      row.children[6].textContent = updatedCounts.brokenHeartsCount;
-      row.children[7].textContent = updatedCounts.readCount;
-    }
-  });
-}
+  const matchingRow = document.querySelector(`tr[data-letter-id="${updatedCounts.letterID}"]`);
+  if (matchingRow) {
+    matchingRow.children[4].textContent = updatedCounts.heartsCount;
+    matchingRow.children[5].textContent = updatedCounts.prayerCount;
+    matchingRow.children[6].textContent = updatedCounts.brokenHeartsCount;
+    matchingRow.children[7].textContent = updatedCounts.readCount;
+  }
 
 // ✅ CLOSE OUTER WRAPPER
 })();
