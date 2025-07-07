@@ -155,6 +155,7 @@ fetch("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth")
     wrapper.className = "table-wrapper";
 
     const table = document.createElement("table");
+    table.style.width = "100%"; // or "95%", "98%", etc. for a slightly narrower fit
     table.innerHTML = `
       <thead>
         <tr>
