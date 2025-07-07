@@ -336,7 +336,9 @@
       .then(res => res.text())
       .then(data => {
         console.log("✅ Delta update sent:", data);
-        loadTable(); // refresh after update
+        setTimeout(() => {
+          loadTable();
+        }, 2000);
       })
       .catch(err => console.warn("❌ Delta update failed:", err));
   }
