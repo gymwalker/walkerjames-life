@@ -164,7 +164,6 @@ fetch("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth")
       <thead>
         <tr>
           <th style="border:1px solid #ccc;padding:8px; min-width: 100px; white-space: nowrap;">Date</th>
-          // <th style="border:1px solid #ccc;padding:8px;">Date</th>
           <th style="border:1px solid #ccc;padding:8px;">Name</th>
           <th style="border:1px solid #ccc;padding:8px;max-width:50ch;">Letter</th>
           <th style="border:1px solid #ccc;padding:8px;max-width:50ch;">Moderator Comments</th>
