@@ -51,7 +51,8 @@
       border-radius: 4px;
     }
     .table-wrapper {
-      min-width: 1200px; width: max-content;
+      max-width: 100%;
+      width: 95%;
       margin: 0 auto;
     }
     table {
