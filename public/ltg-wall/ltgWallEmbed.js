@@ -13,10 +13,14 @@
 (function () {
   const css = `
     #ltg-wall-container {
+      max-width: 100%;
+      width: 100%;
       padding: 2rem;
       font-family: sans-serif;
       overflow-x: auto;
+      box-sizing: border-box;
     }
+
     #ltg-modal {
       display: none;
       position: fixed;
@@ -52,7 +56,6 @@
     }
     .table-wrapper {
       max-width: 100%;
-      width: 95%;
       margin: 0 auto;
     }
     table {
