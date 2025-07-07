@@ -348,6 +348,6 @@ function postReaction(updatedCounts, deltas) {
     matchingRow.children[6].textContent = updatedCounts.brokenHeartsCount;
     matchingRow.children[7].textContent = updatedCounts.readCount;
   }
-
+}
 // ✅ CLOSE OUTER WRAPPER
 })();
