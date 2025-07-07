@@ -96,7 +96,7 @@
   if (!container) return;
 
   function loadTable() {
-    container.innerHTML = "<p>Refreshing letters…</p>";
+    container.innerHTML = "<p>Loading letters…</p>";
 
     fetch("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth")
       .then(response => {
@@ -333,15 +333,17 @@
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(deltas)
     })
-      .then(res => res.text())
-      .then(data => {
-        console.log("✅ Delta update sent:", data);
-        setTimeout(() => {
-          loadTable();
-        }, 2000);
-      })
-      .catch(err => console.warn("❌ Delta update failed:", err));
+    .then(res => res.text())
+    .then(data => {
+      console.log("✅ Delta update sent:", data);
+      setTimeout(() => {
+        loadTable();
+      }, 2000); // ✅ 2 second wait before reload
+    })
+    .catch(err => console.warn("❌ Delta update failed:", err));
   }
 
+  // Initial render
   loadTable();
+// ✅ CLOSE OUTER WRAPPER
 })();
