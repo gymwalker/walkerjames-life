@@ -205,7 +205,8 @@
       })
       .then(() => {
         overlay.remove();
-        loadTable();
+        container.innerHTML = `<p class="ltg-loading-message">Refreshing letters…<span class="spinner"></span></p>`;
+        setTimeout(loadTable, 2000);
       });
     };
   }
