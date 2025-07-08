@@ -326,7 +326,7 @@
   }
 
   function postReaction(updatedCounts, deltas) {
-    if (letterId && letterId.trim() !== "") {
+    if (deltas.letterId && deltas.letterId.trim() !== "") {
     // proceed with fetch to Make
       const endpoint = "https://hook.us2.make.com/llyd2p9njx4s7pqb3krotsvb7wbaso4f";
   
