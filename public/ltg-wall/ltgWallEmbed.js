@@ -294,6 +294,7 @@
     });
 
     const sendReactionUpdate = () => {
+      letterId = "";
       postReaction(
         {
           letterID: id,
@@ -326,22 +327,26 @@
   }
 
   function postReaction(updatedCounts, deltas) {
-    const endpoint = "https://hook.us2.make.com/llyd2p9njx4s7pqb3krotsvb7wbaso4f";
-
-    fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(deltas)
-    })
-    .then(res => res.text())
-    .then(data => {
-      console.log("✅ Delta update sent:", data);
-      setTimeout(() => {
-        loadTable();
-      }, 2000); // ✅ 2 second wait before reload
-    })
-    .catch(err => console.warn("❌ Delta update failed:", err));
-  }
+    if (letterId && letterId.trim() !== "") {
+    // proceed with fetch to Make
+      const endpoint = "https://hook.us2.make.com/llyd2p9njx4s7pqb3krotsvb7wbaso4f";
+  
+      fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(deltas)
+      })
+      .then(res => res.text())
+      .then(data => {
+        console.log("✅ Delta update sent:", data);
+        setTimeout(() => {
+          loadTable();
+        }, 2000); // ✅ 2 second wait before reload
+      })
+      .catch(err => console.warn("❌ Delta update failed:", err));
+    } else {
+      console.warn("Invalid letterId, skipping Make call. Payload was:", deltas);
+    }}
 
   // Initial render
   loadTable();
