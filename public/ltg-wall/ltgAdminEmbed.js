@@ -1,5 +1,5 @@
 // ltgAdminEmbed.js (WalkerJames.Life LTG Admin Page Script)
-// Based on ltgWallEmbed.js - adds Approve/Reject functionality
+// Updated to support multi-line Letter Content and reordered field structure
 
 (function () {
   const css = `
@@ -78,7 +78,38 @@
       .then(r => r.text())
       .then(text => {
         const lines = text.trim().split(/\r?\n/);
-        const letters = lines.map(l => l.trim().split("|").map(s => s.trim()));
+        const letters = [];
+        let buffer = "";
+
+        lines.forEach(line => {
+          buffer += line.trim() + " ";
+          const fieldCount = (buffer.match(/\|/g) || []).length;
+          if (fieldCount < 9) return; // wait until we have 9 pipes (10 fields)
+
+          const [
+            email,
+            lastName,
+            letterID,
+            firstName,
+            canRespond,
+            letterContent,
+            sharePublicly,
+            approvalStatus,
+            submissionDate,
+            moderatorComments
+          ] = buffer.split("|").map(x => x.trim());
+
+          letters.push({
+            letterID,
+            submissionDate,
+            displayName: firstName || "Anonymous",
+            letterContent,
+            approvalStatus,
+            moderatorComments
+          });
+
+          buffer = "";
+        });
 
         const wrapper = document.createElement("div");
         wrapper.className = "table-wrapper";
@@ -97,8 +128,7 @@
         `;
         const tbody = table.querySelector("tbody");
 
-        letters.forEach(parts => {
-          const [letterID, submissionDate, displayName, letterContent, approvalStatus, moderatorComments] = parts;
+        letters.forEach(({ letterID, submissionDate, displayName, letterContent, approvalStatus, moderatorComments }) => {
           const row = document.createElement("tr");
           row.innerHTML = `
             <td>${submissionDate}</td>
@@ -115,22 +145,24 @@
         container.appendChild(wrapper);
 
         document.querySelectorAll(".open-btn").forEach(btn => {
-          btn.onclick = () => showModal(btn.dataset.id, letters.find(l => l[0] === btn.dataset.id));
+          btn.onclick = () => {
+            const letter = letters.find(l => l.letterID === btn.dataset.id);
+            if (letter) showModal(letter);
+          };
         });
       });
   }
 
-  function showModal(letterID, fields) {
-    const [id, date, name, content, status, comments] = fields;
+  function showModal({ letterID, submissionDate, displayName, letterContent, approvalStatus, moderatorComments }) {
     const overlay = document.createElement("div");
     overlay.id = "ltg-modal";
     overlay.style.display = "flex";
     overlay.innerHTML = `
       <div class="modal-box">
         <button onclick="document.getElementById('ltg-modal').remove()" style="position:absolute;top:10px;right:15px;font-size:24px;background:none;border:none;cursor:pointer;">&times;</button>
-        <h3>${name} (${date})</h3>
+        <h3>${displayName} (${submissionDate})</h3>
         <p><strong>Letter:</strong></p>
-        <div class="admin-scroll">${content}</div>
+        <div class="admin-scroll">${letterContent}</div>
         <label><strong>Approval Status:</strong><br>
           <select id="ltg-status">
             <option>Pending</option>
@@ -140,15 +172,15 @@
           </select>
         </label><br><br>
         <label><strong>Moderator Comments:</strong><br>
-          <textarea id="ltg-comments" rows="4" style="width:100%;">${comments || ""}</textarea>
+          <textarea id="ltg-comments" rows="4" style="width:100%;">${moderatorComments || ""}</textarea>
         </label><br><br>
         <button id="ltg-save" style="margin-top:1rem;">Save Changes</button>
       </div>
     `;
 
     document.body.appendChild(overlay);
+    document.getElementById("ltg-status").value = approvalStatus;
 
-    document.getElementById("ltg-status").value = status;
     document.getElementById("ltg-save").onclick = () => {
       const newStatus = document.getElementById("ltg-status").value;
       const newComments = document.getElementById("ltg-comments").value;
@@ -156,7 +188,7 @@
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          letterId: id,
+          letterId: letterID,
           approvalStatus: newStatus,
           moderatorComments: newComments
         })
