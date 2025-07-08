@@ -358,7 +358,7 @@
       })
       .then(res => res.text())
       .then(data => {
-        //console.log("✅ Delta update sent:", data);
+        console.log("✅ Delta update sent:", data);
         document.getElementById("ltg-wall-container").innerHTML =
           '<p class="ltg-loading-message">Refreshing Letters...<span class="spinner"></span></p>';
         setTimeout(() => {
