@@ -294,7 +294,6 @@
     });
 
     const sendReactionUpdate = () => {
-      letterId = "";
       postReaction(
         {
           letterID: id,
