@@ -86,17 +86,6 @@
         const records = text.trim().split("|||END|||");
         const letters = [];
         
-        if (!letters || letters.length === 0) {
-          document.getElementById("ltg-admin-table").innerHTML = `
-            <tr>
-              <td colspan="4" style="text-align: center; padding: 2rem;">
-                There are currently no letters awaiting review. Please check back later.
-              </td>
-            </tr>
-          `;
-          return; // Skip further processing
-        }
-      
         records.forEach(raw => {
           if (!raw.trim()) return;
           const parts = raw.split("|");
@@ -127,6 +116,17 @@
             moderatorComments
           });
         });
+
+        if (!letters || letters.length === 0) {
+          document.getElementById("ltg-admin-table").innerHTML = `
+            <tr>
+              <td colspan="4" style="text-align: center; padding: 2rem;">
+                There are currently no letters awaiting review. Please check back later.
+              </td>
+            </tr>
+          `;
+          return; // Skip further processing
+        }
 
         const wrapper = document.createElement("div");
         wrapper.className = "table-wrapper";
