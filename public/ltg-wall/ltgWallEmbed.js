@@ -175,7 +175,7 @@
           return;
         }
 
-        console.log(`Total letters parsed: ${lettersArray.length}`);
+        //console.log(`Total letters parsed: ${lettersArray.length}`);
 
         const wrapper = document.createElement("div");
         wrapper.className = "table-wrapper";
