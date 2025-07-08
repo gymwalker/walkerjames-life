@@ -1,3 +1,4 @@
+
 // ltgAdminEmbed.js (WalkerJames.Life LTG Admin Page Script)
 // Updated to support multi-line Letter Content, reordered field structure, and scrollable Moderator Comments
 
@@ -83,8 +84,6 @@
     fetch("https://hook.us2.make.com/f69bd7qoiatb8ivuw6bl54m5ruarpnk4")
       .then(r => r.text())
       .then(text => {
-        const records = text.trim().split("|||END|||");
-        
         if (!text.includes("|")) {
           container.innerHTML = `
             <div class="ltg-loading-message">
@@ -93,15 +92,16 @@
           `;
           return;
         }
-        
+
+        const records = text.trim().split("|||END|||");
         const letters = [];
-        
+
         records.forEach(raw => {
           if (!raw.trim()) return;
           const parts = raw.split("|");
-      
+
           if (parts.length < 10) return;
-      
+
           const [
             email,
             lastName,
@@ -114,28 +114,24 @@
             submissionDate,
             moderatorCommentsRaw
           ] = parts.map(x => x.trim());
-      
-          const moderatorComments = moderatorCommentsRaw;
-      
+
           letters.push({
             letterID,
             submissionDate,
             displayName: firstName || "Anonymous",
             letterContent,
             approvalStatus,
-            moderatorComments
+            moderatorComments: moderatorCommentsRaw
           });
         });
 
         if (!letters || letters.length === 0) {
-          document.getElementById("ltg-admin-table").innerHTML = `
-            <tr>
-              <td colspan="4" style="text-align: center; padding: 2rem;">
-                There are currently no letters awaiting review. Please check back later.
-              </td>
-            </tr>
+          container.innerHTML = `
+            <div class="ltg-loading-message">
+              There are currently no letters awaiting review. Please check back later.
+            </div>
           `;
-          return; // Skip further processing
+          return;
         }
 
         const wrapper = document.createElement("div");
@@ -208,7 +204,6 @@
 
     document.body.appendChild(overlay);
     document.getElementById("ltg-status").value = approvalStatus;
-    //document.getElementById("ltg-comments").value = moderatorComments;
     document.getElementById("ltg-comments").textContent = moderatorComments;
 
     document.getElementById("ltg-save").onclick = () => {
