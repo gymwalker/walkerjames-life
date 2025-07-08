@@ -1,5 +1,5 @@
 // ltgAdminEmbed.js (WalkerJames.Life LTG Admin Page Script)
-// Updated to support multi-line Letter Content and reordered field structure, with MM/DD/YYYY formatting and full-width Date column
+// Updated to support multi-line Letter Content, reordered field structure, and scrollable Moderator Comments
 
 (function () {
   const css = `
@@ -32,7 +32,8 @@
     .modal-box {
       background: white;
       padding: 2rem;
-      max-width: 600px;
+      max-width: 700px;
+      width: 90%;
       border-radius: 8px;
       position: relative;
     }
@@ -44,9 +45,6 @@
       border-bottom: 1px solid #ccc;
       padding: 0.5rem;
       text-align: left;
-    }
-    th:nth-child(1), td:nth-child(1) {
-      width: 130px;
     }
     .clickable { cursor: pointer; }
     .ltg-loading-message {
@@ -75,12 +73,9 @@
   const container = document.getElementById("ltg-wall-container");
   if (!container) return;
 
-  function formatDate(input) {
-    const parts = input.split("-");
-    if (parts.length === 3) {
-      return `${parts[1]}/${parts[2]}/${parts[0]}`;
-    }
-    return input;
+  function formatDate(isoDate) {
+    const [year, month, day] = isoDate.split("-");
+    return `${month}/${day}/${year}`;
   }
 
   function loadTable() {
@@ -107,12 +102,14 @@
             sharePublicly,
             approvalStatus,
             submissionDate,
-            moderatorComments
+            moderatorCommentsRaw
           ] = buffer.split("|").map(x => x.trim());
+
+          const moderatorComments = moderatorCommentsRaw.replace(/\\n/g, "\n");
 
           letters.push({
             letterID,
-            submissionDate: formatDate(submissionDate),
+            submissionDate,
             displayName: firstName || "Anonymous",
             letterContent,
             approvalStatus,
@@ -128,7 +125,7 @@
         table.innerHTML = `
           <thead>
             <tr>
-              <th>Date</th>
+              <th style="min-width: 110px">Date</th>
               <th>Name</th>
               <th>Letter</th>
               <th>Status</th>
@@ -142,7 +139,7 @@
         letters.forEach(({ letterID, submissionDate, displayName, letterContent, approvalStatus, moderatorComments }) => {
           const row = document.createElement("tr");
           row.innerHTML = `
-            <td>${submissionDate}</td>
+            <td>${formatDate(submissionDate)}</td>
             <td>${displayName}</td>
             <td class="clickable">${letterContent.slice(0, 80)}...</td>
             <td>${approvalStatus}</td>
@@ -171,7 +168,7 @@
     overlay.innerHTML = `
       <div class="modal-box">
         <button onclick="document.getElementById('ltg-modal').remove()" style="position:absolute;top:10px;right:15px;font-size:24px;background:none;border:none;cursor:pointer;">&times;</button>
-        <h3>${displayName} (${submissionDate})</h3>
+        <h3>${displayName} (${formatDate(submissionDate)})</h3>
         <p><strong>Letter:</strong></p>
         <div class="admin-scroll">${letterContent}</div>
         <label><strong>Approval Status:</strong><br>
@@ -183,7 +180,7 @@
           </select>
         </label><br><br>
         <label><strong>Moderator Comments:</strong><br>
-          <textarea id="ltg-comments" rows="4" style="width:100%;">${moderatorComments || ""}</textarea>
+          <textarea id="ltg-comments" rows="6" style="width:100%; white-space:pre-wrap; overflow-y:auto;">${moderatorComments}</textarea>
         </label><br><br>
         <button id="ltg-save" style="margin-top:1rem;">Save Changes</button>
       </div>
