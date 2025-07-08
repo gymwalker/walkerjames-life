@@ -190,7 +190,8 @@
 
     document.body.appendChild(overlay);
     document.getElementById("ltg-status").value = approvalStatus;
-    document.getElementById("ltg-comments").value = moderatorComments;
+    //document.getElementById("ltg-comments").value = moderatorComments;
+    document.getElementById("ltg-comments").textContent = moderatorComments;
 
     document.getElementById("ltg-save").onclick = () => {
       const newStatus = document.getElementById("ltg-status").value;
