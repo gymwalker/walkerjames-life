@@ -338,6 +338,7 @@
       .then(res => res.text())
       .then(data => {
         console.log("✅ Delta update sent:", data);
+        document.getElementById("ltg-wall-container").innerHTML = "<p>Refreshing Letters...</p>";
         setTimeout(() => {
           loadTable();
         }, 2000); // ✅ 2 second wait before reload
