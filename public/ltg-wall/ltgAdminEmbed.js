@@ -1,5 +1,5 @@
 // ltgAdminEmbed.js (WalkerJames.Life LTG Admin Page Script)
-// Updated to support multi-line Letter Content and reordered field structure
+// Updated to support multi-line Letter Content and reordered field structure, with MM/DD/YYYY formatting and full-width Date column
 
 (function () {
   const css = `
@@ -45,6 +45,9 @@
       padding: 0.5rem;
       text-align: left;
     }
+    th:nth-child(1), td:nth-child(1) {
+      width: 130px;
+    }
     .clickable { cursor: pointer; }
     .ltg-loading-message {
       font-size: 1.1rem;
@@ -72,6 +75,14 @@
   const container = document.getElementById("ltg-wall-container");
   if (!container) return;
 
+  function formatDate(input) {
+    const parts = input.split("-");
+    if (parts.length === 3) {
+      return `${parts[1]}/${parts[2]}/${parts[0]}`;
+    }
+    return input;
+  }
+
   function loadTable() {
     container.innerHTML = '<p class="ltg-loading-message">Loading pending letters<span class="spinner"></span></p>';
     fetch("https://hook.us2.make.com/f69bd7qoiatb8ivuw6bl54m5ruarpnk4")
@@ -84,7 +95,7 @@
         lines.forEach(line => {
           buffer += line.trim() + " ";
           const fieldCount = (buffer.match(/\|/g) || []).length;
-          if (fieldCount < 9) return; // wait until we have 9 pipes (10 fields)
+          if (fieldCount < 9) return;
 
           const [
             email,
@@ -101,7 +112,7 @@
 
           letters.push({
             letterID,
-            submissionDate,
+            submissionDate: formatDate(submissionDate),
             displayName: firstName || "Anonymous",
             letterContent,
             approvalStatus,
