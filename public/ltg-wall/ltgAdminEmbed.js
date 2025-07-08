@@ -84,6 +84,16 @@
       .then(r => r.text())
       .then(text => {
         const records = text.trim().split("|||END|||");
+        
+        if (!text.includes("|")) {
+          container.innerHTML = `
+            <div class="ltg-loading-message">
+              There are currently no letters awaiting review or the server returned invalid data.
+            </div>
+          `;
+          return;
+        }
+        
         const letters = [];
         
         records.forEach(raw => {
