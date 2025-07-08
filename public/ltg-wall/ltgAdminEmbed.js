@@ -83,15 +83,15 @@
     fetch("https://hook.us2.make.com/f69bd7qoiatb8ivuw6bl54m5ruarpnk4")
       .then(r => r.text())
       .then(text => {
-        const lines = text.trim().split(/\r?\n/);
+        const records = text.trim().split("|||END|||");
         const letters = [];
-        let buffer = "";
-
-        lines.forEach(line => {
-          buffer += line.trim() + " ";
-          const fieldCount = (buffer.match(/\|/g) || []).length;
-          if (fieldCount < 9) return;
-
+      
+        records.forEach(raw => {
+          if (!raw.trim()) return;
+          const parts = raw.split("|");
+      
+          if (parts.length < 10) return;
+      
           const [
             email,
             lastName,
@@ -103,10 +103,10 @@
             approvalStatus,
             submissionDate,
             moderatorCommentsRaw
-          ] = buffer.split("|").map(x => x.trim());
-
-          const moderatorComments = moderatorCommentsRaw.replace(/\\n/g, "\n");
-
+          ] = parts.map(x => x.trim());
+      
+          const moderatorComments = moderatorCommentsRaw;
+      
           letters.push({
             letterID,
             submissionDate,
@@ -115,8 +115,6 @@
             approvalStatus,
             moderatorComments
           });
-
-          buffer = "";
         });
 
         const wrapper = document.createElement("div");
