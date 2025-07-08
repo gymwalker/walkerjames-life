@@ -87,6 +87,27 @@
     .reaction[data-type] {
       cursor: pointer;
     }
+    .ltg-loading-message {
+      font-size: 1.1rem;
+      font-weight: 500;
+      text-align: center;
+      padding: 1rem;
+      color: #444;
+    }
+    .spinner {
+      display: inline-block;
+      margin-left: 10px;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid #ccc;
+      border-top: 2px solid #333;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   `;
   const style = document.createElement("style");
   style.innerHTML = css;
@@ -96,17 +117,17 @@
   if (!container) return;
 
   function loadTable() {
-    container.innerHTML = "<p>Loading letters…</p>";
-
+    container.innerHTML = '<p class="ltg-loading-message">Loading letters<span class="spinner"></span></p>';
+   
     fetch("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth")
       .then(response => {
-        console.log("Fetch succeeded, status:", response.status);
+        //console.log("Fetch succeeded, status:", response.status);
         return response.text();
       })
       .then(text => {
-        console.log("Raw text received:", text.slice(0, 300));
+        //console.log("Raw text received:", text.slice(0, 300));
         const lines = text.trim().split(/\r?\n/);
-        console.log("Total lines:", lines.length);
+        //console.log("Total lines:", lines.length);
 
         const lettersArray = [];
         let buffer = "";
@@ -116,7 +137,7 @@
           const parts = buffer.split("|");
 
           if (parts.length < 9) {
-            console.log(`Line ${index + 1}: Incomplete, waiting for more...`);
+            //console.log(`Line ${index + 1}: Incomplete, waiting for more...`);
             return;
           }
 
@@ -144,7 +165,7 @@
             brokenHeartsCount
           });
 
-          console.log(`Letter ${letterID} parsed and added.`);
+          //console.log(`Letter ${letterID} parsed and added.`);
           buffer = "";
         });
 
@@ -213,7 +234,7 @@
               );
           }
 
-          console.log(`Row for letter ${letter.letterID} added to table.`);
+          //console.log(`Row for letter ${letter.letterID} added to table.`);
         });
 
         wrapper.appendChild(table);
@@ -337,8 +358,9 @@
       })
       .then(res => res.text())
       .then(data => {
-        console.log("✅ Delta update sent:", data);
-        document.getElementById("ltg-wall-container").innerHTML = "<p>Refreshing Letters...</p>";
+        //console.log("✅ Delta update sent:", data);
+        document.getElementById("ltg-wall-container").innerHTML =
+          '<p class="ltg-loading-message">Refreshing Letters...<span class="spinner"></span></p>';
         setTimeout(() => {
           loadTable();
         }, 2000); // ✅ 2 second wait before reload
