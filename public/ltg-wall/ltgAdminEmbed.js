@@ -180,7 +180,9 @@
           </select>
         </label><br><br>
         <label><strong>Moderator Comments:</strong><br>
-          <textarea id="ltg-comments" rows="6" style="width:100%; white-space:pre-wrap; overflow-y:auto;">${moderatorComments}</textarea>
+          <textarea id="ltg-comments"
+                    rows="10"
+                    style="width:100%; white-space:pre-wrap; overflow-y:auto; resize:vertical; padding:0.5rem; font-family:inherit; font-size:1rem;"></textarea>
         </label><br><br>
         <button id="ltg-save" style="margin-top:1rem;">Save Changes</button>
       </div>
@@ -188,6 +190,7 @@
 
     document.body.appendChild(overlay);
     document.getElementById("ltg-status").value = approvalStatus;
+    document.getElementById("ltg-comments").value = moderatorComments;
 
     document.getElementById("ltg-save").onclick = () => {
       const newStatus = document.getElementById("ltg-status").value;
