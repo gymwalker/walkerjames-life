@@ -14,12 +14,13 @@
   fetch(`https://hook.us2.make.com/vscwqy0qy5qm59gtobrk63m2hovlmf39?LetterID=${encodeURIComponent(letterId)}`)
     .then(response => {
       if (!response.ok) throw new Error('Letter not found');
-      return response.text();  // <-- NOT .json()
+      return response.text(); // plain text response from Make
     })
     .then(text => {
       const fields = text.split('|');
 
-      // Map incoming fields (order must match exactly what Make returns)
+      if (fields.length < 9) throw new Error("Incomplete data returned");
+
       const [
         LetterID,
         DisplayName,
@@ -32,13 +33,12 @@
         BrokenHeartsCount
       ] = fields;
 
-      // Render to container
       container.innerHTML = `
         <div style="font-family: sans-serif; line-height: 1.5; max-width: 800px; margin: auto;">
           <h2>Your Letter to God</h2>
           <hr>
           <p><strong>Letter ID:</strong> ${LetterID}</p>
-          <p><strong>Display Name:</strong> ${DisplayName}</p>
+          <p><strong>Display Name:</strong> ${DisplayName || 'Anonymous'}</p>
           <p><strong>Submitted:</strong> ${SubmissionDate}</p>
           <p><strong>Share Publicly:</strong> Unknown</p>
           <p><strong>Can Respond:</strong> Unknown</p>
