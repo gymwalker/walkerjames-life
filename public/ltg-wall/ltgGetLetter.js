@@ -36,6 +36,9 @@
         BrokenHeartsCount
       ] = fields;
 
+      LetterContent.trimStart()
+      ModeratorComments.trimStart()
+
       container.innerHTML = `
         <div style="font-family: sans-serif; line-height: 1.5; max-width: 800px; margin: auto;">
           <h2>Your Letter to God</h2>
@@ -48,13 +51,13 @@
           <p><strong>Approval Status:</strong> ${ApprovalStatus}</p>
 
           <h3>Letter Content:</h3>
-         <div style="white-space: pre-wrap; border: 1px solid #ccc; padding: 1rem; background: #f9f9f9; height: 18em; overflow-y: auto;">
-          ${LetterContent}
+          <div style="white-space: pre-wrap; border: 1px solid #ccc; padding: 1rem; background: #f9f9f9; height: 18em; overflow-y: auto;">
+            ${LetterContent.trimStart()}
           </div>
 
           <h3>Moderator Comments:</h3>
           <div style="white-space: pre-wrap; border: 1px solid #eee; padding: 1rem; background: #f1f1f1; height: 18em; overflow-y: auto;">
-            ${ModeratorComments || '(none)'}
+            ${(ModeratorComments || '(none)').trimStart()}
           </div>
 
           <hr>
