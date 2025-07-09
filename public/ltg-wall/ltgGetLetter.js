@@ -48,10 +48,14 @@
           <p><strong>Approval Status:</strong> ${ApprovalStatus}</p>
 
           <h3>Letter Content:</h3>
-          <div style="white-space: pre-wrap; border: 1px solid #ccc; padding: 1rem; background: #f9f9f9;">${LetterContent}</div>
+         <div style="white-space: pre-wrap; border: 1px solid #ccc; padding: 1rem; background: #f9f9f9; height: 18em; overflow-y: auto;">
+          ${LetterContent}
+          </div>
 
           <h3>Moderator Comments:</h3>
-          <div style="white-space: pre-wrap; border: 1px solid #eee; padding: 1rem; background: #f1f1f1;">${ModeratorComments || '(none)'}</div>
+          <div style="white-space: pre-wrap; border: 1px solid #eee; padding: 1rem; background: #f1f1f1; height: 18em; overflow-y: auto;">
+            ${ModeratorComments || '(none)'}
+          </div>
 
           <hr>
           <p>
