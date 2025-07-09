@@ -24,10 +24,13 @@
       const [
         LetterID,
         ViewCount,
+        CanRespond,
         DisplayName,
         HeartsCount,
         PrayerCount,
         LetterContent,
+        SharePublicly,
+        ApprovalStatus,
         SubmissionDate,
         ModeratorComments,
         BrokenHeartsCount
@@ -40,9 +43,9 @@
           <p><strong>Letter ID:</strong> ${LetterID}</p>
           <p><strong>Display Name:</strong> ${DisplayName || 'Anonymous'}</p>
           <p><strong>Submitted:</strong> ${SubmissionDate}</p>
-          <p><strong>Share Publicly:</strong> Unknown</p>
-          <p><strong>Can Respond:</strong> Unknown</p>
-          <p><strong>Approval Status:</strong> Unknown</p>
+          <p><strong>Share Publicly:</strong> ${SharePublicly}</p>
+          <p><strong>Can Respond:</strong> ${CanRespond}</p>
+          <p><strong>Approval Status:</strong> ${ApprovalStatus}</p>
 
           <h3>Letter Content:</h3>
           <div style="white-space: pre-wrap; border: 1px solid #ccc; padding: 1rem; background: #f9f9f9;">${LetterContent}</div>
