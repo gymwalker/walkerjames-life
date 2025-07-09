@@ -11,42 +11,38 @@
     return;
   }
 
-  // Call Make webhook with LetterID
   fetch(`https://hook.us2.make.com/vscwqy0qy5qm59gtobrk63m2hovlmf39?LetterID=${encodeURIComponent(letterId)}`)
     .then(response => {
       if (!response.ok) throw new Error('Letter not found');
-      return response.json();
+      return response.text();  // <-- NOT .json()
     })
-    .then(data => {
-      const {
+    .then(text => {
+      const fields = text.split('|');
+
+      // Map incoming fields (order must match exactly what Make returns)
+      const [
         LetterID,
-        SubmissionDate,
-        FirstName,
-        LastName,
-        eMailAddress,
-        LetterContent,
-        ModeratorComments,
         DisplayName,
-        SharePublicly,
-        CanRespond,
-        ApprovalStatus,
         HeartsCount,
         PrayerCount,
-        BrokenHeartsCount,
-        ReadCount
-      } = data;
+        LetterContent,
+        ViewCount,
+        SubmissionDate,
+        ModeratorComments,
+        BrokenHeartsCount
+      ] = fields;
 
+      // Render to container
       container.innerHTML = `
         <div style="font-family: sans-serif; line-height: 1.5; max-width: 800px; margin: auto;">
           <h2>Your Letter to God</h2>
           <hr>
           <p><strong>Letter ID:</strong> ${LetterID}</p>
-          <p><strong>Submitted:</strong> ${SubmissionDate}</p>
-          <p><strong>From:</strong> ${FirstName} ${LastName} (${eMailAddress})</p>
           <p><strong>Display Name:</strong> ${DisplayName}</p>
-          <p><strong>Share Publicly:</strong> ${SharePublicly}</p>
-          <p><strong>Can Respond:</strong> ${CanRespond}</p>
-          <p><strong>Approval Status:</strong> ${ApprovalStatus}</p>
+          <p><strong>Submitted:</strong> ${SubmissionDate}</p>
+          <p><strong>Share Publicly:</strong> Unknown</p>
+          <p><strong>Can Respond:</strong> Unknown</p>
+          <p><strong>Approval Status:</strong> Unknown</p>
 
           <h3>Letter Content:</h3>
           <div style="white-space: pre-wrap; border: 1px solid #ccc; padding: 1rem; background: #f9f9f9;">${LetterContent}</div>
@@ -59,13 +55,13 @@
             ❤️ <strong>Hearts:</strong> ${HeartsCount} &nbsp;&nbsp;
             🙏 <strong>Prayers:</strong> ${PrayerCount} &nbsp;&nbsp;
             💔 <strong>Broken Hearts:</strong> ${BrokenHeartsCount} &nbsp;&nbsp;
-            📖 <strong>Views:</strong> ${ReadCount}
+            📖 <strong>Views:</strong> ${ViewCount}
           </p>
         </div>
       `;
     })
     .catch(error => {
       console.error('Error loading letter:', error);
-      container.innerHTML = `<p style="color: red;">Sorry, we couldn't find your letter. Please check the link.</p>`;
+      container.innerHTML = `<p style="color: red;">Sorry, we couldn't load your letter. Please try again later.</p>`;
     });
 })();
