@@ -23,11 +23,11 @@
 
       const [
         LetterID,
+        ViewCount,
         DisplayName,
         HeartsCount,
         PrayerCount,
         LetterContent,
-        ViewCount,
         SubmissionDate,
         ModeratorComments,
         BrokenHeartsCount
