@@ -122,7 +122,8 @@
     fetch("https://hook.us2.make.com/usth4qxyezk7yfmdnew21ibgjpnzd4nc")
       .then(response => response.text())
       .then(text => {
-        const lines = text.trim().split(/\r?\n/);
+        //const lines = text.trim().split(/\r?\n/);
+        const lines = text.trim().split("|||END|||").map(line => line.trim()).filter(line => line.length > 0);
         const prayersArray = [];
         let buffer = "";
 
