@@ -139,21 +139,21 @@
             heartsCount,
             prayerCount,
             prayerContent,
-            submissionDate,
+            created,
             moderatorComments,
             brokenHeartsCount
           ] = parts.map(x => x.trim());
 
           prayersArray.push({
+            created,
             prayerID,
             viewCount,
             displayName,
             heartsCount,
             prayerCount,
             prayerContent,
-            submissionDate,
-            moderatorComments,
-            brokenHeartsCount
+            brokenHeartsCount,
+            moderatorComments
           });
 
           buffer = "";
@@ -192,7 +192,7 @@
           row.dataset.prayerId = prayer.prayerID;
 
           row.innerHTML = `
-            <td>${prayer.submissionDate}</td>
+            <td>${prayer.created}</td>
             <td>${prayer.displayName}</td>
             <td class="clickable">${prayer.prayerContent.substring(0, 80)}...</td>
             <td>${prayer.moderatorComments.substring(0, 80)}...</td>
@@ -210,7 +210,7 @@
             popupTrigger.onclick = () =>
               showPopup(
                 prayer.displayName,
-                prayer.submissionDate,
+                prayer.created,
                 prayer.prayerContent,
                 prayer.moderatorComments,
                 parseInt(prayer.heartsCount),
@@ -328,7 +328,7 @@
 
   function postReaction(updatedCounts, deltas) {
     if (deltas.prayerId && deltas.prayerId.trim() !== "") {
-      const endpoint = "https://hook.us2.make.com/llyd2p9njx4s7pqb3krotsvb7wbaso4f";
+      const endpoint = "https://hook.us2.make.com/3s4f25oqjtsm7pw4qkxyq114hn25kbq2";
 
       fetch(endpoint, {
         method: "POST",
