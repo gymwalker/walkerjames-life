@@ -135,17 +135,17 @@
           if (parts.length < 9) return;
 
           const [
+            created,
             prayerID,
             viewCount,
             displayName,
             heartsCount,
             prayerCount,
             prayerContent,
-            created,
-            moderatorComments,
-            brokenHeartsCount
+            brokenHeartsCount,
+            moderatorComments
           ] = parts.map(x => x.trim());
-
+          
           prayersArray.push({
             created,
             prayerID,
