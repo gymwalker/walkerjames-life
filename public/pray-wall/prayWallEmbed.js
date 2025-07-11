@@ -119,7 +119,7 @@
   function loadTable() {
     container.innerHTML = '<p class="ltg-loading-message">Loading prayers<span class="spinner"></span></p>';
    
-    fetch("https://hook.us2.make.com/sp9n176kbk7uzawj5uj7255w9ljjznth")
+    fetch("https://hook.us2.make.com/usth4qxyezk7yfmdnew21ibgjpnzd4nc")
       .then(response => response.text())
       .then(text => {
         const lines = text.trim().split(/\r?\n/);
