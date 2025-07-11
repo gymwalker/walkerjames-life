@@ -126,14 +126,6 @@
 
         const lines = text.trim().split("|||END|||").map(line => line.trim()).filter(line => line.length > 0);
         const prayersArray = [];
-        // Reformat created date from ISO to mm/dd/yyyy
-        const formattedDate = (() => {
-          const d = new Date(created);
-          const mm = String(d.getMonth() + 1).padStart(2, '0');
-          const dd = String(d.getDate()).padStart(2, '0');
-          const yyyy = d.getFullYear();
-          return `${mm}/${dd}/${yyyy}`;
-        })();
         
         let buffer = "";
 
@@ -154,6 +146,15 @@
             brokenHeartsCount,
             moderatorComments
           ] = parts.map(x => x.trim());
+
+          // Reformat created date from ISO to mm/dd/yyyy
+          const formattedDate = (() => {
+            const d = new Date(created);
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const yyyy = d.getFullYear();
+            return `${mm}/${dd}/${yyyy}`;
+          })();
           
           prayersArray.push({
             created: formattedDate,
