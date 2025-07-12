@@ -248,6 +248,7 @@
       const parts = date.split("-");
       return parts.length === 3 ? `${parts[1]}/${parts[2]}/${parts[0]}` : date;
     })();
+    console.log("🧪 Popup ID:", id);
 
     let heartDelta = 0;
     let prayerDelta = 0;
@@ -307,6 +308,16 @@
     });
 
     const sendReactionUpdate = () => {
+      const deltas = {
+        prayerId: id,
+        hearts: heartDelta,
+        prayers: prayerDelta,
+        brokenHearts: brokenDelta,
+        views: viewDelta
+      };
+    
+      console.log("📦 Sending deltas:", deltas);
+    
       postReaction(
         {
           prayerID: id,
@@ -315,13 +326,7 @@
           brokenHeartsCount: broken + brokenDelta,
           viewCount: views + viewDelta
         },
-        {
-          prayerId: id,
-          hearts: heartDelta,
-          prayers: prayerDelta,
-          brokenHearts: brokenDelta,
-          views: viewDelta
-        }
+        deltas
       );
     };
 
