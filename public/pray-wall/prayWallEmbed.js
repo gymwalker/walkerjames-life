@@ -256,34 +256,41 @@
     let viewDelta = 1;
 
     const popup = document.createElement("div");
-    popup.style.position = "fixed";
-    popup.style.top = 0;
-    popup.style.left = 0;
-    popup.style.width = "100vw";
-    popup.style.height = "100vh";
-    popup.style.background = "rgba(0,0,0,0.75)";
-    popup.style.zIndex = 9999;
-    popup.style.display = "flex";
-    popup.style.justifyContent = "center";
-    popup.style.alignItems = "center";
-
-    popup.innerHTML = `
-      <div style="background:white;padding:2em;max-width:600px;border-radius:10px;position:relative;">
-        <button style="position:absolute;top:10px;right:15px;font-size:24px;background:none;border:none;cursor:pointer;">&times;</button>
-        <h3>${name}</h3>
-        <p><strong>${formattedDate}</strong></p>
-        <p style="margin-bottom:0.25em;font-weight:bold;">Prayer:</p>
-        <div class="scroll-box">${content}</div>
-        <p style="margin-bottom:0.25em;font-weight:bold;">Moderator Comment:</p>
-        <div class="scroll-box">${moderator || "<em>No moderator comments.</em>"}</div>
-        <div style="margin-top:1em;font-size:1.5em;display:flex;justify-content:space-around;">
-          <div class="reaction" data-type="heart" data-id="${id}">❤️ <span>${hearts}</span></div>
-          <div class="reaction" data-type="pray" data-id="${id}">🙏 <span>${prayers}</span></div>
-          <div class="reaction" data-type="break" data-id="${id}">💔 <span>${broken}</span></div>
-          <div class="reaction read-view" style="pointer-events: none; opacity: 0.6;">📖 <span>${views + 1}</span></div>
+      popup.style.position = "fixed";
+      popup.style.top = 0;
+      popup.style.left = 0;
+      popup.style.width = "100vw";
+      popup.style.height = "100vh";
+      popup.style.background = "rgba(0,0,0,0.75)";
+      popup.style.zIndex = 9999;
+      popup.style.display = "flex";
+      popup.style.justifyContent = "center";
+      popup.style.alignItems = "center";
+      
+      popup.innerHTML = `
+        <div style="background:white;padding:2em;max-width:700px;width:90%;border-radius:10px;position:relative;">
+          <button style="position:absolute;top:10px;right:15px;font-size:24px;background:none;border:none;cursor:pointer;">&times;</button>
+          <h3>${name}</h3>
+          <p><strong>${formattedDate}</strong></p>
+      
+          <p style="margin-bottom:0.25em;font-weight:bold;">Prayer:</p>
+          <div style="max-height:12em;overflow-y:auto;margin-bottom:1rem;padding:0.5rem;background:#f4f4f4;border-radius:4px;">
+            ${content}
+          </div>
+      
+          <p style="margin-bottom:0.25em;font-weight:bold;">Moderator Comment:</p>
+          <div style="max-height:12em;overflow-y:auto;padding:0.5rem;background:#f4f4f4;border-radius:4px;">
+            ${moderator || "<em>No moderator comments.</em>"}
+          </div>
+      
+          <div style="margin-top:1em;font-size:1.5em;display:flex;justify-content:space-around;">
+            <div class="reaction" data-type="heart" data-id="${id}">❤️ <span>${hearts}</span></div>
+            <div class="reaction" data-type="pray" data-id="${id}">🙏 <span>${prayers}</span></div>
+            <div class="reaction" data-type="break" data-id="${id}">💔 <span>${broken}</span></div>
+            <div class="reaction read-view" style="pointer-events: none; opacity: 0.6;">📖 <span>${views + 1}</span></div>
+          </div>
         </div>
-      </div>
-    `;
+      `;
 
     document.body.appendChild(popup);
 
