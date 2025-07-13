@@ -124,7 +124,8 @@
             displayName: firstName || "Anonymous",
             prayerContent,
             status,
-            moderatorComments: moderatorCommentsRaw
+            moderatorComments: moderatorCommentsRaw,
+            canRespond
           });
         });
 
