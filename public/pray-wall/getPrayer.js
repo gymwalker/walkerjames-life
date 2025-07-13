@@ -19,25 +19,24 @@
     .then(text => {
       const fields = text.split('|');
 
-      if (fields.length < 9) throw new Error("Incomplete data returned");
+      if (fields.length < 14) throw new Error("Incomplete data returned");
 
       const [
-        PrayerID,
-        ViewCount,
-        CanRespond,
-        DisplayName,
-        HeartsCount,
-        PrayerCount,
-        PrayerContent,
-        SharePublicly,
-        ApprovalStatus,
-        SubmissionDate,
-        ModeratorComments,
-        BrokenHeartsCount
+        PrayerID,               // 0
+        SubmissionDate,         // 1
+        ApprovalStatus,         // 2
+        DisplayName,            // 3
+        CanRespond,             // 4
+        PrayerContent,          // 5
+        SharePublicly,          // 6
+        PrayerCount,            // 7
+        EmailAddress,           // 8
+        ModeratorComments,      // 9
+        HeartsCount,            // 10
+        ViewCount,              // 11
+        FirstName,              // 12
+        BrokenHeartsCount       // 13
       ] = fields;
-
-      PrayerContent.trimStart();
-      ModeratorComments.trimStart();
 
       container.innerHTML = `
         <div style="font-family: sans-serif; line-height: 1.5; max-width: 800px; margin: auto;">
