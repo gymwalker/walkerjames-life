@@ -179,7 +179,7 @@
       });
   }
 
-  function showModal({ prayerID, submissionDate, displayName, prayerContent, status, moderatorComments }) {
+  function showModal({ prayerID, submissionDate, displayName, prayerContent, status, moderatorComments, canRespond }) {
     const overlay = document.createElement("div");
     overlay.id = "pray-modal";
     overlay.style.display = "flex";
