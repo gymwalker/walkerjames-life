@@ -11,7 +11,7 @@
     return;
   }
 
-  fetch(`https://hook.us2.make.com/bkopq8e6z4qcjiqei4g8cpjab01e5w2h?PrayerID=${encodeURIComponent(prayerId)}`)
+  fetch(`https://hook.us2.make.com/n4o98xm9yv62q3jfve872c3mt7xg14r1?PrayerID=${encodeURIComponent(prayerId)}`)
     .then(response => {
       if (!response.ok) throw new Error('Prayer not found');
       return response.text(); // plain text response from Make
