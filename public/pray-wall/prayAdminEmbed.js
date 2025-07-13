@@ -100,9 +100,8 @@
 
         records.forEach(raw => {
           if (!raw.trim()) return;
-          const parts = raw.split("|");
-
-          if (parts.length < 10) return;
+          const parts = raw.split("|").map(x => x.trim());
+          if (parts.length < 10 || !parts[1] || !parts[4] || !parts[8]) return;
 
           const [
             status,
@@ -128,6 +127,17 @@
             canRespond
           });
         });
+        
+        const validPrayers = prayers.filter(p => p.submissionDate && p.displayName && p.prayerContent);
+        
+        if (validPrayers.length === 0) {
+          container.innerHTML = `
+            <div class="pray-loading-message">
+              There are currently no prayer requests to review... Please check back later!
+            </div>
+          `;
+          return;
+        }
 
         if (!prayers || prayers.length === 0) {
           container.innerHTML = `
