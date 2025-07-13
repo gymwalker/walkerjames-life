@@ -187,13 +187,12 @@
         <button onclick="document.getElementById('pray-modal').remove()" style="position:absolute;top:10px;right:15px;font-size:24px;background:none;border:none;cursor:pointer;">&times;</button>
         <h3>${displayName} (${formatDate(submissionDate)})</h3>
         <p><strong>Prayer Request:</strong></p>
-        <div class="admin-scroll">${prayerContent}</div>
+        <textarea class="admin-scroll" rows="10" readonly style="width:100%; white-space:pre-wrap; font-family:inherit; font-size:1rem;">${prayerContent}</textarea>
         <label><strong>Status:</strong><br>
           <select id="pray-status">
-            <option>Pending</option>
+            <option>New</option>
             <option>Approved</option>
             <option>Rejected</option>
-            <option>Needs Review</option>
           </select>
         </label><br><br>
         <label><strong>Moderator Comments:</strong><br>
