@@ -22,20 +22,21 @@
       if (fields.length < 15) throw new Error("Incomplete data returned");
 
       const [
-        ApprovalStatus,         // 0
-        SubmissionDate,         // 1
-        LastName,               // 2
-        PrayerID,               // 3
-        CanRespond,             // 4
-        DisplayName,            // 5
-        ViewCount,              // 6
-        HeartsCount,            // 7
-        PrayerCount,            // 8
-        EmailAddress,           // 9
-        PrayerContent,          // 10
-        SharePublicly,          // 11
-        BrokenHeartsCount,      // 12
-        ModeratorComments       // 13
+        ApprovalStatus,         
+        SubmissionDate,         
+        LastName,               
+        PrayerID,               
+        FirstName,
+        ViewCount,              
+        CanRespond,             
+        DisplayName,            
+        HeartsCount,            
+        PrayerCount,            
+        EmailAddress,           
+        PrayerContent,          
+        SharePublicly,          
+        BrokenHeartsCount,      
+        ModeratorComments       
       ] = [
         fields[0],
         fields[1],
@@ -50,7 +51,8 @@
         fields[10],
         fields[11],
         fields[12],
-        fields[13] || ''
+        fields[13],
+        fields[14] || ''
       ];
 
       container.innerHTML = `
