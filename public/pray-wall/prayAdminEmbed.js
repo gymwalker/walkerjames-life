@@ -188,6 +188,7 @@
         <h3>${displayName} (${formatDate(submissionDate)})</h3>
         <p><strong>Prayer Request:</strong></p>
         <textarea class="admin-scroll" rows="10" readonly style="width:100%; white-space:pre-wrap; font-family:inherit; font-size:1rem;">${prayerContent}</textarea>
+        <p><strong>Can Respond:</strong> <span id="pray-canrespond"></span></p>
         <label><strong>Status:</strong><br>
           <select id="pray-status">
             <option>New</option>
@@ -207,6 +208,7 @@
     document.body.appendChild(overlay);
     document.getElementById("pray-status").value = status;
     document.getElementById("pray-comments").textContent = moderatorComments;
+    document.getElementById("pray-canrespond").textContent = canRespond;
 
     document.getElementById("pray-save").onclick = () => {
       const newStatus = document.getElementById("pray-status").value;
