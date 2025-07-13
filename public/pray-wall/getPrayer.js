@@ -14,29 +14,44 @@
   fetch(`https://hook.us2.make.com/n4o98xm9yv62q3jfve872c3mt7xg14r1?PrayerID=${encodeURIComponent(prayerId)}`)
     .then(response => {
       if (!response.ok) throw new Error('Prayer not found');
-      return response.text(); // plain text response from Make
+      return response.text();
     })
     .then(text => {
       const fields = text.split('|');
 
-      if (fields.length < 14) throw new Error("Incomplete data returned");
+      if (fields.length < 15) throw new Error("Incomplete data returned");
 
       const [
-        PrayerID,               // 0
+        ApprovalStatus,         // 0
         SubmissionDate,         // 1
-        ApprovalStatus,         // 2
-        DisplayName,            // 3
+        LastName,               // 2
+        PrayerID,               // 3
         CanRespond,             // 4
-        PrayerContent,          // 5
-        SharePublicly,          // 6
-        PrayerCount,            // 7
-        EmailAddress,           // 8
-        ModeratorComments,      // 9
-        HeartsCount,            // 10
-        ViewCount,              // 11
-        FirstName,              // 12
-        BrokenHeartsCount       // 13
-      ] = fields;
+        DisplayName,            // 5
+        ViewCount,              // 6
+        HeartsCount,            // 7
+        PrayerCount,            // 8
+        EmailAddress,           // 9
+        PrayerContent,          // 10
+        SharePublicly,          // 11
+        BrokenHeartsCount,      // 12
+        ModeratorComments       // 13
+      ] = [
+        fields[0],
+        fields[1],
+        fields[2],
+        fields[3],
+        fields[4],
+        fields[5],
+        fields[6],
+        fields[7],
+        fields[8],
+        fields[9],
+        fields[10],
+        fields[11],
+        fields[12],
+        fields[13] || ''
+      ];
 
       container.innerHTML = `
         <div style="font-family: sans-serif; line-height: 1.5; max-width: 800px; margin: auto;">
