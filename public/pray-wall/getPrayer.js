@@ -11,6 +11,15 @@
     return;
   }
 
+  // Helper function to format ISO date into MM/DD/YYYY
+  function formatDate(isoString) {
+    const date = new Date(isoString);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day   = String(date.getDate()).padStart(2, '0');
+    const year  = date.getFullYear();
+    return `${month}/${day}/${year}`;
+  }
+
   fetch(`https://hook.us2.make.com/n4o98xm9yv62q3jfve872c3mt7xg14r1?PrayerID=${encodeURIComponent(prayerId)}`)
     .then(response => {
       if (!response.ok) throw new Error('Prayer not found');
@@ -55,13 +64,15 @@
         fields[14] || ''
       ];
 
+      const formattedDate = formatDate(SubmissionDate);
+
       container.innerHTML = `
         <div style="font-family: sans-serif; line-height: 1.5; max-width: 800px; margin: auto;">
           <h2>Your Prayer Request</h2>
           <hr>
           <p><strong>Prayer ID:</strong> ${PrayerID}</p>
           <p><strong>Display Name:</strong> ${DisplayName || 'Anonymous'}</p>
-          <p><strong>Submitted:</strong> ${SubmissionDate}</p>
+          <p><strong>Submitted:</strong> ${formattedDate}</p>
           <p><strong>Share Publicly:</strong> ${SharePublicly}</p>
           <p><strong>Can Respond:</strong> ${CanRespond}</p>
           <p><strong>Approval Status:</strong> ${ApprovalStatus}</p>
