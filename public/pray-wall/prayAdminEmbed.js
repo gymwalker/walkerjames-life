@@ -102,15 +102,16 @@
           if (parts.length < 10) return;
 
           const [
-            email,
+            status,
+            submissionDate,
             lastName,
             prayerID,
             firstName,
             canRespond,
+            displayName,
+            email,
             prayerContent,
             sharePublicly,
-            status,
-            submissionDate,
             moderatorCommentsRaw
           ] = parts.map(x => x.trim());
 
