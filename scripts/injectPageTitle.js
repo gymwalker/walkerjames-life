@@ -1,16 +1,19 @@
-// injectPageTitle.js
+(function () {
+  const titleText = "Guided Prayers";
 
-document.addEventListener("DOMContentLoaded", function () {
-  const fullTitle = document.title;
-  const cleanTitle = fullTitle.split("|")[0].trim();
+  function injectTitle() {
+    const logoText = document.querySelector("a.logo .logo__text");
+    if (!logoText || document.querySelector(".external-page-title")) return;
 
-  const logoText = document.querySelector("a.logo .logo__text");
-  if (!logoText) return;
+    const titleDiv = document.createElement("div");
+    titleDiv.textContent = titleText;
+    titleDiv.className = "external-page-title";
+    logoText.parentNode.insertBefore(titleDiv, logoText.nextSibling);
 
-  // Avoid duplicate insertions
-  if (document.querySelector(".external-page-title")) return;
+    console.log("✅ Page title injected");
+  }
 
-  // Inject dynamic CSS
+  // Add styling
   const style = document.createElement("style");
   style.textContent = `
     .external-page-title {
@@ -24,11 +27,20 @@ document.addEventListener("DOMContentLoaded", function () {
   `;
   document.head.appendChild(style);
 
-  // Create and inject title element
-  const titleDiv = document.createElement("div");
-  titleDiv.textContent = cleanTitle;
-  titleDiv.className = "external-page-title";
-  logoText.parentNode.insertBefore(titleDiv, logoText.nextSibling);
+  // Inject after DOM ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", injectTitle);
+  } else {
+    injectTitle();
+  }
+
+  // Watch for header rerenders
+  const observer = new MutationObserver(injectTitle);
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
+
+  // Global test flag
   window.injectPageTitleTest = true;
-  console.log("✅ injectPageTitle.js loaded");
-});
+})();
