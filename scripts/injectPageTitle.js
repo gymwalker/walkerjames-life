@@ -29,4 +29,6 @@ document.addEventListener("DOMContentLoaded", function () {
   titleDiv.textContent = cleanTitle;
   titleDiv.className = "external-page-title";
   logoText.parentNode.insertBefore(titleDiv, logoText.nextSibling);
+  window.injectPageTitleTest = true;
+  console.log("✅ injectPageTitle.js loaded");
 });
